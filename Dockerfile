@@ -69,9 +69,7 @@ RUN apk add --no-cache font-noto \
     && rm -rf /apk /tmp/* /var/cache/apk/*
 COPY assets/fonts.conf /etc/fonts/fonts.conf
 
-# URxvt as terminal
-# RUN apk add rxvt-unicode --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/main/ --allow-untrusted
-# COPY assets/urxvt/perl /usr/lib/urxvt/perl
+
 
 # st  as terminal
 RUN apk add --no-cache freetype fontconfig xproto libx11 libxft libxext ncurses \
@@ -111,4 +109,3 @@ EXPOSE 5900 15555 15556 15557 15558
 CMD ["/usr/bin/supervisord","-c","/etc/supervisord.conf"]
 
 
-# docker run -d --restart=always -p 5900:5900 -p 15555:15555 -p 15556:15556 -p 15557:15557 -p 15558:15558 --name ejtraderMT -v ejtraderMT:/data ejtrader/metatrader:5

@@ -5,13 +5,13 @@ The container runs a VNC server on port 5900. This port has to be mapped for VNC
 cd
 vnc login: root password: root
 
-run and build image named as feed and run container named as datafeed
+run and build image named as ejtraderMT and run container named as ejtraderMT
 
 ```bash
 make run
 ```
 
-build image named feed
+build image named ejtraderMT
 
 ```bash
 make build
