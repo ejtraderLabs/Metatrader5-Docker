@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<openbox_menu xmlns="http://openbox.org/"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://openbox.org/
+                file:///usr/share/openbox/menu.xsd">
+
+<menu id="root-menu" label="Openbox 3">
+  <!-- This requires the presence of the 'menu' package to work -->
+  <item label="Terminal">
+    <action name="Execute"><execute>/usr/bin/st</execute></action>
+  </item>
+  <separator />
+  <menu id="client-list-menu" />
+  <item label="Log Out">
+    <action name="Exit">
+      <prompt>yes</prompt>
+    </action>
+  </item>
+</menu>
+
+</openbox_menu>
