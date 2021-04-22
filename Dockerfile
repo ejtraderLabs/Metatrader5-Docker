@@ -90,17 +90,6 @@ COPY assets/start.sh /root/start.sh
 
 RUN apk update && apk add samba-winbind wine && ln -s /usr/bin/wine64 /usr/bin/wine
 
-# Download Winetricks
-RUN wget https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks && chmod +x winetricks && mv winetricks /usr/bin/winetricks
-#RUN winetricks -q vcrun2015 dotnet40
-# Download Mono
-#RUN wget -P /mono http://dl.winehq.org/wine/wine-mono/5.1.1/wine-mono-5.1.1-x86.msi
-# Install Mono Runtime for .NET Applications
-#RUN wine msiexec /i /mono/wine-mono-5.1.1-x86.msi
-# Download gecko
-#RUN wget -P /gecko http://dl.winehq.org/wine/wine-gecko/2.47.1/wine-gecko-2.47.1-x86_64.msi
-#RUN wine msiexec /i /gecko/wine-gecko-2.47.1-x86_64.msi
-#RUN wget -P /vrun https://download.microsoft.com/download/0/6/4/064F84EA-D1DB-4EAA-9A5C-CC2F0FF6A638/vc_redist.x64.exe
 
 
 
