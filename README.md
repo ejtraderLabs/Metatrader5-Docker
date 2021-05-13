@@ -9,13 +9,13 @@ login: root
 password: root
 ```
 
-run and build image named as ejtraderMT and run container named as ejtraderMT
+run and build image named as ejtradermt and run container named as ejtradermt
 
 ```bash
 make run
 ```
 
-build image named ejtraderMT
+build image named ejtradermt
 
 ```bash
 make build
