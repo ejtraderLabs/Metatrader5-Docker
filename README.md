@@ -1,5 +1,5 @@
 # Descrition
- only 250MB docker image smallest  wine image ever! normal docker image only wine size is more than 2GB when this image ever with this image also have python3 and zeromq a normal image would cost you more than 3GB this image with Metatrader inside would cost you only 750mb
+this image is the smallest image available on the internet containing wine64 vnc python3 zeromq authentication openbox gui is less than 250mb
 ## Usage
 
 Metatrader 5 on docker and VNC
