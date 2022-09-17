@@ -309,8 +309,8 @@ private:
    static int        CDenseSolverRFSMaxV2(const int n,const double r2);
    static void       RBasicLUSolve(CMatrixDouble &lua,int &p[],const double scalea,const int n,double &xb[],double &tmp[]);
    static void       SPDBasicCholeskySolve(CMatrixDouble &cha,const double sqrtscalea,const int n,const bool isupper,double &xb[],double &tmp[]);
-   static void       CBasicLUSolve(CMatrixComplex &lua,int &p[],const double scalea,const int n,complex &xb[],complex &tmp[]);
-   static void       HPDBasicCholeskySolve(CMatrixComplex &cha,const double sqrtscalea,const int n,const bool isupper,complex &xb[],complex &tmp[]);
+   static void       CBasicLUSolve(CMatrixComplex &lua,int &p[],const double scalea,const int n,al_complex &xb[],al_complex &tmp[]);
+   static void       HPDBasicCholeskySolve(CMatrixComplex &cha,const double sqrtscalea,const int n,const bool isupper,al_complex &xb[],al_complex &tmp[]);
 public:
    //--- constructor, destructor
                      CDenseSolver(void);
@@ -323,19 +323,19 @@ public:
    static void       RMatrixMixedSolve(CMatrixDouble &a,CMatrixDouble &lua,int &p[],const int n,double &b[],int &info,CDenseSolverReport &rep,double &x[]);
    static void       RMatrixMixedSolveM(CMatrixDouble &a,CMatrixDouble &lua,int &p[],const int n,CMatrixDouble &b,const int m,int &info,CDenseSolverReport &rep,CMatrixDouble &x);
    static void       CMatrixSolveM(CMatrixComplex &a,const int n,CMatrixComplex &b,const int m,const bool rfs,int &info,CDenseSolverReport &rep,CMatrixComplex &x);
-   static void       CMatrixSolve(CMatrixComplex &a,const int n,complex &b[],int &info,CDenseSolverReport &rep,complex &x[]);
+   static void       CMatrixSolve(CMatrixComplex &a,const int n,al_complex &b[],int &info,CDenseSolverReport &rep,al_complex &x[]);
    static void       CMatrixLUSolveM(CMatrixComplex &lua,int &p[],const int n,CMatrixComplex &b,const int m,int &info,CDenseSolverReport &rep,CMatrixComplex &x);
-   static void       CMatrixLUSolve(CMatrixComplex &lua,int &p[],const int n,complex &b[],int &info,CDenseSolverReport &rep,complex &x[]);
+   static void       CMatrixLUSolve(CMatrixComplex &lua,int &p[],const int n,al_complex &b[],int &info,CDenseSolverReport &rep,al_complex &x[]);
    static void       CMatrixMixedSolveM(CMatrixComplex &a,CMatrixComplex &lua,int &p[],const int n,CMatrixComplex &b,const int m,int &info,CDenseSolverReport &rep,CMatrixComplex &x);
-   static void       CMatrixMixedSolve(CMatrixComplex &a,CMatrixComplex &lua,int &p[],const int n,complex &b[],int &info,CDenseSolverReport &rep,complex &x[]);
+   static void       CMatrixMixedSolve(CMatrixComplex &a,CMatrixComplex &lua,int &p[],const int n,al_complex &b[],int &info,CDenseSolverReport &rep,al_complex &x[]);
    static void       SPDMatrixSolveM(CMatrixDouble &a,const int n,const bool isupper,CMatrixDouble &b,const int m,int &info,CDenseSolverReport &rep,CMatrixDouble &x);
    static void       SPDMatrixSolve(CMatrixDouble &a,const int n,const bool isupper,double &b[],int &info,CDenseSolverReport &rep,double &x[]);
    static void       SPDMatrixCholeskySolveM(CMatrixDouble &cha,const int n,const bool isupper,CMatrixDouble &b,const int m,int &info,CDenseSolverReport &rep,CMatrixDouble &x);
    static void       SPDMatrixCholeskySolve(CMatrixDouble &cha,const int n,const bool isupper,double &b[],int &info,CDenseSolverReport &rep,double &x[]);
    static void       HPDMatrixSolveM(CMatrixComplex &a,const int n,const bool isupper,CMatrixComplex &b,const int m,int &info,CDenseSolverReport &rep,CMatrixComplex &x);
-   static void       HPDMatrixSolve(CMatrixComplex &a,const int n,const bool isupper,complex &b[],int &info,CDenseSolverReport &rep,complex &x[]);
+   static void       HPDMatrixSolve(CMatrixComplex &a,const int n,const bool isupper,al_complex &b[],int &info,CDenseSolverReport &rep,al_complex &x[]);
    static void       HPDMatrixCholeskySolveM(CMatrixComplex &cha,const int n,const bool isupper,CMatrixComplex &b,const int m,int &info,CDenseSolverReport &rep,CMatrixComplex &x);
-   static void       HPDMatrixCholeskySolve(CMatrixComplex &cha,const int n,const bool isupper,complex &b[],int &info,CDenseSolverReport &rep,complex &x[]);
+   static void       HPDMatrixCholeskySolve(CMatrixComplex &cha,const int n,const bool isupper,al_complex &b[],int &info,CDenseSolverReport &rep,al_complex &x[]);
    static void       RMatrixSolveLS(CMatrixDouble &a,const int nrows,const int ncols,double &b[],double threshold,int &info,CDenseSolverLSReport &rep,double &x[]);
   };
 //+------------------------------------------------------------------+
@@ -808,8 +808,8 @@ static void CDenseSolver::CMatrixSolveM(CMatrixComplex &a,const int n,
 //|     X       -   same as in RMatrixSolve                          |
 //+------------------------------------------------------------------+
 static void CDenseSolver::CMatrixSolve(CMatrixComplex &a,const int n,
-                                       complex &b[],int &info,
-                                       CDenseSolverReport &rep,complex &x[])
+                                       al_complex &b[],int &info,
+                                       CDenseSolverReport &rep,al_complex &x[])
   {
 //--- create a variable
    int i_=0;
@@ -917,8 +917,8 @@ static void CDenseSolver::CMatrixLUSolveM(CMatrixComplex &lua,int &p[],
 //|     X       -   same as in RMatrixSolve                          |
 //+------------------------------------------------------------------+
 static void CDenseSolver::CMatrixLUSolve(CMatrixComplex &lua,int &p[],
-                                         const int n,complex &b[],int &info,
-                                         CDenseSolverReport &rep,complex &x[])
+                                         const int n,al_complex &b[],int &info,
+                                         CDenseSolverReport &rep,al_complex &x[])
   {
 //--- create matrix
    CMatrixComplex bm;
@@ -1022,9 +1022,9 @@ static void CDenseSolver::CMatrixMixedSolveM(CMatrixComplex &a,CMatrixComplex &l
 //|     X       -   same as in RMatrixSolveM                         |
 //+------------------------------------------------------------------+
 static void CDenseSolver::CMatrixMixedSolve(CMatrixComplex &a,CMatrixComplex &lua,
-                                            int &p[],const int n,complex &b[],
+                                            int &p[],const int n,al_complex &b[],
                                             int &info,CDenseSolverReport &rep,
-                                            complex &x[])
+                                            al_complex &x[])
   {
 //--- create matrix
    CMatrixComplex bm;
@@ -1491,9 +1491,9 @@ static void CDenseSolver::HPDMatrixSolveM(CMatrixComplex &a,const int n,
 //|     X       -   same as in RMatrixSolve                          |
 //+------------------------------------------------------------------+
 static void CDenseSolver::HPDMatrixSolve(CMatrixComplex &a,const int n,
-                                         const bool isupper,complex &b[],
+                                         const bool isupper,al_complex &b[],
                                          int &info,CDenseSolverReport &rep,
-                                         complex &x[])
+                                         al_complex &x[])
   {
 //--- create a variable
    int i_=0;
@@ -1627,9 +1627,9 @@ static void CDenseSolver::HPDMatrixCholeskySolveM(CMatrixComplex &cha,
 //+------------------------------------------------------------------+
 static void CDenseSolver::HPDMatrixCholeskySolve(CMatrixComplex &cha,
                                                  const int n,const bool isupper,
-                                                 complex &b[],int &info,
+                                                 al_complex &b[],int &info,
                                                  CDenseSolverReport &rep,
-                                                 complex &x[])
+                                                 al_complex &x[])
   {
 //--- create a variable
    int i_=0;
@@ -2159,26 +2159,26 @@ static void CDenseSolver::CMatrixLUSolveInternal(CMatrixComplex &lua,int &p[],
                                                  CMatrixComplex &x)
   {
 //--- create variables
-   int     i=0;
-   int     j=0;
-   int     k=0;
-   int     rfs=0;
-   int     nrfs=0;
-   complex v=0;
-   double  verr=0;
-   double  mxb=0;
-   double  scaleright=0;
-   bool    smallerr;
-   bool    terminatenexttime;
-   int     i_=0;
+   int        i=0;
+   int        j=0;
+   int        k=0;
+   int        rfs=0;
+   int        nrfs=0;
+   al_complex v=0;
+   double     verr=0;
+   double     mxb=0;
+   double     scaleright=0;
+   bool       smallerr;
+   bool       terminatenexttime;
+   int        i_=0;
 //--- create arrays
-   complex xc[];
-   complex y[];
-   complex bc[];
-   complex xa[];
-   complex xb[];
-   complex tx[];
-   double  tmpbuf[];
+   al_complex xc[];
+   al_complex y[];
+   al_complex bc[];
+   al_complex xa[];
+   al_complex xb[];
+   al_complex tx[];
+   double     tmpbuf[];
 //--- initialization
    info=0;
 //--- check
@@ -2324,12 +2324,12 @@ static void CDenseSolver::HPDMatrixCholeskySolveInternal(CMatrixComplex &cha,
    double scaleright=0;
    int    i_=0;
 //--- create arrays
-   complex xc[];
-   complex y[];
-   complex bc[];
-   complex xa[];
-   complex xb[];
-   complex tx[];
+   al_complex xc[];
+   al_complex y[];
+   al_complex bc[];
+   al_complex xa[];
+   al_complex xb[];
+   al_complex tx[];
 //--- initialization
    info=0;
 //--- check
@@ -2572,12 +2572,12 @@ static void CDenseSolver::SPDBasicCholeskySolve(CMatrixDouble &cha,
 //+------------------------------------------------------------------+
 static void CDenseSolver::CBasicLUSolve(CMatrixComplex &lua,int &p[],
                                         const double scalea,const int n,
-                                        complex &xb[],complex &tmp[])
+                                        al_complex &xb[],al_complex &tmp[])
   {
 //--- create variables
-   int     i=0;
-   complex v=0;
-   int     i_=0;
+   int        i=0;
+   al_complex v=0;
+   int        i_=0;
 //--- swap
    for(i=0;i<=n-1;i++)
      {
@@ -2622,12 +2622,12 @@ static void CDenseSolver::CBasicLUSolve(CMatrixComplex &lua,int &p[],
 static void CDenseSolver::HPDBasicCholeskySolve(CMatrixComplex &cha,
                                                 const double sqrtscalea,
                                                 const int n,const bool isupper,
-                                                complex &xb[],complex &tmp[])
+                                                al_complex &xb[],al_complex &tmp[])
   {
 //--- create variables
-   int     i=0;
-   complex v=0;
-   int     i_=0;
+   int        i=0;
+   al_complex v=0;
+   int        i_=0;
 //--- A=L*L' or A=U'*U
    if(isupper)
      {

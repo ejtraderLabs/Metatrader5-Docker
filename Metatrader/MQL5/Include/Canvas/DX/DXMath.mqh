@@ -3199,7 +3199,7 @@ void rotate_X(float &out[],uint order,float a,float &in[])
 //| m is the basis function index for the given l value              |
 //|   and ranges from -l to l, inclusive.                            |
 //+------------------------------------------------------------------+
-void DXSHRotate(float &out[],int order,const DXMatrix &matrix,const float &in[])
+void DXSHRotate(float &out[],int order,const DXMatrix &mat,const float &in[])
   {
    float alpha,beta,gamma,sinb,temp[36],temp1[36];
    out[0] = in[0];
@@ -3209,50 +3209,50 @@ void DXSHRotate(float &out[],int order,const DXMatrix &matrix,const float &in[])
 
    if(order <= 3)
      {
-      out[1] = matrix.m[1][1]*in[1] - matrix.m[2][1]*in[2] + matrix.m[0][1]*in[3];
-      out[2] = -matrix.m[1][2]*in[1] + matrix.m[2][2]*in[2] - matrix.m[0][2]*in[3];
-      out[3] = matrix.m[1][0]*in[1] - matrix.m[2][0]*in[2] + matrix.m[0][0]*in[3];
+      out[1] = mat.m[1][1]*in[1] - mat.m[2][1]*in[2] + mat.m[0][1]*in[3];
+      out[2] = -mat.m[1][2]*in[1] + mat.m[2][2]*in[2] - mat.m[0][2]*in[3];
+      out[3] = mat.m[1][0]*in[1] - mat.m[2][0]*in[2] + mat.m[0][0]*in[3];
 
       if(order == 3)
         {
          float coeff[12]= {};
-         coeff[0] = matrix.m[1][0]*matrix.m[0][0];
-         coeff[1] = matrix.m[1][1]*matrix.m[0][1];
-         coeff[2] = matrix.m[1][1]*matrix.m[2][1];
-         coeff[3] = matrix.m[1][0]*matrix.m[2][0];
-         coeff[4] = matrix.m[2][0]*matrix.m[2][0];
-         coeff[5] = matrix.m[2][1]*matrix.m[2][1];
-         coeff[6] = matrix.m[0][0]*matrix.m[2][0];
-         coeff[7] = matrix.m[0][1]*matrix.m[2][1];
-         coeff[8] = matrix.m[0][1]*matrix.m[0][1];
-         coeff[9] = matrix.m[1][0]*matrix.m[1][0];
-         coeff[10] = matrix.m[1][1]*matrix.m[1][1];
-         coeff[11] = matrix.m[0][0]*matrix.m[0][0];
+         coeff[0] = mat.m[1][0]*mat.m[0][0];
+         coeff[1] = mat.m[1][1]*mat.m[0][1];
+         coeff[2] = mat.m[1][1]*mat.m[2][1];
+         coeff[3] = mat.m[1][0]*mat.m[2][0];
+         coeff[4] = mat.m[2][0]*mat.m[2][0];
+         coeff[5] = mat.m[2][1]*mat.m[2][1];
+         coeff[6] = mat.m[0][0]*mat.m[2][0];
+         coeff[7] = mat.m[0][1]*mat.m[2][1];
+         coeff[8] = mat.m[0][1]*mat.m[0][1];
+         coeff[9] = mat.m[1][0]*mat.m[1][0];
+         coeff[10] = mat.m[1][1]*mat.m[1][1];
+         coeff[11] = mat.m[0][0]*mat.m[0][0];
 
-         out[4] = (matrix.m[1][1]*matrix.m[0][0] + matrix.m[0][1]*matrix.m[1][0])*in[4];
-         out[4] -= (matrix.m[1][0]*matrix.m[2][1] + matrix.m[1][1]*matrix.m[2][0])*in[5];
-         out[4] += 1.7320508076f*matrix.m[2][0]*matrix.m[2][1]*in[6];
-         out[4] -= (matrix.m[0][1]*matrix.m[2][0] + matrix.m[0][0]*matrix.m[2][1])*in[7];
-         out[4] += (matrix.m[0][0]*matrix.m[0][1] - matrix.m[1][0]*matrix.m[1][1])*in[8];
+         out[4] = (mat.m[1][1]*mat.m[0][0] + mat.m[0][1]*mat.m[1][0])*in[4];
+         out[4] -= (mat.m[1][0]*mat.m[2][1] + mat.m[1][1]*mat.m[2][0])*in[5];
+         out[4] += 1.7320508076f*mat.m[2][0]*mat.m[2][1]*in[6];
+         out[4] -= (mat.m[0][1]*mat.m[2][0] + mat.m[0][0]*mat.m[2][1])*in[7];
+         out[4] += (mat.m[0][0]*mat.m[0][1] - mat.m[1][0]*mat.m[1][1])*in[8];
 
-         out[5] = (matrix.m[1][1]*matrix.m[2][2] + matrix.m[1][2]*matrix.m[2][1])*in[5];
-         out[5] -= (matrix.m[1][1]*matrix.m[0][2] + matrix.m[1][2]*matrix.m[0][1])*in[4];
-         out[5] -= 1.7320508076f*matrix.m[2][2]*matrix.m[2][1]*in[6];
-         out[5] += (matrix.m[0][2]*matrix.m[2][1] + matrix.m[0][1]*matrix.m[2][2])*in[7];
-         out[5] -= (matrix.m[0][1]*matrix.m[0][2] - matrix.m[1][1]*matrix.m[1][2])*in[8];
+         out[5] = (mat.m[1][1]*mat.m[2][2] + mat.m[1][2]*mat.m[2][1])*in[5];
+         out[5] -= (mat.m[1][1]*mat.m[0][2] + mat.m[1][2]*mat.m[0][1])*in[4];
+         out[5] -= 1.7320508076f*mat.m[2][2]*mat.m[2][1]*in[6];
+         out[5] += (mat.m[0][2]*mat.m[2][1] + mat.m[0][1]*mat.m[2][2])*in[7];
+         out[5] -= (mat.m[0][1]*mat.m[0][2] - mat.m[1][1]*mat.m[1][2])*in[8];
 
-         out[6] = (matrix.m[2][2]*matrix.m[2][2] - 0.5f*(coeff[4] + coeff[5]))*in[6];
-         out[6] -= (0.5773502692f*(coeff[0] + coeff[1]) - 1.1547005384f*matrix.m[1][2]*matrix.m[0][2])*in[4];
-         out[6] += (0.5773502692f*(coeff[2] + coeff[3]) - 1.1547005384f*matrix.m[1][2]*matrix.m[2][2])*in[5];
-         out[6] += (0.5773502692f*(coeff[6] + coeff[7]) - 1.1547005384f*matrix.m[0][2]*matrix.m[2][2])*in[7];
+         out[6] = (mat.m[2][2]*mat.m[2][2] - 0.5f*(coeff[4] + coeff[5]))*in[6];
+         out[6] -= (0.5773502692f*(coeff[0] + coeff[1]) - 1.1547005384f*mat.m[1][2]*mat.m[0][2])*in[4];
+         out[6] += (0.5773502692f*(coeff[2] + coeff[3]) - 1.1547005384f*mat.m[1][2]*mat.m[2][2])*in[5];
+         out[6] += (0.5773502692f*(coeff[6] + coeff[7]) - 1.1547005384f*mat.m[0][2]*mat.m[2][2])*in[7];
          out[6] += (0.2886751347f*(coeff[9] - coeff[8] + coeff[10] - coeff[11]) - 0.5773502692f*
-                    (matrix.m[1][2]*matrix.m[1][2] - matrix.m[0][2]*matrix.m[0][2]))*in[8];
+                    (mat.m[1][2]*mat.m[1][2] - mat.m[0][2]*mat.m[0][2]))*in[8];
 
-         out[7] = (matrix.m[0][0]*matrix.m[2][2] + matrix.m[0][2]*matrix.m[2][0])*in[7];
-         out[7] -= (matrix.m[1][0]*matrix.m[0][2] + matrix.m[1][2]*matrix.m[0][0])*in[4];
-         out[7] += (matrix.m[1][0]*matrix.m[2][2] + matrix.m[1][2]*matrix.m[2][0])*in[5];
-         out[7] -= 1.7320508076f*matrix.m[2][2]*matrix.m[2][0]*in[6];
-         out[7] -= (matrix.m[0][0]*matrix.m[0][2] - matrix.m[1][0]*matrix.m[1][2])*in[8];
+         out[7] = (mat.m[0][0]*mat.m[2][2] + mat.m[0][2]*mat.m[2][0])*in[7];
+         out[7] -= (mat.m[1][0]*mat.m[0][2] + mat.m[1][2]*mat.m[0][0])*in[4];
+         out[7] += (mat.m[1][0]*mat.m[2][2] + mat.m[1][2]*mat.m[2][0])*in[5];
+         out[7] -= 1.7320508076f*mat.m[2][2]*mat.m[2][0]*in[6];
+         out[7] -= (mat.m[0][0]*mat.m[0][2] - mat.m[1][0]*mat.m[1][2])*in[8];
 
          out[8] = 0.5f*(coeff[11] - coeff[8] - coeff[9] + coeff[10])*in[8];
          out[8] += (coeff[0] - coeff[1])*in[4];
@@ -3263,16 +3263,16 @@ void DXSHRotate(float &out[],int order,const DXMatrix &matrix,const float &in[])
       return;
      }
 
-   if((float)fabs(matrix.m[2][2]) != 1.0f)
+   if((float)fabs(mat.m[2][2]) != 1.0f)
      {
-      sinb = (float)sqrt(1.0f - matrix.m[2][2]*matrix.m[2][2]);
-      alpha = (float)atan2(matrix.m[2][1] / sinb,matrix.m[2][0] / sinb);
-      beta = (float)atan2(sinb,matrix.m[2][2]);
-      gamma = (float)atan2(matrix.m[1][2] / sinb,-matrix.m[0][2] / sinb);
+      sinb = (float)sqrt(1.0f - mat.m[2][2]*mat.m[2][2]);
+      alpha = (float)atan2(mat.m[2][1] / sinb,mat.m[2][0] / sinb);
+      beta = (float)atan2(sinb,mat.m[2][2]);
+      gamma = (float)atan2(mat.m[1][2] / sinb,-mat.m[0][2] / sinb);
      }
    else
      {
-      alpha = (float)atan2(matrix.m[0][1],matrix.m[0][0]);
+      alpha = (float)atan2(mat.m[0][1],mat.m[0][0]);
       beta = 0.0f;
       gamma = 0.0f;
      }

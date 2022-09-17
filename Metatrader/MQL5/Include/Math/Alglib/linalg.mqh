@@ -48,7 +48,7 @@ private:
    static void       RMatrixLeftTrsM2(const int m,const int n,CMatrixDouble &a,const int i1,const int j1,const bool isUpper,const bool isUnit,const int optype,CMatrixDouble &x,const int i2,const int j2);
    //--- complex numbers
    static void       CMatrixSyrk2(const int n,const int k,const double alpha,const CMatrixComplex &a,const int ia,const int ja,const int optypea,const double beta,CMatrixComplex &c,const int ic,const int jc,const bool isUpper);
-   static void       CMatrixGemmk(const int m,const int n,const int k,complex &alpha,const CMatrixComplex &a,const int ia,const int ja,const int optypea,const CMatrixComplex &b,const int ib,const int jb,const int optypeb,complex &beta,CMatrixComplex &c,const int ic,const int jc);
+   static void       CMatrixGemmk(const int m,const int n,const int k,al_complex &alpha,const CMatrixComplex &a,const int ia,const int ja,const int optypea,const CMatrixComplex &b,const int ib,const int jb,const int optypeb,al_complex &beta,CMatrixComplex &c,const int ic,const int jc);
    static void       CMatrixRightTrsM2(const int m,const int n,CMatrixComplex &a,const int i1,const int j1,const bool isUpper,const bool isUnit,const int optype,CMatrixComplex &x,const int i2,const int j2);
    static void       CMatrixLeftTrsM2(const int m,const int n,CMatrixComplex &a,const int i1,const int j1,const bool isUpper,const bool isUnit,const int optype,CMatrixComplex &x,const int i2,const int j2);
 public:
@@ -72,11 +72,11 @@ public:
    static void       RMatrixLeftTrsM(const int m,const int n,CMatrixDouble &a,const int i1,const int j1,const bool isUpper,const bool isUnit,const int optype,CMatrixDouble &x,const int i2,const int j2);
    //--- complex numbers
    static void       CMatrixSyrk(const int n,const int k,const double alpha,CMatrixComplex &a,const int ia,const int ja,const int optypea,const double beta,CMatrixComplex &c,const int ic,const int jc,const bool isUpper);
-   static void       CMatrixGemm(const int m,const int n,const int k,complex &alpha,CMatrixComplex &a,const int ia,const int ja,const int optypea,CMatrixComplex &b,const int ib,const int jb,const int optypeb,complex &beta,CMatrixComplex &c,const int ic,const int jc);
+   static void       CMatrixGemm(const int m,const int n,const int k,al_complex &alpha,CMatrixComplex &a,const int ia,const int ja,const int optypea,CMatrixComplex &b,const int ib,const int jb,const int optypeb,al_complex &beta,CMatrixComplex &c,const int ic,const int jc);
    static void       CMatrixTranspose(const int m,const int n,const CMatrixComplex &a,const int ia,const int ja,CMatrixComplex &b,const int ib,const int jb);
    static void       CMatrixCopy(const int m,const int n,const CMatrixComplex &a,const int ia,const int ja,CMatrixComplex &b,const int ib,const int jb);
-   static void       CMatrixRank1(const int m,const int n,CMatrixComplex &a,const int ia,const int ja,const complex &u[],const int iu,const complex &v[],const int iv);
-   static void       CMatrixMVect(const int m,const int n,const CMatrixComplex &a,const int ia,const int ja,const int opa,const complex &x[],const int ix,complex &y[],const int iy);
+   static void       CMatrixRank1(const int m,const int n,CMatrixComplex &a,const int ia,const int ja,const al_complex &u[],const int iu,const al_complex &v[],const int iv);
+   static void       CMatrixMVect(const int m,const int n,const CMatrixComplex &a,const int ia,const int ja,const int opa,const al_complex &x[],const int ix,al_complex &y[],const int iy);
    static void       CMatrixRightTrsM(const int m,const int n,CMatrixComplex &a,const int i1,const int j1,const bool isUpper,const bool isUnit,const int optype,CMatrixComplex &x,const int i2,const int j2);
    static void       CMatrixLeftTrsM(const int m,const int n,CMatrixComplex &a,const int i1,const int j1,const bool isUpper,const bool isUnit,const int optype,CMatrixComplex &x,const int i2,const int j2);
   };
@@ -791,17 +791,17 @@ static void CAblas::RMatrixCopy(const int m,const int n,const CMatrixDouble &a,
 //|     IV  -   subvector offset                                     |
 //+------------------------------------------------------------------+
 static void CAblas::CMatrixRank1(const int m,const int n,CMatrixComplex &a,
-                                 const int ia,const int ja,const complex &u[],
-                                 const int iu,const complex &v[],const int iv)
+                                 const int ia,const int ja,const al_complex &u[],
+                                 const int iu,const al_complex &v[],const int iv)
   {
 //--- check
    if(m==0 || n==0)
       return;
 //--- create variables
-   int     i=0;
-   complex s=0;
-   int     i_=0;
-   int     i1_=0;
+   int        i=0;
+   al_complex s=0;
+   int        i_=0;
+   int        i1_=0;
 //--- correction
    for(i=0;i<m;i++)
      {
@@ -869,14 +869,14 @@ static void CAblas::RMatrixRank1(const int m,const int n,CMatrixDouble &a,
 //+------------------------------------------------------------------+
 static void CAblas::CMatrixMVect(const int m,const int n,const CMatrixComplex &a,
                                  const int ia,const int ja,const int opa,
-                                 const complex &x[],const int ix,complex &y[],
+                                 const al_complex &x[],const int ix,al_complex &y[],
                                  const int iy)
   {
 //--- create variables
-   int     i=0;
-   complex v=0;
-   int     i_=0;
-   int     i1_=0;
+   int        i=0;
+   al_complex v=0;
+   int        i_=0;
+   int        i1_=0;
 //--- check
    if(m==0)
       return;
@@ -1041,11 +1041,11 @@ static void CAblas::CMatrixRightTrsM(const int m,const int n,CMatrixComplex &a,
                                      CMatrixComplex &x,const int i2,const int j2)
   {
 //--- create variables
-   complex Alpha(-1,0);
-   complex Beta(1,0);
-   int     s1=0;
-   int     s2=0;
-   int     bs=AblasComplexBlockSize();
+   al_complex Alpha(-1,0);
+   al_complex Beta(1,0);
+   int        s1=0;
+   int        s2=0;
+   int        bs=AblasComplexBlockSize();
 //--- check
    if(m<=bs && n<=bs)
      {
@@ -1154,11 +1154,11 @@ static void CAblas::CMatrixLeftTrsM(const int m,const int n,CMatrixComplex &a,
                                     CMatrixComplex &x,const int i2,const int j2)
   {
 //--- create variables
-   complex Alpha(-1,0);
-   complex Beta(1,0);
-   int s1=0;
-   int s2=0;
-   int bs=AblasComplexBlockSize();
+   al_complex Alpha(-1,0);
+   al_complex Beta(1,0);
+   int        s1=0;
+   int        s2=0;
+   int        bs=AblasComplexBlockSize();
 //--- check
    if(m<=bs && n<=bs)
      {
@@ -1435,11 +1435,11 @@ static void CAblas::CMatrixSyrk(const int n,const int k,const double alpha,
                                 const int ic,const int jc,const bool isUpper)
   {
 //--- create variables
-   complex Alpha(alpha,0);
-   complex Beta(beta,0);
-   int     s1=0;
-   int     s2=0;
-   int     bs=AblasComplexBlockSize();
+   al_complex Alpha(alpha,0);
+   al_complex Beta(beta,0);
+   int        s1=0;
+   int        s2=0;
+   int        bs=AblasComplexBlockSize();
 //--- check
    if(n<=bs && k<=bs)
      {
@@ -1546,17 +1546,17 @@ static void CAblas::CMatrixSyrk(const int n,const int k,const double alpha,
 //|     IC      -   submatrix offset                                 |
 //|     JC      -   submatrix offset                                 |
 //+------------------------------------------------------------------+
-static void CAblas::CMatrixGemm(const int m,const int n,const int k,complex &alpha,
+static void CAblas::CMatrixGemm(const int m,const int n,const int k,al_complex &alpha,
                                 CMatrixComplex &a,const int ia,const int ja,
                                 const int optypea,CMatrixComplex &b,const int ib,
-                                const int jb,const int optypeb,complex &beta,
+                                const int jb,const int optypeb,al_complex &beta,
                                 CMatrixComplex &c,const int ic,const int jc)
   {
 //--- create variables
-   complex Beta(1,0);
-   int     s1=0;
-   int     s2=0;
-   int     bs=AblasComplexBlockSize();
+   al_complex Beta(1,0);
+   int        s1=0;
+   int        s2=0;
+   int        bs=AblasComplexBlockSize();
 //--- check
    if(m<=bs && n<=bs && k<=bs)
      {
@@ -1643,12 +1643,12 @@ static void CAblas::CMatrixRightTrsM2(const int m,const int n,CMatrixComplex &a,
    if(n*m==0)
       return;
 //--- create variables
-   int     i=0;
-   int     j=0;
-   complex vc=0;
-   complex vd=0;
-   int     i_=0;
-   int     i1_=0;
+   int        i=0;
+   int        j=0;
+   al_complex vc=0;
+   al_complex vd=0;
+   int        i_=0;
+   int        i1_=0;
 //--- General case
    if(isUpper)
      {
@@ -1835,12 +1835,12 @@ static void CAblas::CMatrixLeftTrsM2(const int m,const int n,CMatrixComplex &a,
    if(n*m==0)
       return;
 //--- create variables
-   complex Beta(1,0);
-   int     i=0;
-   int     j=0;
-   complex vc=0;
-   complex vd=0;
-   int     i_=0;
+   al_complex Beta(1,0);
+   int        i=0;
+   int        j=0;
+   al_complex vc=0;
+   al_complex vd=0;
+   int        i_=0;
 //--- General case
    if(isUpper)
      {
@@ -2264,16 +2264,16 @@ static void CAblas::CMatrixSyrk2(const int n,const int k,const double alpha,
    if((alpha==0 || k==0) && beta==1)
       return;
 //--- create variables
-   complex Alpha(alpha,0);
-   complex Beta(beta,0);
-   complex Zero(0,0);
-   int     i=0;
-   int     j=0;
-   int     j1=0;
-   int     j2=0;
-   complex v=0;
-   int     i_=0;
-   int     i1_=0;
+   al_complex Alpha(alpha,0);
+   al_complex Beta(beta,0);
+   al_complex Zero(0,0);
+   int        i=0;
+   int        j=0;
+   int        j1=0;
+   int        j2=0;
+   al_complex v=0;
+   int        i_=0;
+   int        i1_=0;
 //--- check
    if(optypea==0)
      {
@@ -2370,22 +2370,22 @@ static void CAblas::CMatrixSyrk2(const int n,const int k,const double alpha,
 //+------------------------------------------------------------------+
 //| GEMM kernel                                                      |
 //+------------------------------------------------------------------+
-static void CAblas::CMatrixGemmk(const int m,const int n,const int k,complex &alpha,
+static void CAblas::CMatrixGemmk(const int m,const int n,const int k,al_complex &alpha,
                                  const CMatrixComplex &a,const int ia,const int ja,
                                  const int optypea,const CMatrixComplex &b,const int ib,
-                                 const int jb,const int optypeb,complex &beta,
+                                 const int jb,const int optypeb,al_complex &beta,
                                  CMatrixComplex &c,const int ic,const int jc)
   {
 //--- check
    if(m*n==0)
       return;
 //--- create variables
-   complex Zero(0,0);
-   int     i=0;
-   int     j=0;
-   complex v=0;
-   int     i_=0;
-   int     i1_=0;
+   al_complex Zero(0,0);
+   int        i=0;
+   int        j=0;
+   al_complex v=0;
+   int        i_=0;
+   int        i1_=0;
 //--- special case
    if(k==0)
      {
@@ -2583,10 +2583,10 @@ private:
    //--- private methods
    static void       RMatrixQRBaseCase(CMatrixDouble &a,const int m,const int n,double &work[],double &t[],double &tau[]);
    static void       RMatrixLQBaseCase(CMatrixDouble &a,const int m,const int n,double &work[],double &t[],double &tau[]);
-   static void       CMatrixQRBaseCase(CMatrixComplex &a,const int m,const int n,complex &work[],complex &t[],complex &tau[]);
-   static void       CMatrixLQBaseCase(CMatrixComplex &a,const int m,const int n,complex &work[],complex &t[],complex &tau[]);
+   static void       CMatrixQRBaseCase(CMatrixComplex &a,const int m,const int n,al_complex &work[],al_complex &t[],al_complex &tau[]);
+   static void       CMatrixLQBaseCase(CMatrixComplex &a,const int m,const int n,al_complex &work[],al_complex &t[],al_complex &tau[]);
    static void       RMatrixBlockReflector(CMatrixDouble &a,double &tau[],const bool columnwisea,const int lengtha,const int blocksize,CMatrixDouble &t,double &work[]);
-   static void       CMatrixBlockReflector(CMatrixComplex &a,complex &tau[],const bool columnwisea,const int lengtha,const int blocksize,CMatrixComplex &t,complex &work[]);
+   static void       CMatrixBlockReflector(CMatrixComplex &a,al_complex &tau[],const bool columnwisea,const int lengtha,const int blocksize,CMatrixComplex &t,al_complex &work[]);
 public:
    //--- constructor, destructor
                      COrtFac(void);
@@ -2610,14 +2610,14 @@ public:
    static void       SMatrixTD(CMatrixDouble &a,const int n,const bool isupper,double &tau[],double &d[],double &e[]);
    static void       SMatrixTDUnpackQ(CMatrixDouble &a,const int n,const bool isupper,double &tau[],CMatrixDouble &q);
    //--- complex matrix
-   static void       CMatrixQR(CMatrixComplex &a,const int m,const int n,complex &tau[]);
-   static void       CMatrixLQ(CMatrixComplex &a,const int m,const int n,complex &tau[]);
-   static void       CMatrixQRUnpackQ(CMatrixComplex &a,const int m,const int n,complex &tau[],const int qcolumns,CMatrixComplex &q);
+   static void       CMatrixQR(CMatrixComplex &a,const int m,const int n,al_complex &tau[]);
+   static void       CMatrixLQ(CMatrixComplex &a,const int m,const int n,al_complex &tau[]);
+   static void       CMatrixQRUnpackQ(CMatrixComplex &a,const int m,const int n,al_complex &tau[],const int qcolumns,CMatrixComplex &q);
    static void       CMatrixQRUnpackR(CMatrixComplex &a,const int m,const int n,CMatrixComplex &r);
-   static void       CMatrixLQUnpackQ(CMatrixComplex &a,const int m,const int n,complex &tau[],const int qrows,CMatrixComplex &q);
+   static void       CMatrixLQUnpackQ(CMatrixComplex &a,const int m,const int n,al_complex &tau[],const int qrows,CMatrixComplex &q);
    static void       CMatrixLQUnpackL(CMatrixComplex &a,const int m,const int n,CMatrixComplex &l);
-   static void       HMatrixTD(CMatrixComplex &a,const int n,const bool isupper,complex &tau[],double &d[],double &e[]);
-   static void       HMatrixTDUnpackQ(CMatrixComplex &a,const int n,const bool isupper,complex &tau[],CMatrixComplex &q);
+   static void       HMatrixTD(CMatrixComplex &a,const int n,const bool isupper,al_complex &tau[],double &d[],double &e[]);
+   static void       HMatrixTDUnpackQ(CMatrixComplex &a,const int n,const bool isupper,al_complex &tau[],CMatrixComplex &q);
   };
 //+------------------------------------------------------------------+
 //| Constructor without parameters                                   |
@@ -2876,30 +2876,30 @@ static void COrtFac::RMatrixLQ(CMatrixDouble &a,const int m,const int n,double &
 //|      Courant Institute, Argonne National Lab, and Rice University|
 //|      September 30, 1994                                          |
 //+------------------------------------------------------------------+
-static void COrtFac::CMatrixQR(CMatrixComplex &a,const int m,const int n,complex &tau[])
+static void COrtFac::CMatrixQR(CMatrixComplex &a,const int m,const int n,al_complex &tau[])
   {
 //--- check
    if(m<=0 || n<=0)
       return;
 //--- create arrays
-   complex work[];
-   complex t[];
-   complex taubuf[];
+   al_complex work[];
+   al_complex t[];
+   al_complex taubuf[];
 //--- create matrix
    CMatrixComplex tmpa;
    CMatrixComplex tmpt;
    CMatrixComplex tmpr;
 //--- create variables
-   int     minmn=MathMin(m,n);;
-   int     blockstart=0;
-   int     blocksize=0;
-   int     rowscount=0;
-   int     i=0;
-   int     i_=0;
-   int     i1_=0;
-   complex One(1,0);
-   complex Alpha(1,0);
-   complex Beta(0,0);
+   int        minmn=MathMin(m,n);;
+   int        blockstart=0;
+   int        blocksize=0;
+   int        rowscount=0;
+   int        i=0;
+   int        i_=0;
+   int        i1_=0;
+   al_complex One(1,0);
+   al_complex Alpha(1,0);
+   al_complex Beta(0,0);
 //--- allocation
    ArrayResizeAL(work,MathMax(m,n)+1);
    ArrayResizeAL(t,MathMax(m,n)+1);
@@ -2983,30 +2983,30 @@ static void COrtFac::CMatrixQR(CMatrixComplex &a,const int m,const int n,complex
 //|      Courant Institute, Argonne National Lab, and Rice University|
 //|      September 30, 1994                                          |
 //+------------------------------------------------------------------+
-static void COrtFac::CMatrixLQ(CMatrixComplex &a,const int m,const int n,complex &tau[])
+static void COrtFac::CMatrixLQ(CMatrixComplex &a,const int m,const int n,al_complex &tau[])
   {
 //--- check
    if(m<=0 || n<=0)
       return;
 //--- create arrays
-   complex work[];
-   complex t[];
-   complex taubuf[];
+   al_complex work[];
+   al_complex t[];
+   al_complex taubuf[];
 //--- create matrix
    CMatrixComplex tmpa;
    CMatrixComplex tmpt;
    CMatrixComplex tmpr;
 //--- create variables
-   int     minmn=MathMin(m,n);
-   int     blockstart=0;
-   int     blocksize=0;
-   int     columnscount=0;
-   int     i=0;
-   int     i_=0;
-   int     i1_=0;
-   complex One(1,0);
-   complex Alpha(1,0);
-   complex Beta(0,0);
+   int        minmn=MathMin(m,n);
+   int        blockstart=0;
+   int        blocksize=0;
+   int        columnscount=0;
+   int        i=0;
+   int        i_=0;
+   int        i1_=0;
+   al_complex One(1,0);
+   al_complex Alpha(1,0);
+   al_complex Beta(0,0);
 //--- allocation
    ArrayResizeAL(work,MathMax(m,n)+1);
    ArrayResizeAL(t,MathMax(m,n)+1);
@@ -3377,7 +3377,7 @@ static void COrtFac::RMatrixLQUnpackL(CMatrixDouble &a,const int m,const int n,C
 //|                     If QColumns=0, array isn't changed.          |
 //+------------------------------------------------------------------+
 static void COrtFac::CMatrixQRUnpackQ(CMatrixComplex &a,const int m,const int n,
-                                      complex &tau[],const int qcolumns,CMatrixComplex &q)
+                                      al_complex &tau[],const int qcolumns,CMatrixComplex &q)
   {
 //--- check
    if(!CAp::Assert(qcolumns<=m,__FUNCTION__+": QColumns>M!"))
@@ -3386,25 +3386,25 @@ static void COrtFac::CMatrixQRUnpackQ(CMatrixComplex &a,const int m,const int n,
    if(m<=0 || n<=0)
       return;
 //--- create arrays
-   complex work[];
-   complex t[];
-   complex taubuf[];
+   al_complex work[];
+   al_complex t[];
+   al_complex taubuf[];
 //--- create matrix
    CMatrixComplex tmpa;
    CMatrixComplex tmpt;
    CMatrixComplex tmpr;
 //--- create variables
-   int     minmn=MathMin(m,n);
-   int     refcnt=MathMin(minmn,qcolumns);
-   int     blockstart=CAblas::AblasComplexBlockSize()*(refcnt/CAblas::AblasComplexBlockSize());
-   int     blocksize=refcnt-blockstart;
-   int     rowscount=0;
-   int     i=0;
-   int     j=0;
-   int     i_=0;
-   int     i1_=0;
-   complex One(1,0);
-   complex Zero(0,0);
+   int        minmn=MathMin(m,n);
+   int        refcnt=MathMin(minmn,qcolumns);
+   int        blockstart=CAblas::AblasComplexBlockSize()*(refcnt/CAblas::AblasComplexBlockSize());
+   int        blocksize=refcnt-blockstart;
+   int        rowscount=0;
+   int        i=0;
+   int        j=0;
+   int        i_=0;
+   int        i1_=0;
+   al_complex One(1,0);
+   al_complex Zero(0,0);
 //--- allocation
    ArrayResizeAL(work,MathMax(m,n)+1);
    ArrayResizeAL(t,MathMax(m,n)+1);
@@ -3485,10 +3485,10 @@ static void COrtFac::CMatrixQRUnpackR(CMatrixComplex &a,const int m,const int n,
    if(m<=0 || n<=0)
       return;
 //--- create variables
-   complex Zero(0,0);
-   int     i=0;
-   int     k=MathMin(m,n);
-   int     i_=0;
+   al_complex Zero(0,0);
+   int        i=0;
+   int        k=MathMin(m,n);
+   int        i_=0;
 //--- allocation
    r.Resize(m,n);
 //--- Prepare matrix
@@ -3525,31 +3525,31 @@ static void COrtFac::CMatrixQRUnpackR(CMatrixComplex &a,const int m,const int n,
 //|                     If QRows=0, array isn't changed.             |
 //+------------------------------------------------------------------+
 static void COrtFac::CMatrixLQUnpackQ(CMatrixComplex &a,const int m,const int n,
-                                      complex &tau[],const int qrows,CMatrixComplex &q)
+                                      al_complex &tau[],const int qrows,CMatrixComplex &q)
   {
 //--- check
    if(m<=0 || n<=0)
       return;
 //--- create arrays
-   complex work[];
-   complex t[];
-   complex taubuf[];
+   al_complex work[];
+   al_complex t[];
+   al_complex taubuf[];
 //--- create matrix
    CMatrixComplex tmpa;
    CMatrixComplex tmpt;
    CMatrixComplex tmpr;
 //--- create variables
-   int     minmn=MathMin(m,n);
-   int     refcnt=MathMin(minmn,qrows);
-   int     blockstart=CAblas::AblasComplexBlockSize()*(refcnt/CAblas::AblasComplexBlockSize());
-   int     blocksize=refcnt-blockstart;
-   int     columnscount=0;
-   int     i=0;
-   int     j=0;
-   int     i_=0;
-   int     i1_=0;
-   complex One(1,0);
-   complex Zero(0,0);
+   int        minmn=MathMin(m,n);
+   int        refcnt=MathMin(minmn,qrows);
+   int        blockstart=CAblas::AblasComplexBlockSize()*(refcnt/CAblas::AblasComplexBlockSize());
+   int        blocksize=refcnt-blockstart;
+   int        columnscount=0;
+   int        i=0;
+   int        j=0;
+   int        i_=0;
+   int        i1_=0;
+   al_complex One(1,0);
+   al_complex Zero(0,0);
 //--- allocation
    ArrayResizeAL(work,MathMax(m,n)+1);
    ArrayResizeAL(t,MathMax(m,n)+1);
@@ -3630,10 +3630,10 @@ static void COrtFac::CMatrixLQUnpackL(CMatrixComplex &a,const int m,const int n,
    if(m<=0 || n<=0)
       return;
 //--- create variables
-   complex Zero(0,0);
-   int     i=0;
-   int     k=0;
-   int     i_=0;
+   al_complex Zero(0,0);
+   int        i=0;
+   int        k=0;
+   int        i_=0;
 //--- allocation
    l.Resize(m,n);
 //--- Prepare matrix
@@ -4704,25 +4704,25 @@ static void COrtFac::SMatrixTDUnpackQ(CMatrixDouble &a,const int n,const bool is
 //|      October 31, 1992                                            |
 //+------------------------------------------------------------------+
 static void COrtFac::HMatrixTD(CMatrixComplex &a,const int n,const bool isupper,
-                               complex &tau[],double &d[],double &e[])
+                               al_complex &tau[],double &d[],double &e[])
   {
 //--- check
    if(n<=0)
       return;
 //--- create arrays
-   complex t[];
-   complex t2[];
-   complex t3[];
+   al_complex t[];
+   al_complex t2[];
+   al_complex t3[];
 //--- create variables
-   complex Half(0.5,0);
-   complex Zero(0,0);
-   complex _One(-1,0);
-   complex alpha=0;
-   complex taui=0;
-   complex v=0;
-   int     i=0;
-   int     i_=0;
-   int     i1_=0;
+   al_complex Half(0.5,0);
+   al_complex Zero(0,0);
+   al_complex _One(-1,0);
+   al_complex alpha=0;
+   al_complex taui=0;
+   al_complex v=0;
+   int        i=0;
+   int        i_=0;
+   int        i1_=0;
    for(i=0;i<n;i++)
      {
       //--- check
@@ -4885,14 +4885,14 @@ static void COrtFac::HMatrixTD(CMatrixComplex &a,const int n,const bool isupper,
 //|                 array with elements [0..N-1, 0..N-1].            |
 //+------------------------------------------------------------------+
 static void COrtFac::HMatrixTDUnpackQ(CMatrixComplex &a,const int n,const bool isupper,
-                                      complex &tau[],CMatrixComplex &q)
+                                      al_complex &tau[],CMatrixComplex &q)
   {
 //--- check
    if(n==0)
       return;
 //--- create arrays
-   complex v[];
-   complex work[];
+   al_complex v[];
+   al_complex work[];
 //--- create variables
    int i=0;
    int j=0;
@@ -5014,16 +5014,16 @@ static void COrtFac::RMatrixLQBaseCase(CMatrixDouble &a,const int m,const int n,
 //| Base case for complex QR                                         |
 //+------------------------------------------------------------------+
 static void COrtFac::CMatrixQRBaseCase(CMatrixComplex &a,const int m,const int n,
-                                       complex &work[],complex &t[],complex &tau[])
+                                       al_complex &work[],al_complex &t[],al_complex &tau[])
   {
 //--- create variables
-   int     i=0;
-   int     k=MathMin(m,n);
-   int     mmi=0;
-   int     minmn=MathMin(m,n);
-   complex tmp=0;
-   int     i_=0;
-   int     i1_=0;
+   int        i=0;
+   int        k=MathMin(m,n);
+   int        mmi=0;
+   int        minmn=MathMin(m,n);
+   al_complex tmp=0;
+   int        i_=0;
+   int        i1_=0;
 //--- check
    if(minmn<=0)
       return;
@@ -5054,14 +5054,14 @@ static void COrtFac::CMatrixQRBaseCase(CMatrixComplex &a,const int m,const int n
 //| Base case for complex LQ                                         |
 //+------------------------------------------------------------------+
 static void COrtFac::CMatrixLQBaseCase(CMatrixComplex &a,const int m,const int n,
-                                       complex &work[],complex &t[],complex &tau[])
+                                       al_complex &work[],al_complex &t[],al_complex &tau[])
   {
 //--- create variables
-   int     i=0;
-   int     minmn=MathMin(m,n);
-   complex tmp=0;
-   int     i_=0;
-   int     i1_=0;
+   int        i=0;
+   int        minmn=MathMin(m,n);
+   al_complex tmp=0;
+   int        i_=0;
+   int        i1_=0;
 //--- check
    if(minmn<=0)
       return;
@@ -5198,16 +5198,16 @@ static void COrtFac::RMatrixBlockReflector(CMatrixDouble &a,double &tau[],
 //| * fill diagonal of reflectors matrix by ones                     |
 //| * generate triangular factor T                                   |
 //+------------------------------------------------------------------+
-static void COrtFac::CMatrixBlockReflector(CMatrixComplex &a,complex &tau[],
+static void COrtFac::CMatrixBlockReflector(CMatrixComplex &a,al_complex &tau[],
                                            const bool columnwisea,const int lengtha,
-                                           const int blocksize,CMatrixComplex &t,complex &work[])
+                                           const int blocksize,CMatrixComplex &t,al_complex &work[])
   {
 //--- create variables
-   int     i=0;
-   int     k=0;
-   complex v=0;
-   complex tauv=0;
-   int     i_=0;
+   int        i=0;
+   int        k=0;
+   al_complex v=0;
+   al_complex tauv=0;
+   int        i_=0;
 //--- Prepare Y (stored in TmpA) and T (stored in TmpT)
    for(k=0;k<blocksize;k++)
      {
@@ -5534,9 +5534,9 @@ static bool CEigenVDetect::HMatrixEVD(CMatrixComplex &ca,const int n,int zneeded
    int    i_=0;
    bool   result;
 //--- create arrays
-   complex tau[];
-   double  e[];
-   double  work[];
+   al_complex tau[];
+   double     e[];
+   double     work[];
 //--- create matrix
    CMatrixDouble  t;
    CMatrixComplex q;
@@ -5645,9 +5645,9 @@ static bool CEigenVDetect::HMatrixEVDR(CMatrixComplex &ca,const int n,int zneede
    int    i_=0;
    bool   result;
 //--- create arrays
-   complex tau[];
-   double  e[];
-   double  work[];
+   al_complex tau[];
+   double     e[];
+   double     work[];
 //--- create matrix
    CMatrixComplex q;
    CMatrixDouble  t;
@@ -5758,9 +5758,9 @@ static bool CEigenVDetect::HMatrixEVDI(CMatrixComplex &ca,const int n,int zneede
    int    i_=0;
    bool   result;
 //--- create arrays
-   complex tau[];
-   double  e[];
-   double  work[];
+   al_complex tau[];
+   double     e[];
+   double     work[];
 //--- create matrix
    CMatrixComplex q;
    CMatrixDouble t;
@@ -9034,7 +9034,7 @@ static void CEigenVDetect::InternalTREVC(CMatrixDouble &t,const int n,const int 
    CMatrixDouble temp22b;
    CMatrixInt    ipivot44;
 //--- create copy
-   double vselect[];
+   bool vselect[];
    ArrayResizeAL(vselect,ArraySize(cvselect));
    ArrayCopy(vselect,cvselect);
 //--- initialization
@@ -10858,11 +10858,11 @@ static void CMatGen::CMatrixRndOrthogonal(const int n,CMatrixComplex &a)
 static void CMatGen::CMatrixRndCond(const int n,const double c,CMatrixComplex &a)
   {
 //--- create variables
-   int    i=0;
-   int    j=0;
-   double l1=0;
-   double l2=0;
-   complex v=0;
+   int        i=0;
+   int        j=0;
+   double     l1=0;
+   double     l2=0;
+   al_complex v=0;
 //--- object of class
    CHighQualityRandState state;
 //--- check
@@ -11247,15 +11247,15 @@ static void CMatGen::RMatrixRndOrthogonalFromTheLeft(CMatrixDouble &a,const int 
 static void CMatGen::CMatrixRndOrthogonalFromTheRight(CMatrixComplex &a,const int m,const int n)
   {
 //--- create variables
-   complex zero=0;
-   complex lambdav=0;
-   complex tau=0;
-   int     s=0;
-   int     i=0;
-   int     i_=0;
+   al_complex zero=0;
+   al_complex lambdav=0;
+   al_complex tau=0;
+   int        s=0;
+   int        i=0;
+   int        i_=0;
 //--- create arrays
-   complex w[];
-   complex v[];
+   al_complex w[];
+   al_complex v[];
 //--- object of class
    CHighQualityRandState state;
 //--- check
@@ -11324,16 +11324,16 @@ static void CMatGen::CMatrixRndOrthogonalFromTheLeft(CMatrixComplex &a,const int
                                                      const int n)
   {
 //--- create variables
-   complex zero=0;
-   complex tau=0;
-   complex lambdav=0;
-   int     s=0;
-   int     i=0;
-   int     j=0;
-   int     i_=0;
+   al_complex zero=0;
+   al_complex tau=0;
+   al_complex lambdav=0;
+   int        s=0;
+   int        i=0;
+   int        j=0;
+   int        i_=0;
 //--- create arrays
-   complex w[];
-   complex v[];
+   al_complex w[];
+   al_complex v[];
 //--- object of class
    CHighQualityRandState state;
 //--- check
@@ -11470,15 +11470,15 @@ static void CMatGen::SMatrixRndMultiply(CMatrixDouble &a,const int n)
 static void CMatGen::HMatrixRndMultiply(CMatrixComplex &a,const int n)
   {
 //--- create variables
-   complex zero=0;
-   complex tau=0;
-   complex lambdav=0;
-   int     s=0;
-   int     i=0;
-   int     i_=0;
+   al_complex zero=0;
+   al_complex tau=0;
+   al_complex lambdav=0;
+   int        s=0;
+   int        i=0;
+   int        i_=0;
 //--- create arrays
-   complex w[];
-   complex v[];
+   al_complex w[];
+   al_complex v[];
 //--- object of class
    CHighQualityRandState state;
 //--- General case.
@@ -11530,16 +11530,16 @@ class CTrFac
   {
 private:
    //--- private methods
-   static void       CMatrixLUPRec(CMatrixComplex &a,const int offs,const int m,const int n,int &pivots[],complex &tmp[]);
+   static void       CMatrixLUPRec(CMatrixComplex &a,const int offs,const int m,const int n,int &pivots[],al_complex &tmp[]);
    static void       RMatrixLUPRec(CMatrixDouble &a,const int offs,const int m,const int n,int &pivots[],double &tmp[]);
-   static void       CMatrixPLURec(CMatrixComplex &a,const int offs,const int m,const int n,int &pivots[],complex &tmp[]);
+   static void       CMatrixPLURec(CMatrixComplex &a,const int offs,const int m,const int n,int &pivots[],al_complex &tmp[]);
    static void       RMatrixPLURec(CMatrixDouble &a,const int offs,const int m,const int n,int &pivots[],double &tmp[]);
-   static void       CMatrixLUP2(CMatrixComplex &a,const int offs,const int m,const int n,int &pivots[],complex &tmp[]);
+   static void       CMatrixLUP2(CMatrixComplex &a,const int offs,const int m,const int n,int &pivots[],al_complex &tmp[]);
    static void       RMatrixLUP2(CMatrixDouble &a,const int offs,const int m,const int n,int &pivots[],double &tmp[]);
-   static void       CMatrixPLU2(CMatrixComplex &a,const int offs,const int m,const int n,int &pivots[],complex &tmp[]);
+   static void       CMatrixPLU2(CMatrixComplex &a,const int offs,const int m,const int n,int &pivots[],al_complex &tmp[]);
    static void       RMatrixPLU2(CMatrixDouble &a,const int offs,const int m,const int n,int &pivots[],double &tmp[]);
-   static bool       HPDMatrixCholeskyRec(CMatrixComplex &a,const int offs,const int n,const bool isupper,complex &tmp[]);
-   static bool       HPDMatrixCholesky2(CMatrixComplex &aaa,const int offs,const int n,const bool isupper,complex &tmp[]);
+   static bool       HPDMatrixCholeskyRec(CMatrixComplex &a,const int offs,const int n,const bool isupper,al_complex &tmp[]);
+   static bool       HPDMatrixCholesky2(CMatrixComplex &aaa,const int offs,const int n,const bool isupper,al_complex &tmp[]);
    static bool       SPDMatrixCholesky2(CMatrixDouble &aaa,const int offs,const int n,const bool isupper,double &tmp[]);
 public:
                      CTrFac(void);
@@ -11664,7 +11664,7 @@ static void CTrFac::CMatrixLU(CMatrixComplex &a,const int m,const int n,int &piv
 static bool CTrFac::HPDMatrixCholesky(CMatrixComplex &a,const int n,const bool isupper)
   {
 //--- create array
-   complex tmp[];
+   al_complex tmp[];
 //--- check
    if(n<1)
       return(false);
@@ -11764,14 +11764,14 @@ static void CTrFac::RMatrixLUP(CMatrixDouble &a,const int m,const int n,int &piv
 static void CTrFac::CMatrixLUP(CMatrixComplex &a,const int m,const int n,int &pivots[])
   {
 //--- create variables
-   int     i=0;
-   int     j=0;
-   double  mx=0;
-   double  v=0;
-   complex cV;
-   int     i_=0;
+   int        i=0;
+   int        j=0;
+   double     mx=0;
+   double     v=0;
+   al_complex cV;
+   int        i_=0;
 //--- create array
-   complex tmp[];
+   al_complex tmp[];
 //--- Internal LU decomposition subroutine.
 //--- Never call it directly.
    if(!CAp::Assert(m>0,__FUNCTION__+": incorrect M!"))
@@ -11879,13 +11879,13 @@ static void CTrFac::RMatrixPLU(CMatrixDouble &a,const int m,const int n,int &piv
 static void CTrFac::CMatrixPLU(CMatrixComplex &a,const int m,const int n,int &pivots[])
   {
 //--- create variables
-   int     i=0;
-   int     j=0;
-   double  mx=0;
-   complex v=0;
-   int     i_=0;
+   int        i=0;
+   int        j=0;
+   double     mx=0;
+   al_complex v=0;
+   int        i_=0;
 //--- create array
-   complex tmp[];
+   al_complex tmp[];
 //--- Internal LU decomposition subroutine.
 //--- Never call it directly.
    if(!CAp::Assert(m>0,__FUNCTION__+": incorrect M!"))
@@ -12024,16 +12024,16 @@ static bool CTrFac::SPDMatrixCholeskyRec(CMatrixDouble &a,const int offs,const i
 //| Never call it directly.                                          |
 //+------------------------------------------------------------------+
 static void CTrFac::CMatrixLUPRec(CMatrixComplex &a,const int offs,const int m,
-                                  const int n,int &pivots[],complex &tmp[])
+                                  const int n,int &pivots[],al_complex &tmp[])
   {
 //--- create variables
-   int     i=0;
-   int     m1=0;
-   int     m2=0;
-   int     i_=0;
-   int     i1_=0;
-   complex One(1.0,0.0);
-   complex _One(-1.0,0.0);
+   int        i=0;
+   int        m1=0;
+   int        m2=0;
+   int        i_=0;
+   int        i1_=0;
+   al_complex One(1.0,0.0);
+   al_complex _One(-1.0,0.0);
 //--- Kernel case
    if(MathMin(m,n)<=CAblas::AblasComplexBlockSize())
      {
@@ -12215,16 +12215,16 @@ static void CTrFac::RMatrixLUPRec(CMatrixDouble &a,const int offs,const int m,
 //| Recurrent complex LU subroutine.                                 |
 //| Never call it directly.                                          |
 //+------------------------------------------------------------------+
-static void CTrFac::CMatrixPLURec(CMatrixComplex &a,const int offs,const int m,const int n,int &pivots[],complex &tmp[])
+static void CTrFac::CMatrixPLURec(CMatrixComplex &a,const int offs,const int m,const int n,int &pivots[],al_complex &tmp[])
   {
 //--- create variables
-   int     i=0;
-   int     n1=0;
-   int     n2=0;
-   int     i_=0;
-   int     i1_=0;
-   complex One(1.0,0.0);
-   complex _One(-1.0,0.0);
+   int        i=0;
+   int        n1=0;
+   int        n2=0;
+   int        i_=0;
+   int        i1_=0;
+   al_complex One(1.0,0.0);
+   al_complex _One(-1.0,0.0);
 //--- Kernel case
    if(MathMin(m,n)<=CAblas::AblasComplexBlockSize())
      {
@@ -12400,17 +12400,17 @@ static void CTrFac::RMatrixPLURec(CMatrixDouble &a,const int offs,const int m,
 //+------------------------------------------------------------------+
 //| Complex LUP kernel                                               |
 //+------------------------------------------------------------------+
-static void CTrFac::CMatrixLUP2(CMatrixComplex &a,const int offs,const int m,const int n,int &pivots[],complex &tmp[])
+static void CTrFac::CMatrixLUP2(CMatrixComplex &a,const int offs,const int m,const int n,int &pivots[],al_complex &tmp[])
   {
 //--- create variables
-   int     i=0;
-   int     j=0;
-   int     jp=0;
-   complex s=0;
-   int     i_=0;
-   int     i1_=0;
-   complex zero=0;
-   complex One(1.0,0.0);
+   int        i=0;
+   int        j=0;
+   int        jp=0;
+   al_complex s=0;
+   int        i_=0;
+   int        i1_=0;
+   al_complex zero=0;
+   al_complex One(1.0,0.0);
 //--- check
    if(m==0 || n==0)
       return;
@@ -12533,17 +12533,17 @@ static void CTrFac::RMatrixLUP2(CMatrixDouble &a,const int offs,const int m,
 //|      June 30,1992                                                |
 //+------------------------------------------------------------------+
 static void CTrFac::CMatrixPLU2(CMatrixComplex &a,const int offs,const int m,
-                                const int n,int &pivots[],complex &tmp[])
+                                const int n,int &pivots[],al_complex &tmp[])
   {
 //--- create variables
-   int     i=0;
-   int     j=0;
-   int     jp=0;
-   complex s=0;
-   complex zero=0;
-   complex One(1.0,0.0);
-   int     i_=0;
-   int     i1_=0;
+   int        i=0;
+   int        j=0;
+   int        jp=0;
+   al_complex s=0;
+   al_complex zero=0;
+   al_complex One(1.0,0.0);
+   int        i_=0;
+   int        i1_=0;
 //--- check
    if(m==0 || n==0)
       return;
@@ -12668,7 +12668,7 @@ static void CTrFac::RMatrixPLU2(CMatrixDouble &a,const int offs,const int m,
 //| Recursive computational subroutine for HPDMatrixCholesky         |
 //+------------------------------------------------------------------+
 static bool CTrFac::HPDMatrixCholeskyRec(CMatrixComplex &a,const int offs,const int n,
-                                         const bool isupper,complex &tmp[])
+                                         const bool isupper,al_complex &tmp[])
   {
 //--- create variables
    bool result;
@@ -12745,18 +12745,18 @@ static bool CTrFac::HPDMatrixCholeskyRec(CMatrixComplex &a,const int offs,const 
 //|      February 29,1992                                            |
 //+------------------------------------------------------------------+
 static bool CTrFac::HPDMatrixCholesky2(CMatrixComplex &aaa,const int offs,
-                                       const int n,const bool isupper,complex &tmp[])
+                                       const int n,const bool isupper,al_complex &tmp[])
   {
 //--- create variables
-   bool    result;
-   int     i=0;
-   int     j=0;
-   double  ajj=0;
-   complex v=0;
-   complex cR;
-   double  r=0;
-   int     i_=0;
-   int     i1_=0;
+   bool       result;
+   int        i=0;
+   int        j=0;
+   double     ajj=0;
+   al_complex v=0;
+   al_complex cR;
+   double     r=0;
+   int        i_=0;
+   int        i1_=0;
 //--- initialization
    result=true;
 //--- check
@@ -12984,9 +12984,9 @@ private:
    static void       RMatrixRCondLUInternal(CMatrixDouble &lua,const int n,const bool onenorm,const bool isanormprovided,double anorm,double &rc);
    static void       CMatrixRCondLUInternal(CMatrixComplex &lua,const int n,const bool onenorm,const bool isanormprovided,double anorm,double &rc);
    static void       RMatrixEstimateNorm(const int n,double &v[],double &x[],int &isgn[],double &est,int &kase);
-   static void       CMatrixEstimateNorm(const int n,complex &v[],complex &x[],double &est,int &kase,int &isave[],double &rsave[]);
-   static double     InternalComplexRCondScSum1(complex &x[],const int n);
-   static int        InternalComplexRCondIcMax1(complex &x[],const int n);
+   static void       CMatrixEstimateNorm(const int n,al_complex &v[],al_complex &x[],double &est,int &kase,int &isave[],double &rsave[]);
+   static double     InternalComplexRCondScSum1(al_complex &x[],const int n);
+   static int        InternalComplexRCondIcMax1(al_complex &x[],const int n);
    static void       InternalComplexRCondSaveAll(int &isave[],double &rsave[],int &i,int &iter,int &j,int &jlast,int &jump,double &absxi,double &altsgn,double &estold,double &temp);
    static void       InternalComplexRCondLoadAll(int &isave[],double &rsave[],int &i,int &iter,int &j,int &jlast,int &jump,double &absxi,double &altsgn,double &estold,double &temp);
 public:
@@ -13967,12 +13967,12 @@ static void CRCond::CMatrixRCondTrInternal(CMatrixComplex &a,const int n,
    double s=0;
    double maxgrowth=0;
 //--- create arrays
-   complex ex[];
-   complex cwork2[];
-   complex cwork3[];
-   complex cwork4[];
-   int     isave[];
-   double  rsave[];
+   al_complex ex[];
+   al_complex cwork2[];
+   al_complex cwork3[];
+   al_complex cwork4[];
+   int        isave[];
+   double     rsave[];
 //--- initialization
    rc=0;
 //--- check
@@ -14256,22 +14256,22 @@ static void CRCond::HPDMatrixRCondCholeskyInternal(CMatrixComplex &cha,const int
                                                    double anorm,double &rc)
   {
 //--- create variables
-   complex Csa;
-   int     kase=0;
-   double  ainvnm=0;
-   complex v=0;
-   int     i=0;
-   int     j=0;
-   double  sa=0;
-   double  maxgrowth=0;
-   int     i_=0;
-   int     i1_=0;
+   al_complex Csa;
+   int        kase=0;
+   double     ainvnm=0;
+   al_complex v=0;
+   int        i=0;
+   int        j=0;
+   double     sa=0;
+   double     maxgrowth=0;
+   int        i_=0;
+   int        i1_=0;
 //--- create arrays
-   int     isave[];
-   double  rsave[];
-   complex ex[];
-   complex ev[];
-   complex tmp[];
+   int        isave[];
+   double     rsave[];
+   al_complex ex[];
+   al_complex ev[];
+   al_complex tmp[];
 //--- check
    if(!CAp::Assert(n>=1))
       return;
@@ -14646,24 +14646,24 @@ static void CRCond::CMatrixRCondLUInternal(CMatrixComplex &lua,const int n,
                                            double anorm,double &rc)
   {
 //--- create variables
-   int     kase=0;
-   int     kase1=0;
-   double  ainvnm=0;
-   complex v=0;
-   int     i=0;
-   int     j=0;
-   double  su=0;
-   double  sl=0;
-   double  maxgrowth=0;
-   int     i_=0;
-   int     i1_=0;
+   int        kase=0;
+   int        kase1=0;
+   double     ainvnm=0;
+   al_complex v=0;
+   int        i=0;
+   int        j=0;
+   double     su=0;
+   double     sl=0;
+   double     maxgrowth=0;
+   int        i_=0;
+   int        i1_=0;
 //--- create arrays
-   complex ex[];
-   complex cwork2[];
-   complex cwork3[];
-   complex cwork4[];
-   int     isave[];
-   double  rsave[];
+   al_complex ex[];
+   al_complex cwork2[];
+   al_complex cwork3[];
+   al_complex cwork4[];
+   int        isave[];
+   double     rsave[];
 //--- check
    if(n<=0)
       return;
@@ -15059,7 +15059,7 @@ static void CRCond::RMatrixEstimateNorm(const int n,double &v[],double &x[],
 //+------------------------------------------------------------------+
 //| Internal subroutine                                              |
 //+------------------------------------------------------------------+
-static void CRCond::CMatrixEstimateNorm(const int n,complex &v[],complex &x[],
+static void CRCond::CMatrixEstimateNorm(const int n,al_complex &v[],al_complex &x[],
                                         double &est,int &kase,int &isave[],
                                         double &rsave[])
   {
@@ -15249,7 +15249,7 @@ static void CRCond::CMatrixEstimateNorm(const int n,complex &v[],complex &x[],
 //+------------------------------------------------------------------+
 //| Internal subroutine                                              |
 //+------------------------------------------------------------------+
-static double CRCond::InternalComplexRCondScSum1(complex &x[],const int n)
+static double CRCond::InternalComplexRCondScSum1(al_complex &x[],const int n)
   {
 //--- create variables
    double result=0;
@@ -15263,7 +15263,7 @@ static double CRCond::InternalComplexRCondScSum1(complex &x[],const int n)
 //+------------------------------------------------------------------+
 //| Internal subroutine                                              |
 //+------------------------------------------------------------------+
-static int CRCond::InternalComplexRCondIcMax1(complex &x[],const int n)
+static int CRCond::InternalComplexRCondIcMax1(al_complex &x[],const int n)
   {
 //--- create variables
    int    result=0;
@@ -15440,11 +15440,11 @@ class CMatInv
 private:
    //--- private methods
    static void       RMatrixTrInverseRec(CMatrixDouble &a,const int offs,const int n,const bool isupper,const bool isunit,double &tmp[],int &info,CMatInvReport &rep);
-   static void       CMatrixTrInverseRec(CMatrixComplex &a,const int offs,const int n,const bool isupper,const bool isunit,complex &tmp[],int &info,CMatInvReport &rep);
+   static void       CMatrixTrInverseRec(CMatrixComplex &a,const int offs,const int n,const bool isupper,const bool isunit,al_complex &tmp[],int &info,CMatInvReport &rep);
    static void       RMatrixLUInverseRec(CMatrixDouble &a,const int offs,const int n,double &work[],int &info,CMatInvReport &rep);
-   static void       CMatrixLUInverseRec(CMatrixComplex &a,const int offs,const int n,complex &work[],int &info,CMatInvReport &rep);
+   static void       CMatrixLUInverseRec(CMatrixComplex &a,const int offs,const int n,al_complex &work[],int &info,CMatInvReport &rep);
    static void       SPDMatrixCholeskyInverseRec(CMatrixDouble &a,const int offs,const int n,const bool isupper,double &tmp[]);
-   static void       HPDMatrixCholeskyInverseRec(CMatrixComplex &a,const int offs,const int n,const bool isupper,complex &tmp[]);
+   static void       HPDMatrixCholeskyInverseRec(CMatrixComplex &a,const int offs,const int n,const bool isupper,al_complex &tmp[]);
 public:
                      CMatInv(void);
                     ~CMatInv(void);
@@ -15638,12 +15638,12 @@ static void CMatInv::CMatrixLUInverse(CMatrixComplex &a,int &pivots[],
                                       const int n,int &info,CMatInvReport &rep)
   {
 //--- create variables
-   int     i=0;
-   int     j=0;
-   int     k=0;
-   complex v=0;
+   int        i=0;
+   int        j=0;
+   int        k=0;
+   al_complex v=0;
 //--- create array
-   complex work[];
+   al_complex work[];
 //--- initialization
    info=0;
 //--- check
@@ -15919,7 +15919,7 @@ static void CMatInv::HPDMatrixCholeskyInverse(CMatrixComplex &a,const int n,
    int  j=0;
    bool f;
 //--- create array
-   complex tmp[];
+   al_complex tmp[];
 //--- object of class
    CMatInvReport rep2;
 //--- initialization
@@ -16146,7 +16146,7 @@ static void CMatInv::CMatrixTrInverse(CMatrixComplex &a,const int n,
    int i=0;
    int j=0;
 //--- create array
-   complex tmp[];
+   al_complex tmp[];
 //--- initialization
    info=0;
 //--- check
@@ -16352,20 +16352,20 @@ static void CMatInv::RMatrixTrInverseRec(CMatrixDouble &a,const int offs,
 //+------------------------------------------------------------------+
 static void CMatInv::CMatrixTrInverseRec(CMatrixComplex &a,const int offs,
                                          const int n,const bool isupper,
-                                         const bool isunit,complex &tmp[],
+                                         const bool isunit,al_complex &tmp[],
                                          int &info,CMatInvReport &rep)
   {
 //--- create variables
-   complex One=1.0;
-   complex _One=-1.0;
-   int     n1=0;
-   int     n2=0;
-   int     i=0;
-   int     j=0;
-   complex v=0;
-   complex ajj=0;
-   int     i_=0;
-   int     i1_=0;
+   al_complex One=1.0;
+   al_complex _One=-1.0;
+   int        n1=0;
+   int        n2=0;
+   int        i=0;
+   int        j=0;
+   al_complex v=0;
+   al_complex ajj=0;
+   int        i_=0;
+   int        i1_=0;
 //--- check
    if(n<1)
      {
@@ -16615,19 +16615,19 @@ static void CMatInv::RMatrixLUInverseRec(CMatrixDouble &a,const int offs,
 //| Internal subroutine                                              |
 //+------------------------------------------------------------------+
 static void CMatInv::CMatrixLUInverseRec(CMatrixComplex &a,const int offs,
-                                         const int n,complex &work[],
+                                         const int n,al_complex &work[],
                                          int &info,CMatInvReport &rep)
   {
 //--- create variables
-   complex One=1.0;
-   complex _One=-1.0;
-   int     i=0;
-   int     j=0;
-   complex v=0;
-   int     n1=0;
-   int     n2=0;
-   int     i_=0;
-   int     i1_=0;
+   al_complex One=1.0;
+   al_complex _One=-1.0;
+   int        i=0;
+   int        j=0;
+   al_complex v=0;
+   int        n1=0;
+   int        n2=0;
+   int        i_=0;
+   int        i1_=0;
 //--- check
    if(n<1)
      {
@@ -16865,18 +16865,18 @@ static void CMatInv::SPDMatrixCholeskyInverseRec(CMatrixDouble &a,const int offs
 //+------------------------------------------------------------------+
 static void CMatInv::HPDMatrixCholeskyInverseRec(CMatrixComplex &a,const int offs,
                                                  const int n,const bool isupper,
-                                                 complex &tmp[])
+                                                 al_complex &tmp[])
   {
 //--- create variables
-   complex _One=-1.0;
-   int     i=0;
-   int     j=0;
-   complex v=0;
-   int     n1=0;
-   int     n2=0;
-   int     info2=0;
-   int     i_=0;
-   int     i1_=0;
+   al_complex _One=-1.0;
+   int        i=0;
+   int        j=0;
+   al_complex v=0;
+   int        n1=0;
+   int        n2=0;
+   int        info2=0;
+   int        i_=0;
+   int        i1_=0;
 //--- object of class
    CMatInvReport rep2;
 //--- check
@@ -19274,8 +19274,8 @@ public:
    static double     RMatrixDet(CMatrixDouble &ca,const int n);
    static double     SPDMatrixCholeskyDet(CMatrixDouble &a,const int n);
    static double     SPDMatrixDet(CMatrixDouble &ca,const int n,const bool isupper);
-   static complex    CMatrixLUDet(CMatrixComplex &a,int &pivots[],const int n);
-   static complex    CMatrixDet(CMatrixComplex &ca,const int n);
+   static al_complex CMatrixLUDet(CMatrixComplex &a,int &pivots[],const int n);
+   static al_complex CMatrixDet(CMatrixComplex &ca,const int n);
   };
 //+------------------------------------------------------------------+
 //| Constructor without parameters                                   |
@@ -19396,12 +19396,12 @@ static double CMatDet::RMatrixDet(CMatrixDouble &ca,const int n)
 //|                   matrix size (A must be square matrix)          |
 //| Result: matrix determinant.                                      |
 //+------------------------------------------------------------------+
-static complex CMatDet::CMatrixLUDet(CMatrixComplex &a,int &pivots[],const int n)
+static al_complex CMatDet::CMatrixLUDet(CMatrixComplex &a,int &pivots[],const int n)
   {
 //--- create variables
-   complex result=0;
-   int     i=0;
-   int     s=0;
+   al_complex result=0;
+   int        i=0;
+   int        s=0;
 //--- check
    if(!CAp::Assert(n>=1,__FUNCTION__+": N<1!"))
       return(EMPTY_VALUE);
@@ -19442,11 +19442,11 @@ static complex CMatDet::CMatrixLUDet(CMatrixComplex &a,int &pivots[],const int n
 //|                   matrix size (A must be square matrix)          |
 //| Result: determinant of matrix A.                                 |
 //+------------------------------------------------------------------+
-static complex CMatDet::CMatrixDet(CMatrixComplex &ca,const int n)
+static al_complex CMatDet::CMatrixDet(CMatrixComplex &ca,const int n)
   {
 //--- create variables
-   complex result=0;
-   int     pivots[];
+   al_complex result=0;
+   int        pivots[];
 //--- create copy
    CMatrixComplex a;
    a=ca;

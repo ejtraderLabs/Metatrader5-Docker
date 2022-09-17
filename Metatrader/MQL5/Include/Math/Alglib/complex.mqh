@@ -34,78 +34,78 @@
 //+------------------------------------------------------------------+
 //| Complex numbers                                                  |
 //+------------------------------------------------------------------+
-struct complex
+struct al_complex
   {
 public:
    double            re; // real part
    double            im; // imaginary part
 
 public:
-                     complex(void);
-                     complex(const double x);
-                     complex(const double x,const double y);
-                    ~complex(void);
+                     al_complex(void);
+                     al_complex(const double x);
+                     al_complex(const double x,const double y);
+                    ~al_complex(void);
    //--- operations
-   void              Copy(const complex &rhs);
-   bool              Eq(const complex &lhs,const complex &rhs);
-   bool              NotEq(const complex &lhs,const complex &rhs);
-   complex           Add(const complex &lhs,const complex &rhs);
-   complex           Sub(const complex &lhs,const complex &rhs);
-   complex           Mul(const complex &lhs,const complex &rhs);
-   complex           Div(const complex &lhs,const complex &rhs);
-   complex           Conjugate(void);
+   void              Copy(const al_complex &rhs);
+   bool              Eq(const al_complex &lhs,const al_complex &rhs);
+   bool              NotEq(const al_complex &lhs,const al_complex &rhs);
+   al_complex        Add(const al_complex &lhs,const al_complex &rhs);
+   al_complex        Sub(const al_complex &lhs,const al_complex &rhs);
+   al_complex        Mul(const al_complex &lhs,const al_complex &rhs);
+   al_complex        Div(const al_complex &lhs,const al_complex &rhs);
+   al_complex        Conjugate(void);
    //--- overloading
    void              operator=(const double rhs);
-   void              operator=(const complex &rhs);
-   void              operator+=(const complex &rhs);
-   void              operator-=(const complex &rhs);
-   bool              operator==(const complex &rhs);
+   void              operator=(const al_complex &rhs);
+   void              operator+=(const al_complex &rhs);
+   void              operator-=(const al_complex &rhs);
+   bool              operator==(const al_complex &rhs);
    bool              operator==(const double rhs);
-   bool              operator!=(const complex &rhs);
+   bool              operator!=(const al_complex &rhs);
    bool              operator!=(const double rhs);
-   complex           operator+(const complex &rhs);
-   complex           operator+(const double rhs);
-   complex           operator+(void);
-   complex           operator-(const complex &rhs);
-   complex           operator-(const double rhs);
-   complex           operator-(void);
-   complex           operator*(const complex &rhs);
-   complex           operator*(const double rhs);
-   complex           operator/(const complex &rhs);
-   complex           operator/(const double rhs);
+   al_complex        operator+(const al_complex &rhs);
+   al_complex        operator+(const double rhs);
+   al_complex        operator+(void);
+   al_complex        operator-(const al_complex &rhs);
+   al_complex        operator-(const double rhs);
+   al_complex        operator-(void);
+   al_complex        operator*(const al_complex &rhs);
+   al_complex        operator*(const double rhs);
+   al_complex        operator/(const al_complex &rhs);
+   al_complex        operator/(const double rhs);
   };
 //+------------------------------------------------------------------+
 //| Constructor without parameters                                   |
 //+------------------------------------------------------------------+
-complex::complex(void): re(0),im(0)
+al_complex::al_complex(void): re(0),im(0)
   {
 
   }
 //+------------------------------------------------------------------+
 //| Constructor with one parameter                                   |
 //+------------------------------------------------------------------+
-complex::complex(const double x): re(x),im(0)
+al_complex::al_complex(const double x): re(x),im(0)
   {
 
   }
 //+------------------------------------------------------------------+
 //| Constructor with two parameters                                  |
 //+------------------------------------------------------------------+
-complex::complex(const double x,const double y): re(x),im(y)
+al_complex::al_complex(const double x,const double y): re(x),im(y)
   {
 
   }
 //+------------------------------------------------------------------+
 //| Destructor                                                       |
 //+------------------------------------------------------------------+
-complex::~complex(void)
+al_complex::~al_complex(void)
   {
 
   }
 //+------------------------------------------------------------------+
 //| Copy complex                                                     |
 //+------------------------------------------------------------------+
-void complex::Copy(const complex &rhs)
+void al_complex::Copy(const al_complex &rhs)
   {
    re=rhs.re;
    im=rhs.im;
@@ -113,7 +113,7 @@ void complex::Copy(const complex &rhs)
 //+------------------------------------------------------------------+
 //| Comparison (==)                                                  |
 //+------------------------------------------------------------------+
-bool complex::Eq(const complex &lhs,const complex &rhs)
+bool al_complex::Eq(const al_complex &lhs,const al_complex &rhs)
   {
 //--- comparison
    if(lhs.re==rhs.re && lhs.im==rhs.im)
@@ -124,7 +124,7 @@ bool complex::Eq(const complex &lhs,const complex &rhs)
 //+------------------------------------------------------------------+
 //| Comparison (!=)                                                  |
 //+------------------------------------------------------------------+
-bool complex::NotEq(const complex &lhs,const complex &rhs)
+bool al_complex::NotEq(const al_complex &lhs,const al_complex &rhs)
   {
 //--- comparison
    if(lhs.re!=rhs.re || lhs.im!=rhs.im)
@@ -135,9 +135,9 @@ bool complex::NotEq(const complex &lhs,const complex &rhs)
 //+------------------------------------------------------------------+
 //| Sum                                                              |
 //+------------------------------------------------------------------+
-complex complex::Add(const complex &lhs,const complex &rhs)
+al_complex al_complex::Add(const al_complex &lhs,const al_complex &rhs)
   {
-   complex res;
+   al_complex res;
 //--- sum
    res.re=lhs.re+rhs.re;
    res.im=lhs.im+rhs.im;
@@ -147,9 +147,9 @@ complex complex::Add(const complex &lhs,const complex &rhs)
 //+------------------------------------------------------------------+
 //| Subtraction                                                      |
 //+------------------------------------------------------------------+
-complex complex::Sub(const complex &lhs,const complex &rhs)
+al_complex al_complex::Sub(const al_complex &lhs,const al_complex &rhs)
   {
-   complex res;
+   al_complex res;
 //--- subtraction
    res.re=lhs.re-rhs.re;
    res.im=lhs.im-rhs.im;
@@ -159,9 +159,9 @@ complex complex::Sub(const complex &lhs,const complex &rhs)
 //+------------------------------------------------------------------+
 //| Multiplication                                                   |
 //+------------------------------------------------------------------+
-complex complex::Mul(const complex &lhs,const complex &rhs)
+al_complex al_complex::Mul(const al_complex &lhs,const al_complex &rhs)
   {
-   complex res;
+   al_complex res;
 //--- multiplication
    res.re=lhs.re*rhs.re-lhs.im*rhs.im;
    res.im=lhs.re*rhs.im+lhs.im*rhs.re;
@@ -171,10 +171,10 @@ complex complex::Mul(const complex &lhs,const complex &rhs)
 //+------------------------------------------------------------------+
 //| Division                                                          |
 //+------------------------------------------------------------------+
-complex complex::Div(const complex &lhs,const complex &rhs)
+al_complex al_complex::Div(const al_complex &lhs,const al_complex &rhs)
   {
 //--- empty complex value
-   complex res(EMPTY_VALUE,EMPTY_VALUE);
+   al_complex res(EMPTY_VALUE,EMPTY_VALUE);
 //--- check
    if(rhs.re==0 && rhs.im==0)
      {
@@ -204,17 +204,17 @@ complex complex::Div(const complex &lhs,const complex &rhs)
 //+------------------------------------------------------------------+
 //| Conjugate                                                        |
 //+------------------------------------------------------------------+
-complex complex::Conjugate(void)
+al_complex al_complex::Conjugate(void)
   {
 //--- conjugate
-   complex res(re,-im);
+   al_complex res(re,-im);
 //--- return result
    return res;
   }
 //+------------------------------------------------------------------+
 //| Overloading (=)                                                  |
 //+------------------------------------------------------------------+
-void complex::operator=(const double rhs)
+void al_complex::operator=(const double rhs)
   {
    re=rhs;
    im=0;
@@ -222,14 +222,14 @@ void complex::operator=(const double rhs)
 //+------------------------------------------------------------------+
 //| Overloading (=)                                                  |
 //+------------------------------------------------------------------+
-void complex::operator=(const complex &rhs)
+void al_complex::operator=(const al_complex &rhs)
   {
    this.Copy(rhs);
   }
 //+------------------------------------------------------------------+
 //| Overloading (+=)                                                 |
 //+------------------------------------------------------------------+
-void complex::operator+=(const complex &rhs)
+void al_complex::operator+=(const al_complex &rhs)
   {
    re+=rhs.re;
    im+=rhs.im;
@@ -237,63 +237,63 @@ void complex::operator+=(const complex &rhs)
 //+------------------------------------------------------------------+
 //| Overloading (-=)                                                 |
 //+------------------------------------------------------------------+
-void complex::operator-=(const complex &rhs)
+void al_complex::operator-=(const al_complex &rhs)
   {
-   re+=rhs.re;
-   im+=rhs.im;
+   re-=rhs.re;
+   im-=rhs.im;
   }
 //+------------------------------------------------------------------+
 //| Overloading (==)                                                 |
 //+------------------------------------------------------------------+
-bool complex::operator==(const complex &rhs)
+bool al_complex::operator==(const al_complex &rhs)
   {
    return(Eq(this,rhs));
   }
 //+------------------------------------------------------------------+
 //| Overloading (==)                                                 |
 //+------------------------------------------------------------------+
-bool complex::operator==(const double rhs)
+bool al_complex::operator==(const double rhs)
   {
-   complex r(rhs,0);
+   al_complex r(rhs,0);
 //--- return result
    return(Eq(this,r));
   }
 //+------------------------------------------------------------------+
 //| Overloading (!=)                                                 |
 //+------------------------------------------------------------------+
-bool complex::operator!=(const complex &rhs)
+bool al_complex::operator!=(const al_complex &rhs)
   {
    return(NotEq(this,rhs));
   }
 //+------------------------------------------------------------------+
 //| Overloading (!=)                                                 |
 //+------------------------------------------------------------------+
-bool complex::operator!=(const double rhs)
+bool al_complex::operator!=(const double rhs)
   {
-   complex r(rhs,0);
+   al_complex r(rhs,0);
 //--- return result
    return(NotEq(this,r));
   }
 //+------------------------------------------------------------------+
 //| Overloading of binary (+)                                        |
 //+------------------------------------------------------------------+
-complex complex::operator+(const complex &rhs)
+al_complex al_complex::operator+(const al_complex &rhs)
   {
    return(Add(this,rhs));
   }
 //+------------------------------------------------------------------+
 //| Overloading of binary (+)                                        |
 //+------------------------------------------------------------------+
-complex complex::operator+(const double rhs)
+al_complex al_complex::operator+(const double rhs)
   {
-   complex r(rhs,0);
+   al_complex r(rhs,0);
 //--- return result
    return(Add(this,r));
   }
 //+------------------------------------------------------------------+
 //| Overloading of unary (+)                                         |
 //+------------------------------------------------------------------+
-complex complex::operator+(void)
+al_complex al_complex::operator+(void)
   {
 //--- return result
    return(this);
@@ -301,57 +301,57 @@ complex complex::operator+(void)
 //+------------------------------------------------------------------+
 //| Overloading of binary (-)                                        |
 //+------------------------------------------------------------------+
-complex complex::operator-(const complex &rhs)
+al_complex al_complex::operator-(const al_complex &rhs)
   {
    return(Sub(this,rhs));
   }
 //+------------------------------------------------------------------+
 //| Overloading of binary (-)                                        |
 //+------------------------------------------------------------------+
-complex complex::operator-(const double rhs)
+al_complex al_complex::operator-(const double rhs)
   {
-   complex r(rhs,0);
+   al_complex r(rhs,0);
 //--- return result
    return(Sub(this,r));
   }
 //+------------------------------------------------------------------+
 //| Overloading of unary (-)                                         |
 //+------------------------------------------------------------------+
-complex complex::operator-(void)
+al_complex al_complex::operator-(void)
   {
-   complex c(-this.re,-this.im);
+   al_complex c(-this.re,-this.im);
 //--- return result
    return(c);
   }
 //+------------------------------------------------------------------+
 //| Overloading (*)                                                  |
 //+------------------------------------------------------------------+
-complex complex::operator*(const complex &rhs)
+al_complex al_complex::operator*(const al_complex &rhs)
   {
    return(Mul(this,rhs));
   }
 //+------------------------------------------------------------------+
 //| Overloading (*)                                                  |
 //+------------------------------------------------------------------+
-complex complex::operator*(const double rhs)
+al_complex al_complex::operator*(const double rhs)
   {
-   complex r(rhs,0);
+   al_complex r(rhs,0);
 //--- return result
    return(Mul(this,r));
   }
 //+------------------------------------------------------------------+
 //| Overloading (/)                                                  |
 //+------------------------------------------------------------------+
-complex complex::operator/(const complex &rhs)
+al_complex al_complex::operator/(const al_complex &rhs)
   {
    return(Div(this,rhs));
   }
 //+------------------------------------------------------------------+
 //| Overloading (/)                                                  |
 //+------------------------------------------------------------------+
-complex complex::operator/(const double rhs)
+al_complex al_complex::operator/(const double rhs)
   {
-   complex r(rhs,0);
+   al_complex r(rhs,0);
 //--- return result
    return(Div(this,r));
   }

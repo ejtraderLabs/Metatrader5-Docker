@@ -228,11 +228,11 @@ double CAccountInfo::Margin(void) const
    return(AccountInfoDouble(ACCOUNT_MARGIN));
   }
 //+------------------------------------------------------------------+
-//| Get the property value "ACCOUNT_FREEMARGIN"                      |
+//| Get the property value "ACCOUNT_MARGIN_FREE"                     |
 //+------------------------------------------------------------------+
 double CAccountInfo::FreeMargin(void) const
   {
-   return(AccountInfoDouble(ACCOUNT_FREEMARGIN));
+   return(AccountInfoDouble(ACCOUNT_MARGIN_FREE));
   }
 //+------------------------------------------------------------------+
 //| Get the property value "ACCOUNT_MARGIN_LEVEL"                    |

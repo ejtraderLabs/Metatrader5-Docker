@@ -1,8 +1,8 @@
 ﻿
 
-#property copyright   "Copyright 2021, ejtrader."
+#property copyright   "Copyright 2022, ejtrader."
 #property link        "https://github.com/ejtraderLabs"
-#property version     "3.03"
+#property version     "3.04"
 #property description "ejtraderMT"
 #property description "See github link for documentation"
 
@@ -318,7 +318,7 @@ void StreamPriceData()
                      Data[3] = (double) rates[0].low;
                      Data[4] = (double) rates[0].close;
                      Data[5] = (double) rates[0].tick_volume;
-                     Data[6] = (int) spread[0];
+                     
                     }
                   last["status"] = (string) "CONNECTED";
                   last["symbol"] = (string) symbol;

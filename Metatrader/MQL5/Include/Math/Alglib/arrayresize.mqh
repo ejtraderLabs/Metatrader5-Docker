@@ -113,7 +113,7 @@ int ArrayResizeAL(string &arr[],const int size)
 //+------------------------------------------------------------------+
 //| ArrayResizeAL for Alglib library with MQL4 and MQL5 features     |
 //+------------------------------------------------------------------+
-int ArrayResizeAL(complex &arr[],const int size)
+int ArrayResizeAL(al_complex &arr[],const int size)
   {
    int old=ArraySize(arr);
    int res=ArrayResize(arr,size);

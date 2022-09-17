@@ -112,7 +112,7 @@ public:
 
 private:
    void              Initialize(const int capacity);
-   void              Resize(int new_size);
+   bool              Resize(int new_size);
    int               FindEntry(TKey key);
    bool              Insert(TKey key,TValue value,const bool add);
    static int        m_collision_threshold;
@@ -285,7 +285,7 @@ bool CHashMap::Add(CKeyValuePair<TKey,TValue>*pair)
 //--- check pair
    if(CheckPointer(pair)==POINTER_INVALID)
       return(false);
-   return Add(pair.Key(),pair.Value());
+   return(Add(pair.Key(),pair.Value()));
   }
 //+------------------------------------------------------------------+
 //| Adds the specified key and value to the map.                     |
@@ -293,7 +293,7 @@ bool CHashMap::Add(CKeyValuePair<TKey,TValue>*pair)
 template<typename TKey,typename TValue>
 bool CHashMap::Add(TKey key,TValue value)
   {
-   return Insert(key,value,true);
+   return(Insert(key,value,true));
   }
 //+------------------------------------------------------------------+
 //| Determines whether the map contains the specified key-value pair.|
@@ -493,7 +493,7 @@ bool CHashMap::TryGetValue(TKey key,TValue &value)
 template<typename TKey,typename TValue>
 bool CHashMap::TrySetValue(TKey key,TValue value)
   {
-   return Insert(key, value, false);
+   return(Insert(key, value, false));
   }
 //+------------------------------------------------------------------+
 //| Initialize map with specified capacity.                          |
@@ -511,13 +511,15 @@ void CHashMap::Initialize(const int capacity)
 //| Resize map.                                                      |
 //+------------------------------------------------------------------+
 template<typename TKey,typename TValue>
-void CHashMap::Resize(const int new_size)
+bool CHashMap::Resize(const int new_size)
   {
 //--- resize buckets
-   ArrayResize(m_buckets,new_size);
+   if(ArrayResize(m_buckets,new_size)!=new_size)
+      return(false);
    ArrayFill(m_buckets,0,new_size,-1);
 //--- resize entries
-   ArrayResize(m_entries,new_size);
+   if(ArrayResize(m_entries,new_size)!=new_size)
+      return(false);
 //--- restore buckets
    for(int i=0; i<m_count; i++)
       if(m_entries[i].hash_code>=0)
@@ -528,6 +530,7 @@ void CHashMap::Resize(const int new_size)
         }
 //--- restore capacity
    m_capacity=new_size;
+   return(true);
   }
 //+------------------------------------------------------------------+
 //| Find index of entry with specified key.                          |
@@ -562,13 +565,13 @@ bool CHashMap::Insert(TKey key,TValue value,const bool add)
 //--- search pair with specified key
    for(int i=m_buckets[target_bucket]; i>=0; i=m_entries[i].next)
      {
-      //--- hash compare      
+      //--- hash compare
       if(m_entries[i].hash_code!=hash_code)
         {
          collision_count++;
          continue;
         }
-      //--- value compare     
+      //--- value compare
       if(m_comparer.Equals(m_entries[i].key,key))
         {
          //--- adding duplicate
@@ -582,7 +585,9 @@ bool CHashMap::Insert(TKey key,TValue value,const bool add)
    if(collision_count>=m_collision_threshold)
      {
       int new_size=CPrimeGenerator::ExpandPrime(m_count);
-      Resize(new_size);
+      if(!Resize(new_size))
+         return(false);
+      target_bucket=hash_code%new_size;
      }
 //--- calculate index
    int index;
@@ -597,7 +602,8 @@ bool CHashMap::Insert(TKey key,TValue value,const bool add)
       if(m_count==ArraySize(m_entries))
         {
          int new_size=CPrimeGenerator::ExpandPrime(m_count);
-         Resize(new_size);
+         if(!Resize(new_size))
+            return(false);
          target_bucket=hash_code%new_size;
         }
       index=m_count;

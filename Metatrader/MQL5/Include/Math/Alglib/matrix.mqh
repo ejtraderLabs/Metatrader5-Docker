@@ -220,7 +220,7 @@ class CRowComplex
   {
 private:
    //--- array
-   complex           m_array[];
+   al_complex        m_array[];
 public:
    //--- constructor, destructor
                      CRowComplex(void);
@@ -228,13 +228,13 @@ public:
    //--- methods
    int               Size(void) const;
    void              Resize(const int n);
-   void              Set(const int i,const complex &d);
+   void              Set(const int i,const al_complex &d);
    void              Set(const int i,const double d);
    void              SetRe(const int i,const double d);
    void              SetIm(const int i,const double d);
    //--- overloading
-   complex           operator[](const int i) const;
-   void              operator=(const complex &array[]);
+   al_complex        operator[](const int i) const;
+   void              operator=(const al_complex &array[]);
    void              operator=(const CRowComplex &r);
   };
 //+------------------------------------------------------------------+
@@ -268,7 +268,7 @@ void CRowComplex::Resize(const int n)
 //+------------------------------------------------------------------+
 //| Set value                                                        |
 //+------------------------------------------------------------------+
-void CRowComplex::Set(const int i,const complex &d)
+void CRowComplex::Set(const int i,const al_complex &d)
   {
    m_array[i]=d;
   }
@@ -277,7 +277,7 @@ void CRowComplex::Set(const int i,const complex &d)
 //+------------------------------------------------------------------+
 void CRowComplex::Set(const int i,const double d)
   {
-   complex c(d,0);
+   al_complex c(d,0);
    m_array[i]=c;
   }
 //+------------------------------------------------------------------+
@@ -297,14 +297,14 @@ void CRowComplex::SetIm(const int i,const double d)
 //+------------------------------------------------------------------+
 //| Indexing operator                                                |
 //+------------------------------------------------------------------+
-complex CRowComplex::operator[](const int i) const
+al_complex CRowComplex::operator[](const int i) const
   {
    return(m_array[i]);
   }
 //+------------------------------------------------------------------+
 //| Overloading (=)                                                  |
 //+------------------------------------------------------------------+
-void CRowComplex::operator=(const complex &array[])
+void CRowComplex::operator=(const al_complex &array[])
   {
    int size=ArraySize(array);
 //--- check

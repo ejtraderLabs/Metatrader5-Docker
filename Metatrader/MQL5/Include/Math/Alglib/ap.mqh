@@ -45,7 +45,7 @@ public:
    int               ia[];
    bool              ba[];
    double            ra[];
-   complex           ca[];
+   al_complex        ca[];
 
                      RCommState(void) { stage=-1; }
                     ~RCommState(void) { };
@@ -79,7 +79,7 @@ public:
    static int        Len(const int &a[]);
    static int        Len(const bool &a[]);
    static int        Len(const double &a[]);
-   static int        Len(const complex &a[]);
+   static int        Len(const al_complex &a[]);
    //--- rows count
    static int        Rows(const CMatrixInt &a);
    static int        Rows(const CMatrixDouble &a);
@@ -91,11 +91,11 @@ public:
    //--- swap
    static void       Swap(int &a,int &b);
    static void       Swap(double &a,double &b);
-   static void       Swap(complex &a,complex &b);
+   static void       Swap(al_complex &a,al_complex &b);
    static void       Swap(bool &a[],bool &b[]);
    static void       Swap(int &a[],int &b[]);
    static void       Swap(double &a[],double &b[]);
-   static void       Swap(complex &a[],complex &b[]);
+   static void       Swap(al_complex &a[],al_complex &b[]);
    static void       Swap(CMatrixInt &a,CMatrixInt &b);
    static void       Swap(CMatrixDouble &a,CMatrixDouble &b);
    static void       Swap(CMatrixComplex &a,CMatrixComplex &b);
@@ -107,11 +107,11 @@ public:
    //--- join string
    static string     StringJoin(const string sep,const string &a[]);
    //--- convert to string
-   static string     Format(const complex &a,const int dps);
+   static string     Format(const al_complex &a,const int dps);
    static string     Format(const bool &a[]);
    static string     Format(const int &a[]);
    static string     Format(const double &a[],const int dps);
-   static string     Format(const complex &a[],const int dps);
+   static string     Format(const al_complex &a[],const int dps);
    static string     FormatB(const CMatrixInt &a);
    static string     Format(const CMatrixInt &a);
    static string     Format(const CMatrixDouble &a,const int dps);
@@ -164,7 +164,7 @@ static int CAp::Len(const double &a[])
 //+------------------------------------------------------------------+
 //| Get array lenght                                                 |
 //+------------------------------------------------------------------+
-static int CAp::Len(const complex &a[])
+static int CAp::Len(const al_complex &a[])
   {
    return(ArraySize(a));
   }
@@ -243,9 +243,9 @@ static void CAp::Swap(double &a,double &b)
 //+------------------------------------------------------------------+
 //| Swap                                                             |
 //+------------------------------------------------------------------+
-static void CAp::Swap(complex &a,complex &b)
+static void CAp::Swap(al_complex &a,al_complex &b)
   {
-   complex t(a.re,a.im);
+   al_complex t(a.re,a.im);
    a=b;
    b=t;
   }
@@ -306,13 +306,13 @@ static void CAp::Swap(double &a[],double &b[])
 //+------------------------------------------------------------------+
 //| Swap                                                             |
 //+------------------------------------------------------------------+
-static void CAp::Swap(complex &a[],complex &b[])
+static void CAp::Swap(al_complex &a[],al_complex &b[])
   {
 //--- calculation
    int na=ArraySize(a);
    int nb=ArraySize(b);
 //--- create array
-   complex t[];
+   al_complex t[];
    ArrayResizeAL(t,na);
 //--- swap
    ArrayCopy(t,a);
@@ -422,7 +422,7 @@ static string CAp::StringJoin(const string sep,const string &a[])
 //+------------------------------------------------------------------+
 //| Prints formatted complex                                         |
 //+------------------------------------------------------------------+
-static string CAp::Format(const complex &a,const int dps)
+static string CAp::Format(const al_complex &a,const int dps)
   {
 //--- definition of output style
    string fmt;
@@ -518,7 +518,7 @@ static string CAp::Format(const double &a[],const int dps)
 //+------------------------------------------------------------------+
 //| Prints formatted array                                           |
 //+------------------------------------------------------------------+
-static string CAp::Format(const complex &a[],const int dps)
+static string CAp::Format(const al_complex &a[],const int dps)
   {
    int size=ArraySize(a);
 //--- check
@@ -673,8 +673,8 @@ static string CAp::Format(const CMatrixComplex &a,const int dps)
       return(NULL);
      }
 //--- prepare arrays
-   complex line[];
-   string  result[];
+   al_complex line[];
+   string     result[];
    ArrayResizeAL(line,n);
    ArrayResizeAL(result,m);
 //--- converting
@@ -743,9 +743,9 @@ static bool CAp::IsHermitian(const CMatrixComplex &a)
 //--- check
    if(n==0) return(true);
 //--- initialization
-   double   mx=0;
-   double   err=0;
-   complex v1,v2,vt;
+   double     mx=0;
+   double     err=0;
+   al_complex v1,v2,vt;
 //--- check for Hermitian
    for(int i=0;i<n;i++)
      {
@@ -808,7 +808,7 @@ static bool CAp::ForceHermitian(CMatrixComplex &a)
 //--- check
    if(n==0) return(true);
 //--- change matrix
-   complex c;
+   al_complex c;
    for(int i=0;i<n;i++)
       for(int j=i+1;j<n;j++)
         {
@@ -1164,10 +1164,10 @@ public:
    static double     RandomReal(void);
    static int        RandomInteger(const int n);
    static double     Sqr(const double x) { return(x*x); }
-   static double     AbsComplex(const complex &z);
+   static double     AbsComplex(const al_complex &z);
    static double     AbsComplex(const double r);
-   static complex    Conj(const complex &z);
-   static complex    Csqr(const complex &z);
+   static al_complex Conj(const al_complex &z);
+   static al_complex Csqr(const al_complex &z);
   };
 //+------------------------------------------------------------------+
 //| Initialize class constants                                       |
@@ -1246,7 +1246,7 @@ static int CMath::RandomInteger(const int n)
 //+------------------------------------------------------------------+
 //| The absolute value of a complex number                           |
 //+------------------------------------------------------------------+
-static double CMath::AbsComplex(const complex &z)
+static double CMath::AbsComplex(const al_complex &z)
   {
 //--- initialization
    double w=0.0;
@@ -1273,11 +1273,11 @@ static double CMath::AbsComplex(const complex &z)
 static double CMath::AbsComplex(const double r)
   {
 //--- initialization
-   complex z=r;
-   double  w=0.0;
-   double  v=0.0;
-   double  xabs=MathAbs(z.re);
-   double  yabs=MathAbs(z.im);
+   al_complex z=r;
+   double     w=0.0;
+   double     v=0.0;
+   double     xabs=MathAbs(z.re);
+   double     yabs=MathAbs(z.im);
 //--- check
    if(xabs>yabs) w=xabs;
    else          w=yabs;
@@ -1295,9 +1295,9 @@ static double CMath::AbsComplex(const double r)
 //+------------------------------------------------------------------+
 //| Get conjugate                                                    |
 //+------------------------------------------------------------------+
-static complex CMath::Conj(const complex &z)
+static al_complex CMath::Conj(const al_complex &z)
   {
-   complex res;
+   al_complex res;
    res.re=z.re;
    res.im=-z.im;
 //--- return result
@@ -1306,9 +1306,9 @@ static complex CMath::Conj(const complex &z)
 //+------------------------------------------------------------------+
 //| Squaring                                                         |
 //+------------------------------------------------------------------+
-static complex CMath::Csqr(const complex &z)
+static al_complex CMath::Csqr(const al_complex &z)
   {
-   complex res;
+   al_complex res;
    res.re=z.re*z.re-z.im*z.im;
    res.im=2*z.re*z.im;
 //--- return result

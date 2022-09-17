@@ -42,10 +42,10 @@ public:
                      CFastFourierTransform(void);
                     ~CFastFourierTransform(void);
 
-   static void       FFTC1D(complex &a[],const int n);
-   static void       FFTC1DInv(complex &a[],const int n);
-   static void       FFTR1D(double &a[],const int n,complex &f[]);
-   static void       FFTR1DInv(complex &f[],const int n,double &a[]);
+   static void       FFTC1D(al_complex &a[],const int n);
+   static void       FFTC1DInv(al_complex &a[],const int n);
+   static void       FFTR1D(double &a[],const int n,al_complex &f[]);
+   static void       FFTR1DInv(al_complex &f[],const int n,double &a[]);
    static void       FFTR1DInternalEven(double &a[],const int n,double &buf[],CFtPlan &plan);
    static void       FFTR1DInvInternalEven(double &a[],const int n,double &buf[],CFtPlan &plan);
   };
@@ -87,7 +87,7 @@ CFastFourierTransform::~CFastFourierTransform(void)
 //|             A_out[j] = SUM(A_in[k]*exp(-2*pi*sqrt(-1)*j*k/N),    |
 //|             k = 0..N-1)                                          |
 //+------------------------------------------------------------------+
-static void CFastFourierTransform::FFTC1D(complex &a[],const int n)
+static void CFastFourierTransform::FFTC1D(al_complex &a[],const int n)
   {
 //--- create a variable
    int i=0;
@@ -142,7 +142,7 @@ static void CFastFourierTransform::FFTC1D(complex &a[],const int n)
 //|             A_out[j] = SUM(A_in[k]/N*exp(+2*pi*sqrt(-1)*j*k/N),  |
 //|             k = 0..N-1)                                          |
 //+------------------------------------------------------------------+
-static void CFastFourierTransform::FFTC1DInv(complex &a[],const int n)
+static void CFastFourierTransform::FFTC1DInv(al_complex &a[],const int n)
   {
 //--- create a variable
    int i=0;
@@ -186,16 +186,16 @@ static void CFastFourierTransform::FFTC1DInv(complex &a[],const int n)
 //| subroutine returns full complex array (with frequencies above    |
 //| N/2), so its result may be used by other FFT-related subroutines.|
 //+------------------------------------------------------------------+
-static void CFastFourierTransform::FFTR1D(double &a[],const int n,complex &f[])
+static void CFastFourierTransform::FFTR1D(double &a[],const int n,al_complex &f[])
   {
 //--- create variables
-   int     i=0;
-   int     n2=0;
-   int     idx=0;
-   complex hn=0;
-   complex hmnc=0;
-   complex v=0;
-   int     i_=0;
+   int        i=0;
+   int        n2=0;
+   int        idx=0;
+   al_complex hn=0;
+   al_complex hmnc=0;
+   al_complex v=0;
+   int        i_=0;
 //--- create array
    double buf[];
 //--- object of class
@@ -307,14 +307,14 @@ static void CFastFourierTransform::FFTR1D(double &a[],const int n,complex &f[])
 //| (although higher N/2 are still not used) because array size is   |
 //| used to automatically determine FFT length                       |
 //+------------------------------------------------------------------+
-static void CFastFourierTransform::FFTR1DInv(complex &f[],const int n,
+static void CFastFourierTransform::FFTR1DInv(al_complex &f[],const int n,
                                              double &a[])
   {
 //--- create a variable
    int i=0;
 //--- create arrays
-   double  h[];
-   complex fh[];
+   double     h[];
+   al_complex fh[];
 //--- check
    if(!CAp::Assert(n>0,__FUNCTION__+": incorrect N!"))
       return;
@@ -384,15 +384,15 @@ static void CFastFourierTransform::FFTR1DInternalEven(double &a[],const int n,
                                                       double &buf[],CFtPlan &plan)
   {
 //--- create variables
-   double  x=0;
-   double  y=0;
-   int     i=0;
-   int     n2=0;
-   int     idx=0;
-   complex hn=0;
-   complex hmnc=0;
-   complex v=0;
-   int     i_=0;
+   double     x=0;
+   double     y=0;
+   int        i=0;
+   int        n2=0;
+   int        idx=0;
+   al_complex hn=0;
+   al_complex hmnc=0;
+   al_complex v=0;
+   int        i_=0;
 //--- check
    if(!CAp::Assert(n>0 && n%2==0,__FUNCTION__+": incorrect N!"))
       return;
@@ -505,15 +505,15 @@ public:
                      CConv(void);
                     ~CConv(void);
    //--- methods
-   static void       ConvC1D(complex &a[],const int m,complex &b[],const int n,complex &r[]);
-   static void       ConvC1DInv(complex &a[],const int m,complex &b[],const int n,complex &r[]);
-   static void       ConvC1DCircular(complex &s[],const int m,complex &r[],const int n,complex &c[]);
-   static void       ConvC1DCircularInv(complex &a[],const int m,complex &b[],const int n,complex &r[]);
+   static void       ConvC1D(al_complex &a[],const int m,al_complex &b[],const int n,al_complex &r[]);
+   static void       ConvC1DInv(al_complex &a[],const int m,al_complex &b[],const int n,al_complex &r[]);
+   static void       ConvC1DCircular(al_complex &s[],const int m,al_complex &r[],const int n,al_complex &c[]);
+   static void       ConvC1DCircularInv(al_complex &a[],const int m,al_complex &b[],const int n,al_complex &r[]);
    static void       ConvR1D(double &a[],const int m,double &b[],const int n,double &r[]);
    static void       ConvR1DInv(double &a[],const int m,double &b[],const int n,double &r[]);
    static void       ConvR1DCircular(double &s[],const int m,double &r[],const int n,double &c[]);
    static void       ConvR1DCircularInv(double &a[],const int m,double &b[],const int n,double &r[]);
-   static void       ConvC1DX(complex &a[],const int m,complex &b[],const int n,const bool circular,int alg,int q,complex &r[]);
+   static void       ConvC1DX(al_complex &a[],const int m,al_complex &b[],const int n,const bool circular,int alg,int q,al_complex &r[]);
    static void       ConvR1DX(double &a[],const int m,double &b[],const int n,const bool circular,int alg,int q,double &r[]);
   };
 //+------------------------------------------------------------------+
@@ -552,8 +552,8 @@ CConv::~CConv(void)
 //| still use this subroutine - just shift its result                |
 //| correspondingly.                                                 |
 //+------------------------------------------------------------------+
-static void CConv::ConvC1D(complex &a[],const int m,complex &b[],const int n,
-                           complex &r[])
+static void CConv::ConvC1D(al_complex &a[],const int m,al_complex &b[],const int n,
+                           al_complex &r[])
   {
 //--- check
    if(!CAp::Assert(n>0 && m>0,__FUNCTION__+": incorrect N or M!"))
@@ -589,16 +589,16 @@ static void CConv::ConvC1D(complex &a[],const int m,complex &b[],const int n,
 //| or both functions have non-zero values at negative T's, you can  |
 //| still use this subroutine - just shift its result correspondingly|
 //+------------------------------------------------------------------+
-static void CConv::ConvC1DInv(complex &a[],const int m,complex &b[],
-                              const int n,complex &r[])
+static void CConv::ConvC1DInv(al_complex &a[],const int m,al_complex &b[],
+                              const int n,al_complex &r[])
   {
 //--- create variables
-   int     i=0;
-   int     p=0;
-   complex c1=0;
-   complex c2=0;
-   complex c3=0;
-   double  t=0;
+   int        i=0;
+   int        p=0;
+   al_complex c1=0;
+   al_complex c2=0;
+   al_complex c3=0;
+   double     t=0;
 //--- create arrays
    double buf[];
    double buf2[];
@@ -684,8 +684,8 @@ static void CConv::ConvC1DInv(complex &a[],const int m,complex &b[],
 //| values at negative T's, you can still use this subroutine - just |
 //| shift its result correspondingly.                                |
 //+------------------------------------------------------------------+
-static void CConv::ConvC1DCircular(complex &s[],const int m,complex &r[],
-                                   const int n,complex &c[])
+static void CConv::ConvC1DCircular(al_complex &s[],const int m,al_complex &r[],
+                                   const int n,al_complex &c[])
   {
 //--- create variables
    int i1=0;
@@ -694,7 +694,7 @@ static void CConv::ConvC1DCircular(complex &s[],const int m,complex &r[],
    int i_=0;
    int i1_=0;
 //--- create array
-   complex buf[];
+   al_complex buf[];
 //--- check
    if(!CAp::Assert(n>0 && m>0,__FUNCTION__+": incorrect N or M!"))
       return;
@@ -748,24 +748,24 @@ static void CConv::ConvC1DCircular(complex &s[],const int m,complex &r[],
 //| values at negative T's, you can still use this subroutine - just |
 //| shift its result correspondingly.                                |
 //+------------------------------------------------------------------+
-static void CConv::ConvC1DCircularInv(complex &a[],const int m,complex &b[],
-                                      const int n,complex &r[])
+static void CConv::ConvC1DCircularInv(al_complex &a[],const int m,al_complex &b[],
+                                      const int n,al_complex &r[])
   {
 //--- create variables
-   int     i=0;
-   int     i1=0;
-   int     i2=0;
-   int     j2=0;
-   complex c1=0;
-   complex c2=0;
-   complex c3=0;
-   double  t=0;
-   int     i_=0;
-   int     i1_=0;
+   int        i=0;
+   int        i1=0;
+   int        i2=0;
+   int        j2=0;
+   al_complex c1=0;
+   al_complex c2=0;
+   al_complex c3=0;
+   double     t=0;
+   int        i_=0;
+   int        i1_=0;
 //--- create arrays
-   double  buf[];
-   double  buf2[];
-   complex cbuf[];
+   double     buf[];
+   double     buf2[];
+   al_complex cbuf[];
 //--- object of class
    CFtPlan plan;
 //--- check
@@ -902,12 +902,12 @@ static void CConv::ConvR1DInv(double &a[],const int m,double &b[],
                               const int n,double &r[])
   {
 //--- create variables
-   int     i=0;
-   int     p=0;
-   complex c1=0;
-   complex c2=0;
-   complex c3=0;
-   int     i_=0;
+   int        i=0;
+   int        p=0;
+   al_complex c1=0;
+   al_complex c2=0;
+   al_complex c3=0;
+   int        i_=0;
 //--- create arrays
    double buf[];
    double buf2[];
@@ -1044,21 +1044,21 @@ static void CConv::ConvR1DCircularInv(double &a[],const int m,double &b[],
                                       const int n,double &r[])
   {
 //--- create variables
-   int     i=0;
-   int     i1=0;
-   int     i2=0;
-   int     j2=0;
-   complex c1=0;
-   complex c2=0;
-   complex c3=0;
-   int     i_=0;
-   int     i1_=0;
+   int        i=0;
+   int        i1=0;
+   int        i2=0;
+   int        j2=0;
+   al_complex c1=0;
+   al_complex c2=0;
+   al_complex c3=0;
+   int        i_=0;
+   int        i1_=0;
 //--- create arrays
-   double  buf[];
-   double  buf2[];
-   double  buf3[];
-   complex cbuf[];
-   complex cbuf2[];
+   double     buf[];
+   double     buf2[];
+   double     buf3[];
+   al_complex cbuf[];
+   al_complex cbuf2[];
 //--- object of class
    CFtPlan plan;
 //--- check
@@ -1175,35 +1175,35 @@ static void CConv::ConvR1DCircularInv(double &a[],const int m,double &b[],
 //| OUTPUT PARAMETERS                                                |
 //|     R   -   convolution: A*B. array[0..N+M-1].                   |
 //+------------------------------------------------------------------+
-static void CConv::ConvC1DX(complex &a[],const int m,complex &b[],const int n,
-                            const bool circular,int alg,int q,complex &r[])
+static void CConv::ConvC1DX(al_complex &a[],const int m,al_complex &b[],const int n,
+                            const bool circular,int alg,int q,al_complex &r[])
   {
 //--- create variables
-   int     i=0;
-   int     j=0;
-   int     p=0;
-   int     ptotal=0;
-   int     i1=0;
-   int     i2=0;
-   int     j1=0;
-   int     j2=0;
-   complex v=0;
-   double  ax=0;
-   double  ay=0;
-   double  bx=0;
-   double  by=0;
-   double  t=0;
-   double  tx=0;
-   double  ty=0;
-   double  flopcand=0;
-   double  flopbest=0;
-   int     algbest=0;
-   int     i_=0;
-   int     i1_=0;
+   int        i=0;
+   int        j=0;
+   int        p=0;
+   int        ptotal=0;
+   int        i1=0;
+   int        i2=0;
+   int        j1=0;
+   int        j2=0;
+   al_complex v=0;
+   double     ax=0;
+   double     ay=0;
+   double     bx=0;
+   double     by=0;
+   double     t=0;
+   double     tx=0;
+   double     ty=0;
+   double     flopcand=0;
+   double     flopbest=0;
+   int        algbest=0;
+   int        i_=0;
+   int        i1_=0;
 //--- create arrays
-   complex bbuf[];
-   double  buf[];
-   double  buf2[];
+   al_complex bbuf[];
+   double     buf[];
+   double     buf2[];
 //--- object of class
    CFtPlan plan;
 //--- check
@@ -2021,8 +2021,8 @@ public:
                      CCorr(void);
                     ~CCorr(void);
    //--- methods
-   static void       CorrC1D(complex &signal[],const int n,complex &pattern[],const int m,complex &r[]);
-   static void       CorrC1DCircular(complex &signal[],const int m,complex &pattern[],const int n,complex &c[]);
+   static void       CorrC1D(al_complex &signal[],const int n,al_complex &pattern[],const int m,al_complex &r[]);
+   static void       CorrC1DCircular(al_complex &signal[],const int m,al_complex &pattern[],const int n,al_complex &c[]);
    static void       CorrR1D(double &signal[],const int n,double &pattern[],const int m,double &r[]);
    static void       CorrR1DCircular(double &signal[],const int m,double &pattern[],const int n,double &c[]);
   };
@@ -2070,16 +2070,16 @@ CCorr::~CCorr(void)
 //| non-zero on [-K..M-1], you can still use this subroutine, just   |
 //| shift result by K.                                               |
 //+------------------------------------------------------------------+
-static void CCorr::CorrC1D(complex &signal[],const int n,complex &pattern[],
-                           const int m,complex &r[])
+static void CCorr::CorrC1D(al_complex &signal[],const int n,al_complex &pattern[],
+                           const int m,al_complex &r[])
   {
 //--- create variables
    int i=0;
    int i_=0;
    int i1_=0;
 //--- create arrays
-   complex p[];
-   complex b[];
+   al_complex p[];
+   al_complex b[];
 //--- check
    if(!CAp::Assert(n>0 && m>0,__FUNCTION__+": incorrect N or M!"))
       return;
@@ -2122,8 +2122,8 @@ static void CCorr::CorrC1D(complex &signal[],const int n,complex &pattern[],
 //| OUTPUT PARAMETERS                                                |
 //|     R   -   convolution: A*B. array[0..M-1].                     |
 //+------------------------------------------------------------------+
-static void CCorr::CorrC1DCircular(complex &signal[],const int m,complex &pattern[],
-                                   const int n,complex &c[])
+static void CCorr::CorrC1DCircular(al_complex &signal[],const int m,al_complex &pattern[],
+                                   const int n,al_complex &c[])
   {
 //--- create variables
    int i1=0;
@@ -2133,8 +2133,8 @@ static void CCorr::CorrC1DCircular(complex &signal[],const int m,complex &patter
    int i_=0;
    int i1_=0;
 //--- create arrays
-   complex p[];
-   complex b[];
+   al_complex p[];
+   al_complex b[];
 //--- check
    if(!CAp::Assert(n>0 && m>0,__FUNCTION__+": incorrect N or M!"))
       return;
@@ -2372,7 +2372,7 @@ static void CFastHartleyTransform::FHTR1D(double &a[],const int n)
 //--- create a variable
    int i=0;
 //--- create array
-   complex fa[];
+   al_complex fa[];
 //--- object of class
    CFtPlan plan;
 //--- check

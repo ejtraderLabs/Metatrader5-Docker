@@ -133,9 +133,9 @@ public:
    bool              AddToChart(const long chart,const int subwin);
    bool              DeleteFromChart(const long chart,const int subwin);
    //--- methods of conversion of constants to strings
-   string            MethodDescription(const int val) const;
-   string            PriceDescription(const int val) const;
-   string            VolumeDescription(const int val) const;
+   static string     MethodDescription(const int val);
+   static string     PriceDescription(const int val);
+   static string     VolumeDescription(const int val);
 
 protected:
    //--- methods of tuning
@@ -448,69 +448,69 @@ bool CIndicator::DeleteFromChart(const long chart,const int subwin)
 //+------------------------------------------------------------------+
 //| Converting value of ENUM_MA_METHOD into string                   |
 //+------------------------------------------------------------------+
-string CIndicator::MethodDescription(const int val) const
+string CIndicator::MethodDescription(const int val)
   {
-   string str;
-//--- array for conversion of ENUM_MA_METHOD to string
-   static string _m_str[]={"SMA","EMA","SMMA","LWMA"};
-//--- check
-   if(val<0)
-      return("ERROR");
-//---
-   if(val<4)
-      str=_m_str[val];
-   else
-   if(val<10)
-      str="METHOD_UNKNOWN="+IntegerToString(val);
-//---
-   return(str);
+//--- select by value
+   switch(val)
+     {
+      case ENUM_MA_METHOD::MODE_SMA:
+         return("SMA");
+      case ENUM_MA_METHOD::MODE_EMA:
+         return("EMA");
+      case ENUM_MA_METHOD::MODE_SMMA:
+         return("SMMA");
+      case ENUM_MA_METHOD::MODE_LWMA:
+         return("LWMA");
+     }
+//--- wrong value
+   return("MethodUnknown="+IntegerToString(val));
   }
 //+------------------------------------------------------------------+
 //| Converting value of ENUM_APPLIED_PRICE into string               |
 //+------------------------------------------------------------------+
-string CIndicator::PriceDescription(const int val) const
+string CIndicator::PriceDescription(const int val)
   {
-   string str;
-//--- array for conversion of ENUM_APPLIED_PRICE to string
-   static string _a_str[]={"Close","Open","High","Low","Median","Typical","Weighted"};
-//--- check
-   if(val<0)
-      return("Unknown");
-//---
-   if(val<7)
-      str=_a_str[val];
-   else
+//--- select by value
+   switch(val)
      {
-      if(val<10)
-         str="PriceUnknown="+IntegerToString(val);
-      else
-         str="AppliedHandle="+IntegerToString(val);
+      case ENUM_APPLIED_PRICE::PRICE_CLOSE:
+         return("Close");
+      case ENUM_APPLIED_PRICE::PRICE_OPEN:
+         return("Open");
+      case ENUM_APPLIED_PRICE::PRICE_HIGH:
+         return("High");
+      case ENUM_APPLIED_PRICE::PRICE_LOW:
+         return("Low");
+      case ENUM_APPLIED_PRICE::PRICE_MEDIAN:
+         return("Median");
+      case ENUM_APPLIED_PRICE::PRICE_TYPICAL:
+         return("Typical");
+      case ENUM_APPLIED_PRICE::PRICE_WEIGHTED:
+         return("Weighted");
+      default:
+         //--- is an indicator handle
+         if(val>=10)
+            return("AppliedHandle="+IntegerToString(val));
+         //---
+         break;
      }
-//---
-   return(str);
+//--- wrong value
+   return("PriceUnknown="+IntegerToString(val));
   }
 //+------------------------------------------------------------------+
 //| Converting value of ENUM_APPLIED_VOLUME into string              |
 //+------------------------------------------------------------------+
-string CIndicator::VolumeDescription(const int val) const
+string CIndicator::VolumeDescription(const int val)
   {
-   string str;
-//--- array for conversion of ENUM_APPLIED_VOLUME to string
-   static string _v_str[]={"None","Tick","Real"};
-//--- check
-   if(val<0)
-      return("Unknown");
-//---
-   if(val<3)
-      str=_v_str[val];
-   else
+//--- select by value
+   switch(val)
      {
-      if(val<10)
-         str="VolumeUnknown="+IntegerToString(val);
-      else
-         str="AppliedHandle="+IntegerToString(val);
+      case ENUM_APPLIED_VOLUME::VOLUME_TICK:
+         return("Tick");
+      case ENUM_APPLIED_VOLUME::VOLUME_REAL:
+         return("Real");
      }
-//---
-   return(str);
+//--- wrong value
+   return("VolumeUnknown="+IntegerToString(val));
   }
 //+------------------------------------------------------------------+

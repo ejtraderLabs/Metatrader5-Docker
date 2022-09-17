@@ -18,13 +18,17 @@ public:
    static int        GetPrime(const int min);
    static int        ExpandPrime(const int old_size);
   };
-const static int  CPrimeGenerator::s_primes[]=
+const static int CPrimeGenerator::s_primes[]=
   {
    3,7,11,17,23,29,37,47,59,71,89,107,131,163,197,239,293,353,431,521,631,761,919,
    1103,1327,1597,1931,2333,2801,3371,4049,4861,5839,7013,8419,10103,12143,14591,
    17519,21023,25229,30293,36353,43627,52361,62851,75431,90523,108631,130363,156437,
    187751,225307,270371,324449,389357,467237,560689,672827,807403,968897,1162687,1395263,
-   1674319,2009191,2411033,2893249,3471899,4166287,4999559,5999471,7199369
+   1674319,2009191,2411033,2893249,3471899,4166287,4999559,5999471,7199369,8332579,
+   9999161,11998949,14398753,16665163,19998337,23997907,28797523,33330329,39996683,
+   47995853,57595063,66660701,79993367,95991737,115190149,133321403,159986773,191983481,
+   230380307,266642809,319973567,383966977,460760623,533285671,639947149,767933981,
+   921521257,1066571383,1279894313,1535867969,1843042529,2133142771
   };
 const static int CPrimeGenerator::s_hash_prime=101;
 //+------------------------------------------------------------------+
@@ -32,7 +36,7 @@ const static int CPrimeGenerator::s_hash_prime=101;
 //+------------------------------------------------------------------+
 bool CPrimeGenerator::IsPrime(const int candidate)
   {
-   if((candidate  &1)!=0)
+   if((candidate&1)!=0)
      {
       int limit=(int)MathSqrt(candidate);
       //--- check value is prime
@@ -41,10 +45,10 @@ bool CPrimeGenerator::IsPrime(const int candidate)
             return(false);
       return(true);
      }
-   return(candidate == 2);
+   return(candidate==2);
   }
 //+------------------------------------------------------------------+
-//| Fast generator of parime value.                                  |
+//| Fast generator of prime value.                                   |
 //+------------------------------------------------------------------+
 int CPrimeGenerator::GetPrime(const int min)
   {
@@ -70,10 +74,8 @@ int CPrimeGenerator::GetPrime(const int min)
 //+------------------------------------------------------------------+
 int CPrimeGenerator::ExpandPrime(const int old_size)
   {
-   int new_size=2*old_size;
-   if((uint)new_size>INT_MAX && INT_MAX>old_size)
-      return INT_MAX;
-   else
-      return GetPrime(new_size);
+   if(old_size>=INT_MAX/2)
+      return(INT_MAX);
+   return(GetPrime(old_size*2));
   }
 //+------------------------------------------------------------------+

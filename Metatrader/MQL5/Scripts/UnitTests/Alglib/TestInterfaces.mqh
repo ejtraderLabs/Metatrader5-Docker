@@ -875,7 +875,7 @@ bool Doc_Test_Real(double val,double test_val,double _threshold)
 //+------------------------------------------------------------------+
 //| A comparison of two numbers with an accuracy                     |
 //+------------------------------------------------------------------+
-bool Doc_Test_Complex(complex &val,complex &test_val,double _threshold)
+bool Doc_Test_Complex(al_complex &val,al_complex &test_val,double _threshold)
   {
 //--- calculation
    double s=_threshold>=0 ? 1.0 : CMath::AbsComplex(test_val);
@@ -972,7 +972,7 @@ bool Doc_Test_Real_Matrix(CMatrixDouble &val,CMatrixDouble &test_val,double _thr
 //+------------------------------------------------------------------+
 //| A comparison of two vectors with an accuracy                     |
 //+------------------------------------------------------------------+
-bool Doc_Test_Complex_Vector(complex &val[],complex &test_val[],double _threshold)
+bool Doc_Test_Complex_Vector(al_complex &val[],al_complex &test_val[],double _threshold)
   {
 //--- create a variable
    int i;
@@ -1044,7 +1044,7 @@ void Spoil_Vector_By_Adding_Element(double &x[])
 //+------------------------------------------------------------------+
 //| Add to the vector random element                                 |
 //+------------------------------------------------------------------+
-void Spoil_Vector_By_Adding_Element(complex &x[])
+void Spoil_Vector_By_Adding_Element(al_complex &x[])
   {
 //--- size calculation
    int n=ArraySize(x);
@@ -1077,7 +1077,7 @@ void Spoil_Vector_By_Deleting_Element(double &x[])
 //+------------------------------------------------------------------+
 //| Removing the number of vector                                    |
 //+------------------------------------------------------------------+
-void Spoil_Vector_By_Deleting_Element(complex &x[])
+void Spoil_Vector_By_Deleting_Element(al_complex &x[])
   {
 //--- size calculation
    int n=ArraySize(x);
@@ -1247,7 +1247,7 @@ void Spoil_Vector_By_Value(int &x[],int &val)
   {
 //--- size calculation
    int n=ArraySize(x);
-//--- ????????? ????? ? ????????? ?????? ???????
+//--- set value
    if(n!=0)
       x[CMath::RandomInteger(n)]=val;
   }
@@ -1265,7 +1265,7 @@ void Spoil_Vector_By_Value(double &x[],double val)
 //+------------------------------------------------------------------+
 //| Set number to a random position                                  |
 //+------------------------------------------------------------------+
-void Spoil_Vector_By_Value(complex &x[],complex &val)
+void Spoil_Vector_By_Value(al_complex &x[],al_complex &val)
   {
 //--- size calculation
    int n=ArraySize(x);
@@ -1300,7 +1300,7 @@ void Spoil_Matrix_By_Value(CMatrixDouble &x,double val)
 //+------------------------------------------------------------------+
 //| Set number to a random position                                  |
 //+------------------------------------------------------------------+
-void Spoil_Matrix_By_Value(CMatrixComplex &x,complex &val)
+void Spoil_Matrix_By_Value(CMatrixComplex &x,al_complex &val)
   {
 //--- get cols and rows
    int n=CAp::Rows(x);
@@ -3204,11 +3204,11 @@ void TEST_MatInv_D_C1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
 //--- create variables
    CMatrixComplex a;
    CMatrixComplex tempmatrix;
-   complex        tempcomplex1;
-   complex        tempcomplex2;
-   complex        cnan;
-   complex        cpositiveinfinity;
-   complex        cnegativeinfinity;
+   al_complex     tempcomplex1;
+   al_complex     tempcomplex2;
+   al_complex     cnan;
+   al_complex     cpositiveinfinity;
+   al_complex     cnegativeinfinity;
 //--- testing
    for(_spoil_scenario=-1;_spoil_scenario<7;_spoil_scenario++)
      {
@@ -3355,9 +3355,9 @@ void TEST_MatInv_D_HPD1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResul
 //--- create variables
    CMatrixComplex a;
    CMatrixComplex tempmatrix;
-   complex cnan;
-   complex cpositiveinfinity;
-   complex cnegativeinfinity;
+   al_complex cnan;
+   al_complex cpositiveinfinity;
+   al_complex cnegativeinfinity;
 //--- testing
    for(_spoil_scenario=-1;_spoil_scenario<7;_spoil_scenario++)
      {
@@ -3460,8 +3460,8 @@ void TEST_MatInv_T_R1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
 void TEST_MatInv_T_C1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
   {
    CMatrixComplex a;
-   complex tempcomplex1;
-   complex tempcomplex2;
+   al_complex tempcomplex1;
+   al_complex tempcomplex2;
    _TestResult=true;
 //--- create variables
    tempcomplex1.re=0;
@@ -5552,13 +5552,13 @@ void TEST_FFT_Complex_D1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResu
   {
    _TestResult=true;
 //--- create variables
-   complex z[];
-   complex temparray[];
-   complex tempcomplex1;
-   complex tempcomplex2;
-   complex cnan;
-   complex cpositiveinfinity;
-   complex cnegativeinfinity;
+   al_complex z[];
+   al_complex temparray[];
+   al_complex tempcomplex1;
+   al_complex tempcomplex2;
+   al_complex cnan;
+   al_complex cpositiveinfinity;
+   al_complex cnegativeinfinity;
 //--- testing
    for(_spoil_scenario=-1;_spoil_scenario<3;_spoil_scenario++)
      {
@@ -5635,14 +5635,14 @@ void TEST_FFT_Complex_D2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResu
   {
    _TestResult=true;
 //--- create variables
-   complex z[];
-   complex temparray[];
-   complex tempcomplex1;
-   complex tempcomplex2;
-   complex tempcomplex3;
-   complex cnan;
-   complex cpositiveinfinity;
-   complex cnegativeinfinity;
+   al_complex z[];
+   al_complex temparray[];
+   al_complex tempcomplex1;
+   al_complex tempcomplex2;
+   al_complex tempcomplex3;
+   al_complex cnan;
+   al_complex cpositiveinfinity;
+   al_complex cnegativeinfinity;
 //--- testing
    for(_spoil_scenario=-1;_spoil_scenario<3;_spoil_scenario++)
      {
@@ -5721,11 +5721,11 @@ void TEST_FFT_Real_D1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
   {
    _TestResult=true;
 //--- create variables
-   double  x[];
-   complex tempcarray[];
-   double  temparray[];
-   complex f[];
-   double  x2[];
+   double     x[];
+   al_complex tempcarray[];
+   double     temparray[];
+   al_complex f[];
+   double     x2[];
 //--- testing
    for(_spoil_scenario=-1;_spoil_scenario<3;_spoil_scenario++)
      {
@@ -5790,13 +5790,13 @@ void TEST_FFT_Real_D2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
   {
    _TestResult=true;
 //--- create variables
-   double  x[];
-   double  temparray[];
-   complex tempcarray[];
-   complex f[];
-   double  x2[];
-   complex tempcomplex1;
-   complex tempcomplex2;
+   double     x[];
+   double     temparray[];
+   al_complex tempcarray[];
+   al_complex f[];
+   double     x2[];
+   al_complex tempcomplex1;
+   al_complex tempcomplex2;
 //--- testing
    for(_spoil_scenario=-1;_spoil_scenario<3;_spoil_scenario++)
      {
@@ -5894,13 +5894,13 @@ void TEST_FFT_Complex_E1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResu
   {
    _TestResult=true;
 //--- create variables
-   complex tempcomplex1;
-   complex tempcomplex2;
-   complex z[];
-   complex temparray[];
-   complex cnan;
-   complex cpositiveinfinity;
-   complex cnegativeinfinity;
+   al_complex tempcomplex1;
+   al_complex tempcomplex2;
+   al_complex z[];
+   al_complex temparray[];
+   al_complex cnan;
+   al_complex cpositiveinfinity;
+   al_complex cnegativeinfinity;
 //--- testing
    for(_spoil_scenario=-1;_spoil_scenario<3;_spoil_scenario++)
      {
@@ -11206,14 +11206,14 @@ void TEST_MatDet_D_3(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
   {
    _TestResult=true;
 //--- create variables
-   complex        a;
-   complex        tempcomplex1;
-   complex        tempcomplex2;
-   complex        tempcomplex3;
+   al_complex     a;
+   al_complex     tempcomplex1;
+   al_complex     tempcomplex2;
+   al_complex     tempcomplex3;
    CMatrixComplex b;
-   complex        cnan;
-   complex        cpositiveinfinity;
-   complex        cnegativeinfinity;
+   al_complex     cnan;
+   al_complex     cpositiveinfinity;
+   al_complex     cnegativeinfinity;
 //--- testing
    for(_spoil_scenario=-1;_spoil_scenario<7;_spoil_scenario++)
      {
@@ -11282,14 +11282,14 @@ void TEST_MatDet_D_4(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
   {
    _TestResult=true;
 //--- create variables
-   complex        a;
-   complex        tempcomplex1;
-   complex        tempcomplex2;
-   complex        tempcomplex3;
+   al_complex     a;
+   al_complex     tempcomplex1;
+   al_complex     tempcomplex2;
+   al_complex     tempcomplex3;
    CMatrixComplex b;
-   complex        cnan;
-   complex        cpositiveinfinity;
-   complex        cnegativeinfinity;
+   al_complex     cnan;
+   al_complex     cpositiveinfinity;
+   al_complex     cnegativeinfinity;
 //--- testing
    for(_spoil_scenario=-1;_spoil_scenario<5;_spoil_scenario++)
      {
@@ -11353,12 +11353,12 @@ void TEST_MatDet_D_5(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
   {
    _TestResult=true;
 //--- create variables
-   complex        a;
-   complex        tempcomplex;
+   al_complex     a;
+   al_complex     tempcomplex;
    CMatrixComplex b;
-   complex        cnan;
-   complex        cpositiveinfinity;
-   complex        cnegativeinfinity;
+   al_complex     cnan;
+   al_complex     cpositiveinfinity;
+   al_complex     cnegativeinfinity;
 //--- testing
    for(_spoil_scenario=-1;_spoil_scenario<7;_spoil_scenario++)
      {
@@ -11596,13 +11596,13 @@ void TEST_MatDet_T_3(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
   {
    _TestResult=true;
 //--- create variables
-   complex        a;
+   al_complex     a;
    CMatrixComplex b;
-   complex        tempcomplex1;
-   complex        tempcomplex2;
-   complex        cnan;
-   complex        cpositiveinfinity;
-   complex        cnegativeinfinity;
+   al_complex     tempcomplex1;
+   al_complex     tempcomplex2;
+   al_complex     cnan;
+   al_complex     cpositiveinfinity;
+   al_complex     cnegativeinfinity;
 //--- testing
    for(_spoil_scenario=-1;_spoil_scenario<5;_spoil_scenario++)
      {
@@ -11663,14 +11663,14 @@ void TEST_MatDet_T_4(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
   {
    _TestResult=true;
 //--- create variables
-   complex        a;
+   al_complex     a;
    int            p[];
-   complex        tempcomplex1;
-   complex        tempcomplex2;
+   al_complex     tempcomplex1;
+   al_complex     tempcomplex2;
    CMatrixComplex b;
-   complex        cnan;
-   complex        cpositiveinfinity;
-   complex        cnegativeinfinity;
+   al_complex     cnan;
+   al_complex     cpositiveinfinity;
+   al_complex     cnegativeinfinity;
 //--- testing
    for(_spoil_scenario=-1;_spoil_scenario<9;_spoil_scenario++)
      {
@@ -11748,13 +11748,13 @@ void TEST_MatDet_T_5(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
   {
    _TestResult=true;
 //--- create variables
-   complex        a;
-   complex        tempcomplex1;
-   complex        tempcomplex2;
+   al_complex     a;
+   al_complex     tempcomplex1;
+   al_complex     tempcomplex2;
    CMatrixComplex b;
-   complex        cnan;
-   complex        cpositiveinfinity;
-   complex        cnegativeinfinity;
+   al_complex     cnan;
+   al_complex     cpositiveinfinity;
+   al_complex     cnegativeinfinity;
    int            p[];
 //--- testing
    for(_spoil_scenario=-1;_spoil_scenario<6;_spoil_scenario++)

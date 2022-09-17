@@ -1570,7 +1570,7 @@ private:
    static bool       InternalRMatrixTrInverse(CMatrixDouble &a,const int n,const bool isupper,const bool isunittriangular);
    static void       RefCMatrixSyrk(const int n,const int k,const double alpha,CMatrixComplex &a,const int ia,const int ja,const int optypea,const double beta,CMatrixComplex &c,const int ic,const int jc,const bool isupper);
    static void       RefRMatrixSyrk(const int n,const int k,const double alpha,CMatrixDouble &a,const int ia,const int ja,const int optypea,const double beta,CMatrixDouble &c,const int ic,const int jc,const bool isupper);
-   static void       RefCMatrixGemm(const int m,const int n,const int k,complex &alpha,CMatrixComplex &a,const int ia,const int ja,const int optypea,CMatrixComplex &b,const int ib,const int jb,const int optypeb,complex &beta,CMatrixComplex &c,const int ic,const int jc);
+   static void       RefCMatrixGemm(const int m,const int n,const int k,al_complex &alpha,CMatrixComplex &a,const int ia,const int ja,const int optypea,CMatrixComplex &b,const int ib,const int jb,const int optypeb,al_complex &beta,CMatrixComplex &c,const int ic,const int jc);
    static void       RefRMatrixGemm(const int m,const int n,const int k,const double alpha,CMatrixDouble &a,const int ia,const int ja,const int optypea,CMatrixDouble &b,const int ib,const int jb,const int optypeb,const double beta,CMatrixDouble &c,const int ic,const int jc);
   };
 //+------------------------------------------------------------------+
@@ -2287,28 +2287,28 @@ static bool CTestAblasUnit::TestSyrk(const int minn,const int maxn)
 static bool CTestAblasUnit::TestGemm(const int minn,const int maxn)
   {
 //--- create variables
-   bool    result;
-   int     m=0;
-   int     n=0;
-   int     k=0;
-   int     mx=0;
-   int     i=0;
-   int     j=0;
-   int     aoffsi=0;
-   int     aoffsj=0;
-   int     aoptype=0;
-   int     aoptyper=0;
-   int     boffsi=0;
-   int     boffsj=0;
-   int     boptype=0;
-   int     boptyper=0;
-   int     coffsi=0;
-   int     coffsj=0;
-   double  alphar=0;
-   double  betar=0;
-   complex alphac=0;
-   complex betac=0;
-   double  threshold=0;
+   bool       result;
+   int        m=0;
+   int        n=0;
+   int        k=0;
+   int        mx=0;
+   int        i=0;
+   int        j=0;
+   int        aoffsi=0;
+   int        aoffsj=0;
+   int        aoptype=0;
+   int        aoptyper=0;
+   int        boffsi=0;
+   int        boffsj=0;
+   int        boptype=0;
+   int        boptyper=0;
+   int        coffsi=0;
+   int        coffsj=0;
+   double     alphar=0;
+   double     betar=0;
+   al_complex alphac=0;
+   al_complex betac=0;
+   double     threshold=0;
 //--- create matrix
    CMatrixDouble  refra;
    CMatrixDouble  refrb;
@@ -2554,10 +2554,10 @@ static bool CTestAblasUnit::TestRank1(const int minn,const int maxn)
    int    voffs=0;
    double threshold=0;
 //--- create arrays
-   double ru[];
-   double rv[];
-   complex cu[];
-   complex cv[];
+   double     ru[];
+   double     rv[];
+   al_complex cu[];
+   al_complex cv[];
 //--- create matrix
    CMatrixDouble  refra;
    CMatrixDouble  refrb;
@@ -2662,30 +2662,30 @@ static bool CTestAblasUnit::TestRank1(const int minn,const int maxn)
 static bool CTestAblasUnit::TestMV(const int minn,const int maxn)
   {
 //--- create variables
-   bool    result;
-   int     m=0;
-   int     n=0;
-   int     mx=0;
-   int     i=0;
-   int     j=0;
-   int     aoffsi=0;
-   int     aoffsj=0;
-   int     xoffs=0;
-   int     yoffs=0;
-   int     opca=0;
-   int     opra=0;
-   double  threshold=0;
-   double  rv1=0;
-   double  rv2=0;
-   complex cv1=0;
-   complex cv2=0;
-   int     i_=0;
-   int     i1_=0;
+   bool       result;
+   int        m=0;
+   int        n=0;
+   int        mx=0;
+   int        i=0;
+   int        j=0;
+   int        aoffsi=0;
+   int        aoffsj=0;
+   int        xoffs=0;
+   int        yoffs=0;
+   int        opca=0;
+   int        opra=0;
+   double     threshold=0;
+   double     rv1=0;
+   double     rv2=0;
+   al_complex cv1=0;
+   al_complex cv2=0;
+   int        i_=0;
+   int        i1_=0;
 //--- create arrays
-   double  rx[];
-   double  ry[];
-   complex cx[];
-   complex cy[];
+   double     rx[];
+   double     ry[];
+   al_complex cx[];
+   al_complex cy[];
 //--- create matrix
    CMatrixDouble  refra;
    CMatrixComplex refca;
@@ -2930,14 +2930,14 @@ static void CTestAblasUnit::RefCMatrixRightTrsM(const int m,const int n,
                                                 const int i2,const int j2)
   {
 //--- create variables
-   int     i=0;
-   int     j=0;
-   complex vc=0;
-   bool    rupper;
-   int     i_=0;
-   int     i1_=0;
+   int        i=0;
+   int        j=0;
+   al_complex vc=0;
+   bool       rupper;
+   int        i_=0;
+   int        i1_=0;
 //--- create array
-   complex tx[];
+   al_complex tx[];
 //--- create matrix
    CMatrixComplex a1;
    CMatrixComplex a2;
@@ -3046,14 +3046,14 @@ static void CTestAblasUnit::RefCMatrixLeftTrsM(const int m,const int n,
                                                const int i2,const int j2)
   {
 //--- create variables
-   int     i=0;
-   int     j=0;
-   complex vc=0;
-   bool    rupper;
-   int     i_=0;
-   int     i1_=0;
+   int        i=0;
+   int        j=0;
+   al_complex vc=0;
+   bool       rupper;
+   int        i_=0;
+   int        i1_=0;
 //--- create array
-   complex tx[];
+   al_complex tx[];
 //--- create matrix
    CMatrixComplex a1;
    CMatrixComplex a2;
@@ -3358,16 +3358,16 @@ static bool CTestAblasUnit::InternalCMatrixTrInverse(CMatrixComplex &a,
                                                      const bool isunittriangular)
   {
 //--- create variables
-   bool    result;
-   bool    nounit;
-   int     i=0;
-   int     j=0;
-   complex v=0;
-   complex ajj=0;
-   complex one=1;
-   int     i_=0;
+   bool       result;
+   bool       nounit;
+   int        i=0;
+   int        j=0;
+   al_complex v=0;
+   al_complex ajj=0;
+   al_complex one=1;
+   int        i_=0;
 //--- create array
-   complex t[];
+   al_complex t[];
 //--- initialization
    result=true;
 //--- allocation
@@ -3616,10 +3616,10 @@ static void CTestAblasUnit::RefCMatrixSyrk(const int n,const int k,
                                            const int jc,const bool isupper)
   {
 //--- create variables
-   int     i=0;
-   int     j=0;
-   complex vc=0;
-   int     i_=0;
+   int        i=0;
+   int        j=0;
+   al_complex vc=0;
+   int        i_=0;
 //--- create matrix
    CMatrixComplex ae;
 //--- calculation
@@ -3760,19 +3760,19 @@ static void CTestAblasUnit::RefRMatrixSyrk(const int n,const int k,
 //| ALGLIB subroutine                                                |
 //+------------------------------------------------------------------+
 static void CTestAblasUnit::RefCMatrixGemm(const int m,const int n,
-                                           const int k,complex &alpha,
+                                           const int k,al_complex &alpha,
                                            CMatrixComplex &a,const int ia,
                                            const int ja,const int optypea,
                                            CMatrixComplex &b,const int ib,
                                            const int jb,const int optypeb,
-                                           complex &beta,CMatrixComplex &c,
+                                           al_complex &beta,CMatrixComplex &c,
                                            const int ic,const int jc)
   {
 //--- create variables
-   int     i=0;
-   int     j=0;
-   complex vc=0;
-   int     i_=0;
+   int        i=0;
+   int        j=0;
+   al_complex vc=0;
+   int        i_=0;
 //--- create matrix
    CMatrixComplex ae;
    CMatrixComplex be;
@@ -7080,24 +7080,24 @@ CTestHblasUnit::~CTestHblasUnit(void)
 static bool CTestHblasUnit::TestHblas(const bool silent)
   {
 //--- create variables
-   int     n=0;
-   int     maxn=0;
-   int     i=0;
-   int     j=0;
-   int     i1=0;
-   int     i2=0;
-   bool    waserrors;
-   double  mverr=0;
-   double  threshold=0;
-   complex alpha=0;
-   complex v=0;
-   int     i_=0;
-   int     i1_=0;
+   int        n=0;
+   int        maxn=0;
+   int        i=0;
+   int        j=0;
+   int        i1=0;
+   int        i2=0;
+   bool       waserrors;
+   double     mverr=0;
+   double     threshold=0;
+   al_complex alpha=0;
+   al_complex v=0;
+   int        i_=0;
+   int        i1_=0;
 //--- create arrays
-   complex x[];
-   complex y1[];
-   complex y2[];
-   complex y3[];
+   al_complex x[];
+   al_complex y1[];
+   al_complex y2[];
+   al_complex y3[];
 //--- create matrix
    CMatrixComplex a;
    CMatrixComplex ua;
@@ -7549,27 +7549,27 @@ CTestCReflectionsUnit::~CTestCReflectionsUnit(void)
 static bool CTestCReflectionsUnit::TestCReflections(const bool silent)
   {
 //--- create variables
-   int     i=0;
-   int     j=0;
-   int     n=0;
-   int     m=0;
-   int     maxmn=0;
-   complex tmp=0;
-   complex beta=0;
-   complex tau=0;
-   double  err=0;
-   double  mer=0;
-   double  mel=0;
-   double  meg=0;
-   int     pass=0;
-   int     passcount=0;
-   bool    waserrors;
-   double  threshold=0;
-   int     i_=0;
+   int        i=0;
+   int        j=0;
+   int        n=0;
+   int        m=0;
+   int        maxmn=0;
+   al_complex tmp=0;
+   al_complex beta=0;
+   al_complex tau=0;
+   double     err=0;
+   double     mer=0;
+   double     mel=0;
+   double     meg=0;
+   int        pass=0;
+   int        passcount=0;
+   bool       waserrors;
+   double     threshold=0;
+   int        i_=0;
 //--- create arrays
-   complex x[];
-   complex v[];
-   complex work[];
+   al_complex x[];
+   al_complex v[];
+   al_complex work[];
 //--- create matrix
    CMatrixComplex h;
    CMatrixComplex a;
@@ -8623,13 +8623,13 @@ static void CTestOrtFacUnit::TestCQRProblem(CMatrixComplex &a,const int m,
                                             bool &qrerrors)
   {
 //--- create variables
-   int     i=0;
-   int     j=0;
-   int     k=0;
-   complex v=0;
-   int     i_=0;
+   int        i=0;
+   int        j=0;
+   int        k=0;
+   al_complex v=0;
+   int        i_=0;
 //--- create array
-   complex taub[];
+   al_complex taub[];
 //--- create matrix
    CMatrixComplex b;
    CMatrixComplex q;
@@ -8761,13 +8761,13 @@ static void CTestOrtFacUnit::TestCLQProblem(CMatrixComplex &a,const int m,
                                             bool &lqerrors)
   {
 //--- create variables
-   int     i=0;
-   int     j=0;
-   int     k=0;
-   complex v=0;
-   int     i_=0;
+   int        i=0;
+   int        j=0;
+   int        k=0;
+   al_complex v=0;
+   int        i_=0;
 //--- create array
-   complex taub[];
+   al_complex taub[];
 //--- create matrix
    CMatrixComplex b;
    CMatrixComplex q;
@@ -9255,14 +9255,14 @@ static void CTestOrtFacUnit::TestCTdProblem(CMatrixComplex &a,const int n,
                                             const double threshold,bool &tderrors)
   {
 //--- create variables
-   int     i=0;
-   int     j=0;
-   complex v=0;
-   int     i_=0;
+   int        i=0;
+   int        j=0;
+   al_complex v=0;
+   int        i_=0;
 //--- create arrays
-   complex tau[];
-   double  d[];
-   double  e[];
+   al_complex tau[];
+   double     d[];
+   double     e[];
 //--- create matrix
    CMatrixComplex ua;
    CMatrixComplex la;
@@ -9436,7 +9436,7 @@ private:
    static void       Unset2D(CMatrixDouble &a);
    static void       CUnset2D(CMatrixComplex &a);
    static void       Unset1D(double &a[]);
-   static void       CUnset1D(complex &a[]);
+   static void       CUnset1D(al_complex &a[]);
    static double     TdTestProduct(double &d[],double &e[],const int n,CMatrixDouble &z,double &lambdav[]);
    static double     TestProduct(CMatrixDouble &a,const int n,CMatrixDouble &z,double &lambdav[]);
    static double     TestOrt(CMatrixDouble &z,const int n);
@@ -9709,7 +9709,7 @@ static void CTestEVDUnit::Unset1D(double &a[])
 //+------------------------------------------------------------------+
 //| Unsets 1D array.                                                 |
 //+------------------------------------------------------------------+
-static void CTestEVDUnit::CUnset1D(complex &a[])
+static void CTestEVDUnit::CUnset1D(al_complex &a[])
   {
 //--- allocation
    ArrayResize(a,1);
@@ -9840,12 +9840,12 @@ static double CTestEVDUnit::TestCProduct(CMatrixComplex &a,const int n,
                                          CMatrixComplex &z,double &lambdav[])
   {
 //--- create variables
-   double  result=0;
-   int     i=0;
-   int     j=0;
-   int     k=0;
-   complex v=0;
-   double  mx=0;
+   double     result=0;
+   int        i=0;
+   int        j=0;
+   int        k=0;
+   al_complex v=0;
+   double     mx=0;
 //--- calculation
    for(i=0;i<=n-1;i++)
      {
@@ -9879,11 +9879,11 @@ static double CTestEVDUnit::TestCProduct(CMatrixComplex &a,const int n,
 static double CTestEVDUnit::TestCOrt(CMatrixComplex &z,const int n)
   {
 //--- create variables
-   double  result=0;
-   int     i=0;
-   int     j=0;
-   complex v=0;
-   int     i_=0;
+   double     result=0;
+   int        i=0;
+   int        j=0;
+   al_complex v=0;
+   int        i_=0;
 //--- calculation
    for(i=0;i<=n-1;i++)
      {
@@ -10394,16 +10394,16 @@ static void CTestEVDUnit::TestHEVDBiProblem(CMatrixComplex &afull,
                                             bool &herrors,int &failc,int &runs)
   {
 //--- create variables
-   int     i=0;
-   int     j=0;
-   int     k=0;
-   int     m=0;
-   int     i1=0;
-   int     i2=0;
-   complex v=0;
-   double  a=0;
-   double  b=0;
-   int     i_=0;
+   int        i=0;
+   int        j=0;
+   int        k=0;
+   int        m=0;
+   int        i1=0;
+   int        i2=0;
+   al_complex v=0;
+   double     a=0;
+   double     b=0;
+   int        i_=0;
 //--- create arrays
    double lambdav[];
    double lambdaref[];
@@ -11711,27 +11711,27 @@ CTestMatGenUnit::~CTestMatGenUnit(void)
 static bool CTestMatGenUnit::TestMatGen(const bool silent)
   {
 //--- create variables
-   int     n=0;
-   int     maxn=0;
-   int     i=0;
-   int     j=0;
-   int     pass=0;
-   int     passcount=0;
-   int     equal_number=0;
-   bool    waserrors;
-   double  cond=0;
-   double  threshold=0;
-   double  vt=0;
-   complex ct=0;
-   double  minw=0;
-   double  maxw=0;
-   bool    serr;
-   bool    herr;
-   bool    spderr;
-   bool    hpderr;
-   bool    rerr;
-   bool    cerr;
-   int     i_=0;
+   int        n=0;
+   int        maxn=0;
+   int        i=0;
+   int        j=0;
+   int        pass=0;
+   int        passcount=0;
+   int        equal_number=0;
+   bool       waserrors;
+   double     cond=0;
+   double     threshold=0;
+   double     vt=0;
+   al_complex ct=0;
+   double     minw=0;
+   double     maxw=0;
+   bool       serr;
+   bool       herr;
+   bool       spderr;
+   bool       hpderr;
+   bool       rerr;
+   bool       cerr;
+   int        i_=0;
 //--- create array
    double w[];
 //--- create matrix
@@ -12456,17 +12456,17 @@ static bool CTestMatGenUnit::IsSPD(CMatrixDouble &ca,const int n,const bool isup
 static bool CTestMatGenUnit::IsHPD(CMatrixComplex &ca,const int n)
   {
 //--- create variables
-   bool    result;
-   int     j=0;
-   double  ajj=0;
-   complex v=0;
-   double  r=0;
-   int     i=0;
-   int     i_=0;
+   bool       result;
+   int        j=0;
+   double     ajj=0;
+   al_complex v=0;
+   double     r=0;
+   int        i=0;
+   int        i_=0;
 //--- create arrays
-   complex t[];
-   complex t2[];
-   complex t3[];
+   al_complex t[];
+   al_complex t2[];
+   al_complex t3[];
 //--- create matrix
    CMatrixComplex a1;
    CMatrixComplex a;
@@ -12987,22 +12987,22 @@ CTestTrFacUnit::~CTestTrFacUnit(void)
 static bool CTestTrFacUnit::TestTrFac(const bool silent)
   {
 //--- create variables
-   int     m=0;
-   int     n=0;
-   int     mx=0;
-   int     maxmn=0;
-   int     i=0;
-   int     j=0;
-   complex vc=0;
-   double  vr=0;
-   bool    waserrors;
-   bool    spderr;
-   bool    hpderr;
-   bool    rerr;
-   bool    cerr;
-   bool    properr;
-   double  threshold=0;
-   int     i_=0;
+   int        m=0;
+   int        n=0;
+   int        mx=0;
+   int        maxmn=0;
+   int        i=0;
+   int        j=0;
+   al_complex vc=0;
+   double     vr=0;
+   bool       waserrors;
+   bool       spderr;
+   bool       hpderr;
+   bool       rerr;
+   bool       cerr;
+   bool       properr;
+   double     threshold=0;
+   int        i_=0;
 //--- create matrix
    CMatrixDouble  ra;
    CMatrixDouble  ral;
@@ -13272,14 +13272,14 @@ static void CTestTrFacUnit::TestCLUProblem(CMatrixComplex &a,const int m,
                                            bool &err,bool &properr)
   {
 //--- create variables
-   int     i=0;
-   int     j=0;
-   int     minmn=0;
-   complex v=0;
-   int     i_=0;
+   int        i=0;
+   int        j=0;
+   int        minmn=0;
+   al_complex v=0;
+   int        i_=0;
 //--- create arrays
-   complex ct[];
-   int     p[];
+   al_complex ct[];
+   int        p[];
 //--- create matrix
    CMatrixComplex ca;
    CMatrixComplex cl;
@@ -13874,29 +13874,29 @@ CTestSafeSolveUnit::~CTestSafeSolveUnit(void)
 static bool CTestSafeSolveUnit::TestSafeSolve(const bool silent)
   {
 //--- create variables
-   int     maxmn=0;
-   double  threshold=0;
-   bool    rerrors;
-   bool    cerrors;
-   bool    waserrors;
-   bool    isupper;
-   int     trans=0;
-   bool    isunit;
-   double  scalea=0;
-   double  growth=0;
-   int     i=0;
-   int     j=0;
-   int     n=0;
-   int     j1=0;
-   int     j2=0;
-   complex cv=0;
-   double  rv=0;
-   int     i_=0;
+   int        maxmn=0;
+   double     threshold=0;
+   bool       rerrors;
+   bool       cerrors;
+   bool       waserrors;
+   bool       isupper;
+   int        trans=0;
+   bool       isunit;
+   double     scalea=0;
+   double     growth=0;
+   int        i=0;
+   int        j=0;
+   int        n=0;
+   int        j1=0;
+   int        j2=0;
+   al_complex cv=0;
+   double     rv=0;
+   int        i_=0;
 //--- create arrays
-   complex cxs[];
-   complex cxe[];
-   double  rxs[];
-   double  rxe[];
+   al_complex cxs[];
+   al_complex cxe[];
+   double     rxs[];
+   double     rxe[];
 //--- create matrix
    CMatrixComplex ca;
    CMatrixComplex cea;
@@ -14757,16 +14757,16 @@ static bool CTestRCondUnit::CMatrixInvMatTr(CMatrixComplex &a,const int n,
                                             const bool isunittriangular)
   {
 //--- create variables
-   bool    result;
-   bool    nounit;
-   int     i=0;
-   int     j=0;
-   complex v=0;
-   complex ajj=0;
-   complex one=1;
-   int     i_=0;
+   bool       result;
+   bool       nounit;
+   int        i=0;
+   int        j=0;
+   al_complex v=0;
+   al_complex ajj=0;
+   al_complex one=1;
+   int        i_=0;
 //--- create array
-   complex t[];
+   al_complex t[];
 //--- initialization
    result=true;
 //--- allocation
@@ -14881,14 +14881,14 @@ static bool CTestRCondUnit::CMatrixInvMatLU(CMatrixComplex &a,int &pivots[],
                                             const int n)
   {
 //--- create variables
-   bool    result;
-   int     i=0;
-   int     j=0;
-   int     jp=0;
-   complex v=0;
-   int     i_=0;
+   bool       result;
+   int        i=0;
+   int        j=0;
+   int        jp=0;
+   al_complex v=0;
+   int        i_=0;
 //--- create array
-   complex           work[];
+   al_complex work[];
 //--- initialization
    result=true;
 //--- Quick return if possible
@@ -16198,11 +16198,11 @@ static bool CTestMatInvUnit::HPDMatrixCheckInverse(CMatrixComplex &ca,
                                                    CMatInvReport &rep)
   {
 //--- create variables
-   bool    result;
-   int     i=0;
-   int     j=0;
-   complex v=0;
-   int     i_=0;
+   bool       result;
+   int        i=0;
+   int        j=0;
+   al_complex v=0;
+   int        i_=0;
 //--- create matrix
    CMatrixComplex a;
    CMatrixComplex inva;
@@ -16306,11 +16306,11 @@ static bool CTestMatInvUnit::CMatrixCheckInverse(CMatrixComplex &a,
                                                  CMatInvReport &rep)
   {
 //--- create variables
-   bool    result;
-   int     i=0;
-   int     j=0;
-   complex v=0;
-   int     i_=0;
+   bool       result;
+   int        i=0;
+   int        j=0;
+   al_complex v=0;
+   int        i_=0;
 //--- initialization
    result=true;
 //--- check
@@ -16551,17 +16551,17 @@ static void CTestMatInvUnit::TestCTRInv(const int maxn,const int passcount,
                                         const double threshold,bool &ctrerrors)
   {
 //--- create variables
-   int     n=0;
-   int     pass=0;
-   int     i=0;
-   int     j=0;
-   int     task=0;
-   bool    isupper;
-   bool    isunit;
-   complex v=0;
-   bool    waserrors;
-   int     info=0;
-   int     i_=0;
+   int        n=0;
+   int        pass=0;
+   int        i=0;
+   int        j=0;
+   int        task=0;
+   bool       isupper;
+   bool       isunit;
+   al_complex v=0;
+   bool       waserrors;
+   int        info=0;
+   int        i_=0;
 //--- create arrays
    CMatrixComplex a;
    CMatrixComplex b;
@@ -19858,29 +19858,29 @@ CTestXBlasUnit::~CTestXBlasUnit(void)
 static bool CTestXBlasUnit::TestXBlas(const bool silent)
   {
 //--- create variables
-   bool    approxerrors;
-   bool    exactnesserrors;
-   bool    waserrors;
-   double  approxthreshold=0;
-   int     maxn=0;
-   int     passcount=0;
-   int     n=0;
-   int     i=0;
-   int     pass=0;
-   double  rv1=0;
-   double  rv2=0;
-   double  rv2err=0;
-   complex cv1=0;
-   complex cv2=0;
-   double  cv2err=0;
-   double  s=0;
-   int     i_=0;
+   bool       approxerrors;
+   bool       exactnesserrors;
+   bool       waserrors;
+   double     approxthreshold=0;
+   int        maxn=0;
+   int        passcount=0;
+   int        n=0;
+   int        i=0;
+   int        pass=0;
+   double     rv1=0;
+   double     rv2=0;
+   double     rv2err=0;
+   al_complex cv1=0;
+   al_complex cv2=0;
+   double     cv2err=0;
+   double     s=0;
+   int        i_=0;
 //--- create arrays
-   double  rx[];
-   double  ry[];
-   complex cx[];
-   complex cy[];
-   double  temp[];
+   double     rx[];
+   double     ry[];
+   al_complex cx[];
+   al_complex cy[];
+   double     temp[];
 //--- initialization
    approxerrors=false;
    exactnesserrors=false;
@@ -20095,9 +20095,9 @@ private:
    static bool       RMatrixCheckSingularM(const int n,const int m,const int info,CDenseSolverReport &rep,CMatrixDouble &xs);
    static bool       RMatrixCheckSingular(const int n,const int info,CDenseSolverReport &rep,double &xs[]);
    static bool       CMatrixCheckSolutionM(CMatrixComplex &xe,const int n,const int m,const double threshold,const int info,CDenseSolverReport &rep,CMatrixComplex &xs);
-   static bool       CMatrixCheckSolution(CMatrixComplex &xe,const int n,const double threshold,const int info,CDenseSolverReport &rep,complex &xs[]);
+   static bool       CMatrixCheckSolution(CMatrixComplex &xe,const int n,const double threshold,const int info,CDenseSolverReport &rep,al_complex &xs[]);
    static bool       CMatrixCheckSingularM(const int n,const int m,const int info,CDenseSolverReport &rep,CMatrixComplex &xs);
-   static bool       CMatrixCheckSingular(const int n,const int info,CDenseSolverReport &rep,complex &xs[]);
+   static bool       CMatrixCheckSingular(const int n,const int info,CDenseSolverReport &rep,al_complex &xs[]);
    static void       RMatrixMakeACopy(CMatrixDouble &a,const int m,const int n,CMatrixDouble &b);
    static void       CMatrixMakeACopy(CMatrixComplex &a,const int m,const int n,CMatrixComplex &b);
    static void       RMatrixDropHalf(CMatrixDouble &a,const int n,const bool droplower);
@@ -20109,7 +20109,7 @@ private:
    static void       Unset2D(CMatrixDouble &x);
    static void       Unset1D(double &x[]);
    static void       CUnset2D(CMatrixComplex &x);
-   static void       CUnset1D(complex &x[]);
+   static void       CUnset1D(al_complex &x[]);
    static void       UnsetRep(CDenseSolverReport &r);
    static void       UnsetLSRep(CDenseSolverLSReport &r);
 public:
@@ -20367,7 +20367,7 @@ static bool CTestDenseSolverUnit::CMatrixCheckSolution(CMatrixComplex &xe,
                                                        const double threshold,
                                                        const int info,
                                                        CDenseSolverReport &rep,
-                                                       complex &xs[])
+                                                       al_complex &xs[])
   {
 //--- create a variable
    int i_=0;
@@ -20425,7 +20425,7 @@ static bool CTestDenseSolverUnit::CMatrixCheckSingularM(const int n,
 static bool CTestDenseSolverUnit::CMatrixCheckSingular(const int n,
                                                        const int info,
                                                        CDenseSolverReport &rep,
-                                                       complex &xs[])
+                                                       al_complex &xs[])
   {
 //--- create variables
    int i_=0;
@@ -21338,23 +21338,23 @@ static void CTestDenseSolverUnit::TestCSolver(const int maxn,const int maxm,
                                               bool &cerrors,bool &rfserrors)
   {
 //--- create variables
-   int     i=0;
-   int     j=0;
-   int     k=0;
-   int     n=0;
-   int     m=0;
-   int     pass=0;
-   int     taskkind=0;
-   double  verr=0;
-   complex v=0;
-   int     info=0;
-   int     i_=0;
+   int        i=0;
+   int        j=0;
+   int        k=0;
+   int        n=0;
+   int        m=0;
+   int        pass=0;
+   int        taskkind=0;
+   double     verr=0;
+   al_complex v=0;
+   int        info=0;
+   int        i_=0;
 //--- create arrays
-   int     p[];
-   complex bv[];
-   complex xv[];
-   complex y[];
-   double  tx[];
+   int        p[];
+   al_complex bv[];
+   al_complex xv[];
+   al_complex y[];
+   double     tx[];
 //--- create matrix
    CMatrixComplex a;
    CMatrixComplex lua;
@@ -21760,23 +21760,23 @@ static void CTestDenseSolverUnit::TestHPDSolver(const int maxn,const int maxm,
                                                 bool &hpderrors,bool &rfserrors)
   {
 //--- create variables
-   int     i=0;
-   int     j=0;
-   int     k=0;
-   int     n=0;
-   int     m=0;
-   int     pass=0;
-   int     taskkind=0;
-   complex v=0;
-   bool    isupper;
-   int     info=0;
-   int     i_=0;
+   int        i=0;
+   int        j=0;
+   int        k=0;
+   int        n=0;
+   int        m=0;
+   int        pass=0;
+   int        taskkind=0;
+   al_complex v=0;
+   bool       isupper;
+   int        info=0;
+   int        i_=0;
 //--- create arrays
-   int     p[];
-   complex bv[];
-   complex xv[];
-   complex y[];
-   complex tx[];
+   int        p[];
+   al_complex bv[];
+   al_complex xv[];
+   al_complex y[];
+   al_complex tx[];
 //--- create matrix
    CMatrixComplex a;
    CMatrixComplex cha;
@@ -22096,7 +22096,7 @@ static void CTestDenseSolverUnit::CUnset2D(CMatrixComplex &x)
 //+------------------------------------------------------------------+
 //| Unsets real vector                                               |
 //+------------------------------------------------------------------+
-static void CTestDenseSolverUnit::CUnset1D(complex &x[])
+static void CTestDenseSolverUnit::CUnset1D(al_complex &x[])
   {
 //--- allocation
    ArrayResize(x,1);
@@ -30447,10 +30447,10 @@ class CTestFFTUnit
   {
 private:
    //--- private methods
-   static void       RefFFTC1D(complex &a[],const int n);
-   static void       RefFFTC1DInv(complex &a[],const int n);
+   static void       RefFFTC1D(al_complex &a[],const int n);
+   static void       RefFFTC1DInv(al_complex &a[],const int n);
    static void       RefInternalCFFT(double &a[],const int nn,const bool inversefft);
-   static void       RefInternalRFFT(double &a[],const int nn,complex &f[]);
+   static void       RefInternalRFFT(double &a[],const int nn,al_complex &f[]);
 public:
    //--- constructor, destructor
                      CTestFFTUnit(void);
@@ -30478,30 +30478,30 @@ CTestFFTUnit::~CTestFFTUnit(void)
 static bool CTestFFTUnit::TestFFT(const bool silent)
   {
 //--- create variables
-   int    n=0;
-   int    i=0;
-   int    k=0;
-   int    maxn=0;
-   double bidierr=0;
-   double bidirerr=0;
-   double referr=0;
-   double refrerr=0;
-   double reinterr=0;
-   double errtol=0;
-   bool   referrors;
-   bool   bidierrors;
-   bool   refrerrors;
-   bool   bidirerrors;
-   bool   reinterrors;
-   bool   waserrors;
-   int    i_=0;
+   int        n=0;
+   int        i=0;
+   int        k=0;
+   int        maxn=0;
+   double     bidierr=0;
+   double     bidirerr=0;
+   double     referr=0;
+   double     refrerr=0;
+   double     reinterr=0;
+   double     errtol=0;
+   bool       referrors;
+   bool       bidierrors;
+   bool       refrerrors;
+   bool       bidirerrors;
+   bool       reinterrors;
+   bool       waserrors;
+   int        i_=0;
 //--- create arrays
-   complex a1[];
-   complex a2[];
-   complex a3[];
-   double  r1[];
-   double  r2[];
-   double  buf[];
+   al_complex a1[];
+   al_complex a2[];
+   al_complex a3[];
+   double     r1[];
+   double     r2[];
+   double     buf[];
 //--- object of class
    CFtPlan plan;
 //--- initialization
@@ -30741,7 +30741,7 @@ static bool CTestFFTUnit::TestFFT(const bool silent)
 //+------------------------------------------------------------------+
 //| Reference FFT                                                    |
 //+------------------------------------------------------------------+
-static void CTestFFTUnit::RefFFTC1D(complex &a[],const int n)
+static void CTestFFTUnit::RefFFTC1D(al_complex &a[],const int n)
   {
 //--- create variables
    int i=0;
@@ -30770,7 +30770,7 @@ static void CTestFFTUnit::RefFFTC1D(complex &a[],const int n)
 //+------------------------------------------------------------------+
 //| Reference inverse FFT                                            |
 //+------------------------------------------------------------------+
-static void CTestFFTUnit::RefFFTC1DInv(complex &a[],const int n)
+static void CTestFFTUnit::RefFFTC1DInv(al_complex &a[],const int n)
   {
 //--- create variables
    int i=0;
@@ -30870,7 +30870,7 @@ static void CTestFFTUnit::RefInternalCFFT(double &a[],const int nn,
 //| Internal real FFT stub.                                          |
 //| Uses straightforward formula with O(N^2) complexity.             |
 //+------------------------------------------------------------------+
-static void CTestFFTUnit::RefInternalRFFT(double &a[],const int nn,complex &f[])
+static void CTestFFTUnit::RefInternalRFFT(double &a[],const int nn,al_complex &f[])
   {
 //--- create a variable
    int i=0;
@@ -30902,8 +30902,8 @@ class CTestConvUnit
   {
 private:
    //--- private methods
-   static void       RefConvC1D(complex &a[],const int m,complex &b[],const int n,complex &r[]);
-   static void       RefConvC1DCircular(complex &a[],const int m,complex &b[],const int n,complex &r[]);
+   static void       RefConvC1D(al_complex &a[],const int m,al_complex &b[],const int n,al_complex &r[]);
+   static void       RefConvC1DCircular(al_complex &a[],const int m,al_complex &b[],const int n,al_complex &r[]);
    static void       RefConvR1D(double &a[],const int m,double &b[],const int n,double &r[]);
    static void       RefConvR1DCircular(double &a[],const int m,double &b[],const int n,double &r[]);
 public:
@@ -30950,14 +30950,14 @@ static bool CTestConvUnit::TestConv(const bool silent)
    bool   invrerrors;
    bool   waserrors;
 //--- create arrays
-   double  ra[];
-   double  rb[];
-   double  rr1[];
-   double  rr2[];
-   complex ca[];
-   complex cb[];
-   complex cr1[];
-   complex cr2[];
+   double     ra[];
+   double     rb[];
+   double     rr1[];
+   double     rr2[];
+   al_complex ca[];
+   al_complex cb[];
+   al_complex cr1[];
+   al_complex cr2[];
 //--- initialization
    maxn=32;
    errtol=100000*MathPow(maxn,3.0/2.0)*CMath::m_machineepsilon;
@@ -31220,14 +31220,14 @@ static bool CTestConvUnit::TestConv(const bool silent)
 //+------------------------------------------------------------------+
 //| Reference implementation                                         |
 //+------------------------------------------------------------------+
-static void CTestConvUnit::RefConvC1D(complex &a[],const int m,complex &b[],
-                                      const int n,complex &r[])
+static void CTestConvUnit::RefConvC1D(al_complex &a[],const int m,al_complex &b[],
+                                      const int n,al_complex &r[])
   {
 //--- create variables
-   int     i=0;
-   complex v=0;
-   int     i_=0;
-   int     i1_=0;
+   int        i=0;
+   al_complex v=0;
+   int        i_=0;
+   int        i1_=0;
 //--- allocation
    ArrayResize(r,m+n-1);
 //--- initialization
@@ -31245,9 +31245,9 @@ static void CTestConvUnit::RefConvC1D(complex &a[],const int m,complex &b[],
 //+------------------------------------------------------------------+
 //| Reference implementation                                         |
 //+------------------------------------------------------------------+
-static void CTestConvUnit::RefConvC1DCircular(complex &a[],const int m,
-                                              complex &b[],const int n,
-                                              complex &r[])
+static void CTestConvUnit::RefConvC1DCircular(al_complex &a[],const int m,
+                                              al_complex &b[],const int n,
+                                              al_complex &r[])
   {
 //--- create variables
    int i1=0;
@@ -31256,7 +31256,7 @@ static void CTestConvUnit::RefConvC1DCircular(complex &a[],const int m,
    int i_=0;
    int i1_=0;
 //--- create array
-   complex buf[];
+   al_complex buf[];
 //--- function call
    RefConvC1D(a,m,b,n,buf);
 //--- allocation
@@ -31344,12 +31344,12 @@ class CTestCorrUnit
   {
 private:
    //--- private methods
-   static void       RefCorrC1D(complex &signal[],const int n,complex &pattern[],const int m,complex &r[]);
-   static void       RefCorrC1DCircular(complex &signal[],const int n,complex &pattern[],const int m,complex &r[]);
+   static void       RefCorrC1D(al_complex &signal[],const int n,al_complex &pattern[],const int m,al_complex &r[]);
+   static void       RefCorrC1DCircular(al_complex &signal[],const int n,al_complex &pattern[],const int m,al_complex &r[]);
    static void       RefCorrR1D(double &signal[],const int n,double &pattern[],const int m,double &r[]);
    static void       RefCorrR1DCircular(double &signal[],const int n,double &pattern[],const int m,double &r[]);
-   static void       RefConvC1D(complex &a[],const int m,complex &b[],const int n,complex &r[]);
-   static void       RefConvC1DCircular(complex &a[],const int m,complex &b[],const int n,complex &r[]);
+   static void       RefConvC1D(al_complex &a[],const int m,al_complex &b[],const int n,al_complex &r[]);
+   static void       RefConvC1DCircular(al_complex &a[],const int m,al_complex &b[],const int n,al_complex &r[]);
    static void       RefConvR1D(double &a[],const int m,double &b[],const int n,double &r[]);
    static void       RefConvR1DCircular(double &a[],const int m,double &b[],const int n,double &r[]);
 public:
@@ -31392,14 +31392,14 @@ static bool CTestCorrUnit::TestCorr(const bool silent)
    bool   invrerrors;
    bool   waserrors;
 //--- create arrays
-   double  ra[];
-   double  rb[];
-   double  rr1[];
-   double  rr2[];
-   complex ca[];
-   complex cb[];
-   complex cr1[];
-   complex cr2[];
+   double     ra[];
+   double     rb[];
+   double     rr1[];
+   double     rr2[];
+   al_complex ca[];
+   al_complex cb[];
+   al_complex cr1[];
+   al_complex cr2[];
 //--- initialization
    maxn=32;
    errtol=100000*MathPow(maxn,3.0/2.0)*CMath::m_machineepsilon;
@@ -31510,17 +31510,17 @@ static bool CTestCorrUnit::TestCorr(const bool silent)
 //+------------------------------------------------------------------+
 //| Reference implementation                                         |
 //+------------------------------------------------------------------+
-static void CTestCorrUnit::RefCorrC1D(complex &signal[],const int n,
-                                      complex &pattern[],const int m,
-                                      complex &r[])
+static void CTestCorrUnit::RefCorrC1D(al_complex &signal[],const int n,
+                                      al_complex &pattern[],const int m,
+                                      al_complex &r[])
   {
 //--- create variables
-   int     i=0;
-   int     j=0;
-   complex v=0;
-   int     i_=0;
+   int        i=0;
+   int        j=0;
+   al_complex v=0;
+   int        i_=0;
 //--- create array
-   complex s[];
+   al_complex s[];
 //--- allocation
    ArrayResize(s,m+n-1);
 //--- change values
@@ -31555,14 +31555,14 @@ static void CTestCorrUnit::RefCorrC1D(complex &signal[],const int n,
 //+------------------------------------------------------------------+
 //| Reference implementation                                         |
 //+------------------------------------------------------------------+
-static void CTestCorrUnit::RefCorrC1DCircular(complex &signal[],const int n,
-                                              complex &pattern[],const int m,
-                                              complex &r[])
+static void CTestCorrUnit::RefCorrC1DCircular(al_complex &signal[],const int n,
+                                              al_complex &pattern[],const int m,
+                                              al_complex &r[])
   {
 //--- create variables
-   int     i=0;
-   int     j=0;
-   complex v=0;
+   int        i=0;
+   int        j=0;
+   al_complex v=0;
 //--- allocation
    ArrayResize(r,n);
 //--- calculation
@@ -31645,14 +31645,14 @@ static void CTestCorrUnit::RefCorrR1DCircular(double &signal[],const int n,
 //+------------------------------------------------------------------+
 //| Reference implementation                                         |
 //+------------------------------------------------------------------+
-static void CTestCorrUnit::RefConvC1D(complex &a[],const int m,complex &b[],
-                                      const int n,complex &r[])
+static void CTestCorrUnit::RefConvC1D(al_complex &a[],const int m,al_complex &b[],
+                                      const int n,al_complex &r[])
   {
 //--- create variables
-   int     i=0;
-   complex v=0;
-   int     i_=0;
-   int     i1_=0;
+   int        i=0;
+   al_complex v=0;
+   int        i_=0;
+   int        i1_=0;
 //--- allocation
    ArrayResize(r,m+n-1);
 //--- initialization
@@ -31670,9 +31670,9 @@ static void CTestCorrUnit::RefConvC1D(complex &a[],const int m,complex &b[],
 //+------------------------------------------------------------------+
 //| Reference implementation                                         |
 //+------------------------------------------------------------------+
-static void CTestCorrUnit::RefConvC1DCircular(complex &a[],const int m,
-                                              complex &b[],const int n,
-                                              complex &r[])
+static void CTestCorrUnit::RefConvC1DCircular(al_complex &a[],const int m,
+                                              al_complex &b[],const int n,
+                                              al_complex &r[])
   {
 //--- create variables
    int i1=0;
@@ -31681,7 +31681,7 @@ static void CTestCorrUnit::RefConvC1DCircular(complex &a[],const int m,
    int i_=0;
    int i1_=0;
 //--- create array
-   complex buf[];
+   al_complex buf[];
 //--- function call
    RefConvC1D(a,m,b,n,buf);
 //--- allocation
@@ -42825,12 +42825,12 @@ public:
    bool              m_bfield;
    double            m_rfield;
    int               m_ifield;
-   complex           m_cfield;
+   al_complex        m_cfield;
    //--- arrays
    bool              m_b1field[];
    double            m_r1field[];
    int               m_i1field[];
-   complex           m_c1field[];
+   al_complex        m_c1field[];
    //--- matrix
    CMatrixInt        m_b2field;
    CMatrixDouble     m_r2field;
@@ -43036,28 +43036,28 @@ static bool CTestAlglibBasicsUnit::TestAlglibBasics(const bool silent)
 static bool CTestAlglibBasicsUnit::TestComplexArithmetics(const bool silent)
   {
 //--- create variables
-   bool    result;
-   bool    absc;
-   bool    addcc;
-   bool    addcr;
-   bool    addrc;
-   bool    subcc;
-   bool    subcr;
-   bool    subrc;
-   bool    mulcc;
-   bool    mulcr;
-   bool    mulrc;
-   bool    divcc;
-   bool    divcr;
-   bool    divrc;
-   complex ca=0;
-   complex cb=0;
-   complex res=0;
-   double  ra=0;
-   double  rb=0;
-   double  threshold=0;
-   int     pass=0;
-   int     passcount=0;
+   bool       result;
+   bool       absc;
+   bool       addcc;
+   bool       addcr;
+   bool       addrc;
+   bool       subcc;
+   bool       subcr;
+   bool       subrc;
+   bool       mulcc;
+   bool       mulcr;
+   bool       mulrc;
+   bool       divcc;
+   bool       divcr;
+   bool       divrc;
+   al_complex ca=0;
+   al_complex cb=0;
+   al_complex res=0;
+   double     ra=0;
+   double     rb=0;
+   double     threshold=0;
+   int        pass=0;
+   int        passcount=0;
 //--- initialization
    threshold=100*CMath::m_machineepsilon;
    passcount=1000;
@@ -43141,7 +43141,7 @@ static bool CTestAlglibBasicsUnit::TestComplexArithmetics(const bool silent)
       divcc=(divcc && MathAbs((res*cb).re-ca.re)<threshold) && MathAbs((res*cb).im-ca.im)<threshold;
       res=ca/rb;
       divcr=(divcr && MathAbs(res.re-ca.re/rb)<threshold) && MathAbs(res.im-ca.im/rb)<threshold;
-      complex cra=ra;
+      al_complex cra=ra;
       res=cra/cb;
       divrc=(divrc && MathAbs((res*cb).re-ra)<threshold) && MathAbs((res*cb).im)<threshold;
      }
@@ -43542,14 +43542,14 @@ static bool CTestAlglibBasicsUnit::TestSwapFunctions(const bool silent)
    bool okc1;
    bool okc2;
 //--- create arrays
-   bool    b11[];
-   bool    b12[];
-   int     i11[];
-   int     i12[];
-   double  r11[];
-   double  r12[];
-   complex c11[];
-   complex c12[];
+   bool       b11[];
+   bool       b12[];
+   int        i11[];
+   int        i12[];
+   double     r11[];
+   double     r12[];
+   al_complex c11[];
+   al_complex c12[];
 //--- create matrix
    CMatrixInt     b21;
    CMatrixInt     b22;

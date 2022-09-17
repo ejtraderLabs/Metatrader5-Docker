@@ -173,16 +173,16 @@ public:
    //+------------------------------------------------------------------+
    //| Get transform matrix                                             |
    //+------------------------------------------------------------------+
-   void              TransformMatrixGet(DXMatrix &matrix) const
+   void              TransformMatrixGet(DXMatrix &mat) const
      {
-      matrix=m_transform_matrix;
+      mat=m_transform_matrix;
      }
    //+------------------------------------------------------------------+
    //| Set transform matrix                                             |
    //+------------------------------------------------------------------+
-   void              TransformMatrixSet(const DXMatrix &matrix)
+   void              TransformMatrixSet(const DXMatrix &mat)
      {
-      m_transform_matrix=matrix;
+      m_transform_matrix=mat;
      }
    //+------------------------------------------------------------------+
    //| Get diffuse color                                                |

@@ -230,25 +230,25 @@ public:
    static void       ODESolverResults(CODESolverStateShell &state,int &m,double &xtbl[],CMatrixDouble &ytbl,CODESolverReportShell &rep);
    //--- function of package fasttransforms
    //--- fast Fourier transform
-   static void       FFTC1D(complex &a[],const int n);
-   static void       FFTC1D(complex &a[]);
-   static void       FFTC1DInv(complex &a[],const int n);
-   static void       FFTC1DInv(complex &a[]);
-   static void       FFTR1D(double &a[],const int n,complex &f[]);
-   static void       FFTR1D(double &a[],complex &f[]);
-   static void       FFTR1DInv(complex &f[],const int n,double &a[]);
-   static void       FFTR1DInv(complex &f[],double &a[]);
+   static void       FFTC1D(al_complex &a[],const int n);
+   static void       FFTC1D(al_complex &a[]);
+   static void       FFTC1DInv(al_complex &a[],const int n);
+   static void       FFTC1DInv(al_complex &a[]);
+   static void       FFTR1D(double &a[],const int n,al_complex &f[]);
+   static void       FFTR1D(double &a[],al_complex &f[]);
+   static void       FFTR1DInv(al_complex &f[],const int n,double &a[]);
+   static void       FFTR1DInv(al_complex &f[],double &a[]);
    //--- convolution
-   static void       ConvC1D(complex &a[],const int m,complex &b[],const int n,complex &r[]);
-   static void       ConvC1DInv(complex &a[],const int m,complex &b[],const int n,complex &r[]);
-   static void       ConvC1DCircular(complex &s[],const int m,complex &r[],const int n,complex &c[]);
-   static void       ConvC1DCircularInv(complex &a[],const int m,complex &b[],const int n,complex &r[]);
+   static void       ConvC1D(al_complex &a[],const int m,al_complex &b[],const int n,al_complex &r[]);
+   static void       ConvC1DInv(al_complex &a[],const int m,al_complex &b[],const int n,al_complex &r[]);
+   static void       ConvC1DCircular(al_complex &s[],const int m,al_complex &r[],const int n,al_complex &c[]);
+   static void       ConvC1DCircularInv(al_complex &a[],const int m,al_complex &b[],const int n,al_complex &r[]);
    static void       ConvR1D(double &a[],const int m,double &b[],const int n,double &r[]);
    static void       ConvR1DInv(double &a[],const int m,double &b[],const int n,double &r[]);
    static void       ConvR1DCircular(double &s[],const int m,double &r[],const int n,double &c[]);
    static void       ConvR1DCircularInv(double &a[],const int m,double &b[],const int n,double &r[]);
-   static void       CorrC1D(complex &signal[],const int n,complex &pattern[],const int m,complex &r[]);
-   static void       CorrC1DCircular(complex &signal[],const int m,complex &pattern[],const int n,complex &c[]);
+   static void       CorrC1D(al_complex &signal[],const int n,al_complex &pattern[],const int m,al_complex &r[]);
+   static void       CorrC1DCircular(al_complex &signal[],const int m,al_complex &pattern[],const int n,al_complex &c[]);
    static void       CorrR1D(double &signal[],const int n,double &pattern[],const int m,double &r[]);
    static void       CorrR1DCircular(double &signal[],const int m,double &pattern[],const int n,double &c[]);
    //--- fast Hartley transform
@@ -422,9 +422,9 @@ public:
    static void       RMatrixTranspose(const int m,const int n,CMatrixDouble &a,const int ia,const int ja,CMatrixDouble &b,const int ib,const int jb);
    static void       CMatrixCopy(const int m,const int n,CMatrixComplex &a,const int ia,const int ja,CMatrixComplex &b,const int ib,const int jb);
    static void       RMatrixCopy(const int m,const int n,CMatrixDouble &a,const int ia,const int ja,CMatrixDouble &b,const int ib,const int jb);
-   static void       CMatrixRank1(const int m,const int n,CMatrixComplex &a,const int ia,const int ja,complex &u[],const int iu,complex &v[],const int iv);
+   static void       CMatrixRank1(const int m,const int n,CMatrixComplex &a,const int ia,const int ja,al_complex &u[],const int iu,al_complex &v[],const int iv);
    static void       RMatrixRank1(const int m,const int n,CMatrixDouble &a,const int ia,const int ja,double &u[],const int iu,double &v[],const int iv);
-   static void       CMatrixMVect(const int m,const int n,CMatrixComplex &a,const int ia,const int ja,const int opa,complex &x[],const int ix,complex &y[],const int iy);
+   static void       CMatrixMVect(const int m,const int n,CMatrixComplex &a,const int ia,const int ja,const int opa,al_complex &x[],const int ix,al_complex &y[],const int iy);
    static void       RMatrixMVect(const int m,const int n,CMatrixDouble &a,const int ia,const int ja,const int opa,double &x[],const int ix,double &y[],const int iy);
    static void       CMatrixRightTrsM(const int m,const int n,CMatrixComplex &a,const int i1,const int j1,const bool isupper,const bool isunit,const int optype,CMatrixComplex &x,const int i2,const int j2);
    static void       CMatrixLeftTrsM(const int m,const int n,CMatrixComplex &a,const int i1,const int j1,const bool isupper,const bool isunit,const int optype,CMatrixComplex &x,const int i2,const int j2);
@@ -432,20 +432,20 @@ public:
    static void       RMatrixLeftTrsM(const int m,const int n,CMatrixDouble &a,const int i1,const int j1,const bool isupper,const bool isunit,const int optype,CMatrixDouble &x,const int i2,const int j2);
    static void       CMatrixSyrk(const int n,const int k,const double alpha,CMatrixComplex &a,const int ia,const int ja,const int optypea,const double beta,CMatrixComplex &c,const int ic,const int jc,const bool isupper);
    static void       RMatrixSyrk(const int n,const int k,const double alpha,CMatrixDouble &a,const int ia,const int ja,const int optypea,const double beta,CMatrixDouble &c,const int ic,const int jc,const bool isupper);
-   static void       CMatrixGemm(const int m,const int n,const int k,complex &alpha,CMatrixComplex &a,const int ia,const int ja,const int optypea,CMatrixComplex &b,const int ib,const int jb,const int optypeb,complex &beta,CMatrixComplex &c,const int ic,const int jc);
+   static void       CMatrixGemm(const int m,const int n,const int k,al_complex &alpha,CMatrixComplex &a,const int ia,const int ja,const int optypea,CMatrixComplex &b,const int ib,const int jb,const int optypeb,al_complex &beta,CMatrixComplex &c,const int ic,const int jc);
    static void       RMatrixGemm(const int m,const int n,const int k,const double alpha,CMatrixDouble &a,const int ia,const int ja,const int optypea,CMatrixDouble &b,const int ib,const int jb,const int optypeb,const double beta,CMatrixDouble &c,const int ic,const int jc);
    //--- orthogonal factorizations
    static void       RMatrixQR(CMatrixDouble &a,const int m,const int n,double &tau[]);
    static void       RMatrixLQ(CMatrixDouble &a,const int m,const int n,double &tau[]);
-   static void       CMatrixQR(CMatrixComplex &a,const int m,const int n,complex &tau[]);
-   static void       CMatrixLQ(CMatrixComplex &a,const int m,const int n,complex &tau[]);
+   static void       CMatrixQR(CMatrixComplex &a,const int m,const int n,al_complex &tau[]);
+   static void       CMatrixLQ(CMatrixComplex &a,const int m,const int n,al_complex &tau[]);
    static void       RMatrixQRUnpackQ(CMatrixDouble &a,const int m,const int n,double &tau[],const int qcolumns,CMatrixDouble &q);
    static void       RMatrixQRUnpackR(CMatrixDouble &a,const int m,const int n,CMatrixDouble &r);
    static void       RMatrixLQUnpackQ(CMatrixDouble &a,const int m,const int n,double &tau[],const int qrows,CMatrixDouble &q);
    static void       RMatrixLQUnpackL(CMatrixDouble &a,const int m,const int n,CMatrixDouble &l);
-   static void       CMatrixQRUnpackQ(CMatrixComplex &a,const int m,const int n,complex &tau[],const int qcolumns,CMatrixComplex &q);
+   static void       CMatrixQRUnpackQ(CMatrixComplex &a,const int m,const int n,al_complex &tau[],const int qcolumns,CMatrixComplex &q);
    static void       CMatrixQRUnpackR(CMatrixComplex &a,const int m,const int n,CMatrixComplex &r);
-   static void       CMatrixLQUnpackQ(CMatrixComplex &a,const int m,const int n,complex &tau[],const int qrows,CMatrixComplex &q);
+   static void       CMatrixLQUnpackQ(CMatrixComplex &a,const int m,const int n,al_complex &tau[],const int qrows,CMatrixComplex &q);
    static void       CMatrixLQUnpackL(CMatrixComplex &a,const int m,const int n,CMatrixComplex &l);
    static void       RMatrixBD(CMatrixDouble &a,const int m,const int n,double &tauq[],double &taup[]);
    static void       RMatrixBDUnpackQ(CMatrixDouble &qp,const int m,const int n,double &tauq[],const int qcolumns,CMatrixDouble &q);
@@ -458,8 +458,8 @@ public:
    static void       RMatrixHessenbergUnpackH(CMatrixDouble &a,const int n,CMatrixDouble &h);
    static void       SMatrixTD(CMatrixDouble &a,const int n,const bool isupper,double &tau[],double &d[],double &e[]);
    static void       SMatrixTDUnpackQ(CMatrixDouble &a,const int n,const bool isupper,double &tau[],CMatrixDouble &q);
-   static void       HMatrixTD(CMatrixComplex &a,const int n,const bool isupper,complex &tau[],double &d[],double &e[]);
-   static void       HMatrixTDUnpackQ(CMatrixComplex &a,const int n,const bool isupper,complex &tau[],CMatrixComplex &q);
+   static void       HMatrixTD(CMatrixComplex &a,const int n,const bool isupper,al_complex &tau[],double &d[],double &e[]);
+   static void       HMatrixTDUnpackQ(CMatrixComplex &a,const int n,const bool isupper,al_complex &tau[],CMatrixComplex &q);
    //--- eigenvalues and eigenvectors
    static bool       SMatrixEVD(CMatrixDouble &a,const int n,int zneeded,const bool isupper,double &d[],CMatrixDouble &z);
    static bool       SMatrixEVDR(CMatrixDouble &a,const int n,int zneeded,const bool isupper,double b1,double b2,int &m,double &w[],CMatrixDouble &z);
@@ -538,10 +538,10 @@ public:
    static double     RMatrixLUDet(CMatrixDouble &a,int &pivots[]);
    static double     RMatrixDet(CMatrixDouble &a,const int n);
    static double     RMatrixDet(CMatrixDouble &a);
-   static complex    CMatrixLUDet(CMatrixComplex &a,int &pivots[],const int n);
-   static complex    CMatrixLUDet(CMatrixComplex &a,int &pivots[]);
-   static complex    CMatrixDet(CMatrixComplex &a,const int n);
-   static complex    CMatrixDet(CMatrixComplex &a);
+   static al_complex CMatrixLUDet(CMatrixComplex &a,int &pivots[],const int n);
+   static al_complex CMatrixLUDet(CMatrixComplex &a,int &pivots[]);
+   static al_complex CMatrixDet(CMatrixComplex &a,const int n);
+   static al_complex CMatrixDet(CMatrixComplex &a);
    static double     SPDMatrixCholeskyDet(CMatrixDouble &a,const int n);
    static double     SPDMatrixCholeskyDet(CMatrixDouble &a);
    static double     SPDMatrixDet(CMatrixDouble &a,const int n,const bool isupper);
@@ -684,19 +684,19 @@ public:
    static void       RMatrixMixedSolve(CMatrixDouble &a,CMatrixDouble &lua,int &p[],const int n,double &b[],int &info,CDenseSolverReportShell &rep,double &x[]);
    static void       RMatrixMixedSolveM(CMatrixDouble &a,CMatrixDouble &lua,int &p[],const int n,CMatrixDouble &b,const int m,int &info,CDenseSolverReportShell &rep,CMatrixDouble &x);
    static void       CMatrixSolveM(CMatrixComplex &a,const int n,CMatrixComplex &b,const int m,const bool rfs,int &info,CDenseSolverReportShell &rep,CMatrixComplex &x);
-   static void       CMatrixSolve(CMatrixComplex &a,const int n,complex &b[],int &info,CDenseSolverReportShell &rep,complex &x[]);
+   static void       CMatrixSolve(CMatrixComplex &a,const int n,al_complex &b[],int &info,CDenseSolverReportShell &rep,al_complex &x[]);
    static void       CMatrixLUSolveM(CMatrixComplex &lua,int &p[],const int n,CMatrixComplex &b,const int m,int &info,CDenseSolverReportShell &rep,CMatrixComplex &x);
-   static void       CMatrixLUSolve(CMatrixComplex &lua,int &p[],const int n,complex &b[],int &info,CDenseSolverReportShell &rep,complex &x[]);
+   static void       CMatrixLUSolve(CMatrixComplex &lua,int &p[],const int n,al_complex &b[],int &info,CDenseSolverReportShell &rep,al_complex &x[]);
    static void       CMatrixMixedSolveM(CMatrixComplex &a,CMatrixComplex &lua,int &p[],const int n,CMatrixComplex &b,const int m,int &info,CDenseSolverReportShell &rep,CMatrixComplex &x);
-   static void       CMatrixMixedSolve(CMatrixComplex &a,CMatrixComplex &lua,int &p[],const int n,complex &b[],int &info,CDenseSolverReportShell &rep,complex &x[]);
+   static void       CMatrixMixedSolve(CMatrixComplex &a,CMatrixComplex &lua,int &p[],const int n,al_complex &b[],int &info,CDenseSolverReportShell &rep,al_complex &x[]);
    static void       SPDMatrixSolveM(CMatrixDouble &a,const int n,const bool isupper,CMatrixDouble &b,const int m,int &info,CDenseSolverReportShell &rep,CMatrixDouble &x);
    static void       SPDMatrixSolve(CMatrixDouble &a,const int n,const bool isupper,double &b[],int &info,CDenseSolverReportShell &rep,double &x[]);
    static void       SPDMatrixCholeskySolveM(CMatrixDouble &cha,const int n,const bool isupper,CMatrixDouble &b,const int m,int &info,CDenseSolverReportShell &rep,CMatrixDouble &x);
    static void       SPDMatrixCholeskySolve(CMatrixDouble &cha,const int n,const bool isupper,double &b[],int &info,CDenseSolverReportShell &rep,double &x[]);
    static void       HPDMatrixSolveM(CMatrixComplex &a,const int n,const bool isupper,CMatrixComplex &b,const int m,int &info,CDenseSolverReportShell &rep,CMatrixComplex &x);
-   static void       HPDMatrixSolve(CMatrixComplex &a,const int n,const bool isupper,complex &b[],int &info,CDenseSolverReportShell &rep,complex &x[]);
+   static void       HPDMatrixSolve(CMatrixComplex &a,const int n,const bool isupper,al_complex &b[],int &info,CDenseSolverReportShell &rep,al_complex &x[]);
    static void       HPDMatrixCholeskySolveM(CMatrixComplex &cha,const int n,const bool isupper,CMatrixComplex &b,const int m,int &info,CDenseSolverReportShell &rep,CMatrixComplex &x);
-   static void       HPDMatrixCholeskySolve(CMatrixComplex &cha,const int n,const bool isupper,complex &b[],int &info,CDenseSolverReportShell &rep,complex &x[]);
+   static void       HPDMatrixCholeskySolve(CMatrixComplex &cha,const int n,const bool isupper,al_complex &b[],int &info,CDenseSolverReportShell &rep,al_complex &x[]);
    static void       RMatrixSolveLS(CMatrixDouble &a,const int nrows,const int ncols,double &b[],const double threshold,int &info,CDenseSolverLSReportShell &rep,double &x[]);
    //--- solving systems of nonlinear equations
    static void       NlEqCreateLM(const int n,const int m,double &x[],CNlEqStateShell &state);
@@ -4798,7 +4798,7 @@ static void CAlglib::ODESolverResults(CODESolverStateShell &state,int &m,
 //|             A_out[j] = SUM(A_in[k]*exp(-2*pi*sqrt(-1)*j*k/N),    |
 //|             k = 0..N-1)                                          |
 //+------------------------------------------------------------------+
-static void CAlglib::FFTC1D(complex &a[],const int n)
+static void CAlglib::FFTC1D(al_complex &a[],const int n)
   {
 //--- function call
    CFastFourierTransform::FFTC1D(a,n);
@@ -4829,7 +4829,7 @@ static void CAlglib::FFTC1D(complex &a[],const int n)
 //|             A_out[j] = SUM(A_in[k]*exp(-2*pi*sqrt(-1)*j*k/N),    |
 //|             k = 0..N-1)                                          |
 //+------------------------------------------------------------------+
-static void CAlglib::FFTC1D(complex &a[])
+static void CAlglib::FFTC1D(al_complex &a[])
   {
 //--- create a variable
    int n;
@@ -4854,7 +4854,7 @@ static void CAlglib::FFTC1D(complex &a[])
 //|             A_out[j] = SUM(A_in[k]/N*exp(+2*pi*sqrt(-1)*j*k/N),  |
 //|             k = 0..N-1)                                          |
 //+------------------------------------------------------------------+
-static void CAlglib::FFTC1DInv(complex &a[],const int n)
+static void CAlglib::FFTC1DInv(al_complex &a[],const int n)
   {
 //--- function call
    CFastFourierTransform::FFTC1DInv(a,n);
@@ -4875,7 +4875,7 @@ static void CAlglib::FFTC1DInv(complex &a[],const int n)
 //|             A_out[j] = SUM(A_in[k]/N*exp(+2*pi*sqrt(-1)*j*k/N),  |
 //|             k = 0..N-1)                                          |
 //+------------------------------------------------------------------+
-static void CAlglib::FFTC1DInv(complex &a[])
+static void CAlglib::FFTC1DInv(al_complex &a[])
   {
 //--- create a variable
    int n;
@@ -4903,7 +4903,7 @@ static void CAlglib::FFTC1DInv(complex &a[])
 //| subroutine returns full complex array (with frequencies above    |
 //| N/2), so its result may be used by other FFT-related subroutines.|
 //+------------------------------------------------------------------+
-static void CAlglib::FFTR1D(double &a[],const int n,complex &f[])
+static void CAlglib::FFTR1D(double &a[],const int n,al_complex &f[])
   {
 //--- function call
    CFastFourierTransform::FFTR1D(a,n,f);
@@ -4927,7 +4927,7 @@ static void CAlglib::FFTR1D(double &a[],const int n,complex &f[])
 //| subroutine returns full complex array (with frequencies above    |
 //| N/2), so its result may be used by other FFT-related subroutines.|
 //+------------------------------------------------------------------+
-static void CAlglib::FFTR1D(double &a[],complex &f[])
+static void CAlglib::FFTR1D(double &a[],al_complex &f[])
   {
 //--- create a variable
    int n;
@@ -4968,7 +4968,7 @@ static void CAlglib::FFTR1D(double &a[],complex &f[])
 //| (although higher N/2 are still not used) because array size is   |
 //| used to automatically determine FFT length                       |
 //+------------------------------------------------------------------+
-static void CAlglib::FFTR1DInv(complex &f[],const int n,double &a[])
+static void CAlglib::FFTR1DInv(al_complex &f[],const int n,double &a[])
   {
 //--- function call
    CFastFourierTransform::FFTR1DInv(f,n,a);
@@ -5005,7 +5005,7 @@ static void CAlglib::FFTR1DInv(complex &f[],const int n,double &a[])
 //| (although higher N/2 are still not used) because array size is   |
 //| used to automatically determine FFT length                       |
 //+------------------------------------------------------------------+
-static void CAlglib::FFTR1DInv(complex &f[],double &a[])
+static void CAlglib::FFTR1DInv(al_complex &f[],double &a[])
   {
 //--- create a variable
    int n;
@@ -5038,8 +5038,8 @@ static void CAlglib::FFTR1DInv(complex &f[],double &a[])
 //| still use this subroutine - just shift its result                |
 //| correspondingly.                                                 |
 //+------------------------------------------------------------------+
-static void CAlglib::ConvC1D(complex &a[],const int m,complex &b[],
-                             const int n,complex &r[])
+static void CAlglib::ConvC1D(al_complex &a[],const int m,al_complex &b[],
+                             const int n,al_complex &r[])
   {
 //--- function call
    CConv::ConvC1D(a,m,b,n,r);
@@ -5066,8 +5066,8 @@ static void CAlglib::ConvC1D(complex &a[],const int m,complex &b[],
 //| or both functions have non-zero values at negative T's, you can  |
 //| still use this subroutine - just shift its result correspondingly|
 //+------------------------------------------------------------------+
-static void CAlglib::ConvC1DInv(complex &a[],const int m,complex &b[],
-                                const int n,complex &r[])
+static void CAlglib::ConvC1DInv(al_complex &a[],const int m,al_complex &b[],
+                                const int n,al_complex &r[])
   {
 //--- function call
    CConv::ConvC1DInv(a,m,b,n,r);
@@ -5094,8 +5094,8 @@ static void CAlglib::ConvC1DInv(complex &a[],const int m,complex &b[],
 //| values at negative T's, you can still use this subroutine - just |
 //| shift its result correspondingly.                                |
 //+------------------------------------------------------------------+
-static void CAlglib::ConvC1DCircular(complex &s[],const int m,complex &r[],
-                                     const int n,complex &c[])
+static void CAlglib::ConvC1DCircular(al_complex &s[],const int m,al_complex &r[],
+                                     const int n,al_complex &c[])
   {
 //--- function call
    CConv::ConvC1DCircular(s,m,r,n,c);
@@ -5123,8 +5123,8 @@ static void CAlglib::ConvC1DCircular(complex &s[],const int m,complex &r[],
 //| values at negative T's, you can still use this subroutine - just |
 //| shift its result correspondingly.                                |
 //+------------------------------------------------------------------+
-static void CAlglib::ConvC1DCircularInv(complex &a[],const int m,complex &b[],
-                                        const int n,complex &r[])
+static void CAlglib::ConvC1DCircularInv(al_complex &a[],const int m,al_complex &b[],
+                                        const int n,al_complex &r[])
   {
 //--- function call
    CConv::ConvC1DCircularInv(a,m,b,n,r);
@@ -5262,8 +5262,8 @@ static void CAlglib::ConvR1DCircularInv(double &a[],const int m,double &b[],
 //| non-zero on [-K..M-1], you can still use this subroutine, just   |
 //| shift result by K.                                               |
 //+------------------------------------------------------------------+
-static void CAlglib::CorrC1D(complex &signal[],const int n,complex &pattern[],
-                             const int m,complex &r[])
+static void CAlglib::CorrC1D(al_complex &signal[],const int n,al_complex &pattern[],
+                             const int m,al_complex &r[])
   {
 //--- function call
    CCorr::CorrC1D(signal,n,pattern,m,r);
@@ -5290,9 +5290,9 @@ static void CAlglib::CorrC1D(complex &signal[],const int n,complex &pattern[],
 //| OUTPUT PARAMETERS                                                |
 //|     R   -   convolution: A*B. array[0..M-1].                     |
 //+------------------------------------------------------------------+
-static void CAlglib::CorrC1DCircular(complex &signal[],const int m,
-                                     complex &pattern[],const int n,
-                                     complex &c[])
+static void CAlglib::CorrC1DCircular(al_complex &signal[],const int m,
+                                     al_complex &pattern[],const int n,
+                                     al_complex &c[])
   {
 //--- function call
    CCorr::CorrC1DCircular(signal,m,pattern,n,c);
@@ -11836,8 +11836,8 @@ static void CAlglib::RMatrixCopy(const int m,const int n,CMatrixDouble &a,
 //|     IV  -   subvector offset                                     |
 //+------------------------------------------------------------------+
 static void CAlglib::CMatrixRank1(const int m,const int n,CMatrixComplex &a,
-                                  const int ia,const int ja,complex &u[],
-                                  const int iu,complex &v[],const int iv)
+                                  const int ia,const int ja,al_complex &u[],
+                                  const int iu,al_complex &v[],const int iv)
   {
 //--- function call
    CAblas::CMatrixRank1(m,n,a,ia,ja,u,iu,v,iv);
@@ -11890,7 +11890,7 @@ static void CAlglib::RMatrixRank1(const int m,const int n,CMatrixDouble &a,
 //+------------------------------------------------------------------+
 static void CAlglib::CMatrixMVect(const int m,const int n,CMatrixComplex &a,
                                   const int ia,const int ja,const int opa,
-                                  complex &x[],const int ix,complex &y[],
+                                  al_complex &x[],const int ix,al_complex &y[],
                                   const int iy)
   {
 //--- function call
@@ -12121,10 +12121,10 @@ static void CAlglib::RMatrixSyrk(const int n,const int k,const double alpha,
 //|     JC      -   submatrix offset                                 |
 //+------------------------------------------------------------------+
 static void CAlglib::CMatrixGemm(const int m,const int n,const int k,
-                                 complex &alpha,CMatrixComplex &a,
+                                 al_complex &alpha,CMatrixComplex &a,
                                  const int ia,const int ja,const int optypea,
                                  CMatrixComplex &b,const int ib,const int jb,
-                                 const int optypeb,complex &beta,CMatrixComplex &c,
+                                 const int optypeb,al_complex &beta,CMatrixComplex &c,
                                  const int ic,const int jc)
   {
 //--- function call
@@ -12235,7 +12235,7 @@ static void CAlglib::RMatrixLQ(CMatrixDouble &a,const int m,const int n,
 //|      September 30, 1994                                          |
 //+------------------------------------------------------------------+
 static void CAlglib::CMatrixQR(CMatrixComplex &a,const int m,const int n,
-                               complex &tau[])
+                               al_complex &tau[])
   {
 //--- function call
    COrtFac::CMatrixQR(a,m,n,tau);
@@ -12262,7 +12262,7 @@ static void CAlglib::CMatrixQR(CMatrixComplex &a,const int m,const int n,
 //|      September 30, 1994                                          |
 //+------------------------------------------------------------------+
 static void CAlglib::CMatrixLQ(CMatrixComplex &a,const int m,const int n,
-                               complex &tau[])
+                               al_complex &tau[])
   {
 //--- function call
    COrtFac::CMatrixLQ(a,m,n,tau);
@@ -12378,7 +12378,7 @@ static void CAlglib::RMatrixLQUnpackL(CMatrixDouble &a,const int m,
 //|                     If QColumns=0, array isn't changed.          |
 //+------------------------------------------------------------------+
 static void CAlglib::CMatrixQRUnpackQ(CMatrixComplex &a,const int m,
-                                      const int n,complex &tau[],
+                                      const int n,al_complex &tau[],
                                       const int qcolumns,CMatrixComplex &q)
   {
 //--- function call
@@ -12423,7 +12423,7 @@ static void CAlglib::CMatrixQRUnpackR(CMatrixComplex &a,const int m,
 //|                     If QRows=0, array isn't changed.             |
 //+------------------------------------------------------------------+
 static void CAlglib::CMatrixLQUnpackQ(CMatrixComplex &a,const int m,
-                                      const int n,complex &tau[],
+                                      const int n,al_complex &tau[],
                                       const int qrows,CMatrixComplex &q)
   {
 //--- function call
@@ -12862,7 +12862,7 @@ static void CAlglib::SMatrixTDUnpackQ(CMatrixDouble &a,const int n,
 //|      October 31, 1992                                            |
 //+------------------------------------------------------------------+
 static void CAlglib::HMatrixTD(CMatrixComplex &a,const int n,const bool isupper,
-                               complex &tau[],double &d[],double &e[])
+                               al_complex &tau[],double &d[],double &e[])
   {
 //--- function call
    COrtFac::HMatrixTD(a,n,isupper,tau,d,e);
@@ -12883,7 +12883,7 @@ static void CAlglib::HMatrixTD(CMatrixComplex &a,const int n,const bool isupper,
 //|                 array with elements [0..N-1, 0..N-1].            |
 //+------------------------------------------------------------------+
 static void CAlglib::HMatrixTDUnpackQ(CMatrixComplex &a,const int n,
-                                      const bool isupper,complex &tau[],
+                                      const bool isupper,al_complex &tau[],
                                       CMatrixComplex &q)
   {
 //--- function call
@@ -15253,7 +15253,7 @@ static double CAlglib::RMatrixDet(CMatrixDouble &a)
 //|                   matrix size (A must be square matrix)          |
 //| Result: matrix determinant.                                      |
 //+------------------------------------------------------------------+
-static complex CAlglib::CMatrixLUDet(CMatrixComplex &a,int &pivots[],
+static al_complex CAlglib::CMatrixLUDet(CMatrixComplex &a,int &pivots[],
                                      const int n)
   {
 //--- return result
@@ -15276,7 +15276,7 @@ static complex CAlglib::CMatrixLUDet(CMatrixComplex &a,int &pivots[],
 //|                   matrix size (A must be square matrix)          |
 //| Result: matrix determinant.                                      |
 //+------------------------------------------------------------------+
-static complex CAlglib::CMatrixLUDet(CMatrixComplex &a,int &pivots[])
+static al_complex CAlglib::CMatrixLUDet(CMatrixComplex &a,int &pivots[])
   {
 //--- create a variable
    int n;
@@ -15304,7 +15304,7 @@ static complex CAlglib::CMatrixLUDet(CMatrixComplex &a,int &pivots[])
 //|                   matrix size (A must be square matrix)          |
 //| Result: determinant of matrix A.                                 |
 //+------------------------------------------------------------------+
-static complex CAlglib::CMatrixDet(CMatrixComplex &a,const int n)
+static al_complex CAlglib::CMatrixDet(CMatrixComplex &a,const int n)
   {
 //--- return result
    return(CMatDet::CMatrixDet(a,n));
@@ -15321,7 +15321,7 @@ static complex CAlglib::CMatrixDet(CMatrixComplex &a,const int n)
 //|                   matrix size (A must be square matrix)          |
 //| Result: determinant of matrix A.                                 |
 //+------------------------------------------------------------------+
-static complex CAlglib::CMatrixDet(CMatrixComplex &a)
+static al_complex CAlglib::CMatrixDet(CMatrixComplex &a)
   {
 //--- create a variable
    int n;
@@ -19558,9 +19558,9 @@ static void CAlglib::CMatrixSolveM(CMatrixComplex &a,const int n,CMatrixComplex 
 //|     Rep     -   same as in RMatrixSolve                          |
 //|     X       -   same as in RMatrixSolve                          |
 //+------------------------------------------------------------------+
-static void CAlglib::CMatrixSolve(CMatrixComplex &a,const int n,complex &b[],
+static void CAlglib::CMatrixSolve(CMatrixComplex &a,const int n,al_complex &b[],
                                   int &info,CDenseSolverReportShell &rep,
-                                  complex &x[])
+                                  al_complex &x[])
   {
 //--- initialization
    info=0;
@@ -19623,8 +19623,8 @@ static void CAlglib::CMatrixLUSolveM(CMatrixComplex &lua,int &p[],const int n,
 //|     X       -   same as in RMatrixSolve                          |
 //+------------------------------------------------------------------+
 static void CAlglib::CMatrixLUSolve(CMatrixComplex &lua,int &p[],const int n,
-                                    complex &b[],int &info,CDenseSolverReportShell &rep,
-                                    complex &x[])
+                                    al_complex &b[],int &info,CDenseSolverReportShell &rep,
+                                    al_complex &x[])
   {
 //--- initialization
    info=0;
@@ -19688,9 +19688,9 @@ static void CAlglib::CMatrixMixedSolveM(CMatrixComplex &a,CMatrixComplex &lua,
 //|     X       -   same as in RMatrixSolveM                         |
 //+------------------------------------------------------------------+
 static void CAlglib::CMatrixMixedSolve(CMatrixComplex &a,CMatrixComplex &lua,
-                                       int &p[],const int n,complex &b[],
+                                       int &p[],const int n,al_complex &b[],
                                        int &info,CDenseSolverReportShell &rep,
-                                       complex &x[])
+                                       al_complex &x[])
   {
 //--- initialization
    info=0;
@@ -19904,9 +19904,9 @@ static void CAlglib::HPDMatrixSolveM(CMatrixComplex &a,const int n,const bool is
 //|     X       -   same as in RMatrixSolve                          |
 //+------------------------------------------------------------------+
 static void CAlglib::HPDMatrixSolve(CMatrixComplex &a,const int n,
-                                    const bool isupper,complex &b[],
+                                    const bool isupper,al_complex &b[],
                                     int &info,CDenseSolverReportShell &rep,
-                                    complex &x[])
+                                    al_complex &x[])
   {
 //--- initialization
    info=0;
@@ -19978,9 +19978,9 @@ static void CAlglib::HPDMatrixCholeskySolveM(CMatrixComplex &cha,const int n,
 //|     X       -   same as in RMatrixSolve                          |
 //+------------------------------------------------------------------+
 static void CAlglib::HPDMatrixCholeskySolve(CMatrixComplex &cha,const int n,
-                                            const bool isupper,complex &b[],
+                                            const bool isupper,al_complex &b[],
                                             int &info,CDenseSolverReportShell &rep,
-                                            complex &x[])
+                                            al_complex &x[])
   {
 //--- initialization
    info=0;

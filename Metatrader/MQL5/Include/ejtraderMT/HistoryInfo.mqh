@@ -1,4 +1,5 @@
 
+
 //+------------------------------------------------------------------+
 #property copyright "ejtrader"
 #property link      "https://github.com/ejtraderLabs/MQL5-ejtraderMT"
@@ -240,7 +241,6 @@ void HistoryInfo(CJAVal &dataObject)
                      c[i][3]=(double) r[i].low;
                      c[i][4]=(double) r[i].close;
                      c[i][5]=(double) r[i].tick_volume;
-                     c[i][6]=(int) spread[i];
                     }
                   d["data"].Set(c);
                  }

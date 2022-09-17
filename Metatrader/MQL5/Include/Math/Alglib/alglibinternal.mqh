@@ -140,7 +140,7 @@ public:
    static void       RMatrixResize(CMatrixDouble &x,const int m,const int n);
    //--- check to infinity
    static bool       IsFiniteVector(const double &x[],const int n);
-   static bool       IsFiniteComplexVector(complex &z[],const int n);
+   static bool       IsFiniteComplexVector(al_complex &z[],const int n);
    static bool       IsFiniteMatrix(const CMatrixDouble &x,const int m,const int n);
    static bool       IsFiniteComplexMatrix(CMatrixComplex &x,const int m,const int n);
    static bool       IsFiniteRTrMatrix(CMatrixDouble &x,const int n,const bool isupper);
@@ -154,9 +154,9 @@ public:
    static void       ApPeriodicMap(double &x,const double a,const double b,double &k);
    static double     BoundVal(const double x,const double b1,const double b2);
    //--- serialization/unserialization
-   static void       AllocComplex(CSerializer &s,complex &v);
-   static void       SerializeComplex(CSerializer &s,complex &v);
-   static complex    UnserializeComplex(CSerializer &s);
+   static void       AllocComplex(CSerializer &s,al_complex &v);
+   static void       SerializeComplex(CSerializer &s,al_complex &v);
+   static al_complex UnserializeComplex(CSerializer &s);
    static void       AllocRealArray(CSerializer &s,double &v[],int n);
    static void       SerializeRealArray(CSerializer &s,double &v[],int n);
    static void       UnserializeRealArray(CSerializer &s,double &v[]);
@@ -466,7 +466,7 @@ static void CApServ::RMatrixResize(CMatrixDouble &x,const int m,const int n)
 //+------------------------------------------------------------------+
 //| This function checks that all values from X[] are finite         |
 //+------------------------------------------------------------------+
-static bool CApServ::IsFiniteComplexVector(complex &z[],const int n)
+static bool CApServ::IsFiniteComplexVector(al_complex &z[],const int n)
   {
 //--- create a variable
    int i=0;
@@ -863,7 +863,7 @@ static double CApServ::BoundVal(const double x,const double b1,const double b2)
 //+------------------------------------------------------------------+
 //| Allocation of serializer: complex value                          |
 //+------------------------------------------------------------------+
-static void CApServ::AllocComplex(CSerializer &s,complex &v)
+static void CApServ::AllocComplex(CSerializer &s,al_complex &v)
   {
 //--- entry
    s.Alloc_Entry();
@@ -872,7 +872,7 @@ static void CApServ::AllocComplex(CSerializer &s,complex &v)
 //+------------------------------------------------------------------+
 //| Serialization: complex value                                     |
 //+------------------------------------------------------------------+
-static void CApServ::SerializeComplex(CSerializer &s,complex &v)
+static void CApServ::SerializeComplex(CSerializer &s,al_complex &v)
   {
 //--- serialization
    s.Serialize_Double(v.re);
@@ -881,10 +881,10 @@ static void CApServ::SerializeComplex(CSerializer &s,complex &v)
 //+------------------------------------------------------------------+
 //| Unserialization: complex value                                   |
 //+------------------------------------------------------------------+
-static complex CApServ::UnserializeComplex(CSerializer &s)
+static al_complex CApServ::UnserializeComplex(CSerializer &s)
   {
 //--- create a variable
-   complex result;
+   al_complex result;
 //--- unserialization
    result.re=s.Unserialize_Double();
    result.im=s.Unserialize_Double();
@@ -2293,9 +2293,9 @@ public:
                      CAblasF(void);
                     ~CAblasF(void);
    //--- return false
-   static bool       CMatrixRank1F(const int m,const int n,CMatrixComplex &a,int ia,int ja,complex &u[],int iu,complex &v[],int iv);
+   static bool       CMatrixRank1F(const int m,const int n,CMatrixComplex &a,int ia,int ja,al_complex &u[],int iu,al_complex &v[],int iv);
    static bool       RMatrixRank1F(const int m,const int n,CMatrixDouble &a,int ia,int ja,double &u[],int iu,double &v[],int iv);
-   static bool       CMatrixMVF(const int m,const int n,CMatrixComplex &a,int ia,int ja,int opa,complex &x[],int ix,complex &y[],int iy);
+   static bool       CMatrixMVF(const int m,const int n,CMatrixComplex &a,int ia,int ja,int opa,al_complex &x[],int ix,al_complex &y[],int iy);
    static bool       RMatrixMVF(const int m,const int n,CMatrixDouble &a,int ia,int ja,int opa,double &x[],int ix,double &y[],int iy);
    static bool       CMatrixRightTrsMF(const int m,const int n,CMatrixComplex &a,const int i1,int j1,const bool isupper,bool isunit,int optype,CMatrixComplex &x,int i2,int j2);
    static bool       CMatrixLeftTrsMF(const int m,const int n,CMatrixComplex &a,const int i1,int j1,const bool isupper,bool isunit,int optype,CMatrixComplex &x,int i2,int j2);
@@ -2304,7 +2304,7 @@ public:
    static bool       CMatrixSyrkF(const int n,int k,double alpha,CMatrixComplex &a,int ia,int ja,int optypea,double beta,CMatrixComplex &c,int ic,int jc,bool isupper);
    static bool       RMatrixSyrkF(const int n,int k,double alpha,CMatrixDouble &a,int ia,int ja,int optypea,double beta,CMatrixDouble &c,int ic,int jc,bool isupper);
    static bool       RMatrixGemmF(const int m,const int n,int k,double alpha,CMatrixDouble &a,int ia,int ja,int optypea,CMatrixDouble &b,int ib,int jb,int optypeb,double beta,CMatrixDouble &c,int ic,int jc);
-   static bool       CMatrixGemmF(const int m,const int n,int k,complex &alpha,CMatrixComplex &a,int ia,int ja,int optypea,CMatrixComplex &b,int ib,int jb,int optypeb,complex &beta,CMatrixComplex &c,int ic,int jc);
+   static bool       CMatrixGemmF(const int m,const int n,int k,al_complex &alpha,CMatrixComplex &a,int ia,int ja,int optypea,CMatrixComplex &b,int ib,int jb,int optypeb,al_complex &beta,CMatrixComplex &c,int ic,int jc);
   };
 //+------------------------------------------------------------------+
 //| Constructor without parameters                                   |
@@ -2324,8 +2324,8 @@ CAblasF::~CAblasF(void)
 //| Fast kernel                                                      |
 //+------------------------------------------------------------------+
 static bool CAblasF::CMatrixRank1F(const int m,const int n,CMatrixComplex &a,
-                                   int ia,int ja,complex &u[],int iu,
-                                   complex &v[],int iv)
+                                   int ia,int ja,al_complex &u[],int iu,
+                                   al_complex &v[],int iv)
   {
 //--- return result
    return(false);
@@ -2344,8 +2344,8 @@ static bool CAblasF::RMatrixRank1F(const int m,const int n,CMatrixDouble &a,
 //| Fast kernel                                                      |
 //+------------------------------------------------------------------+
 static bool CAblasF::CMatrixMVF(const int m,const int n,CMatrixComplex &a,
-                                int ia,int ja,int opa,complex &x[],int ix,
-                                complex &y[],int iy)
+                                int ia,int ja,int opa,al_complex &x[],int ix,
+                                al_complex &y[],int iy)
   {
 //--- return result
    return(false);
@@ -2438,10 +2438,10 @@ static bool CAblasF::RMatrixGemmF(const int m,const int n,int k,double alpha,
 //+------------------------------------------------------------------+
 //| Fast kernel                                                      |
 //+------------------------------------------------------------------+
-static bool CAblasF::CMatrixGemmF(const int m,const int n,int k,complex &alpha,
+static bool CAblasF::CMatrixGemmF(const int m,const int n,int k,al_complex &alpha,
                                   CMatrixComplex &a,int ia,int ja,int optypea,
                                   CMatrixComplex &b,int ib,int jb,int optypeb,
-                                  complex &beta,CMatrixComplex &c,int ic,int jc)
+                                  al_complex &beta,CMatrixComplex &c,int ic,int jc)
   {
 //--- return result
    return(false);
@@ -3018,8 +3018,8 @@ public:
                      CHblas(void);
                     ~CHblas(void);
    //--- methods
-   static void       HermitianMatrixVectorMultiply(CMatrixComplex &a,const bool isupper,const int i1,const int i2,complex &x[],complex &alpha,complex &y[]);
-   static void       HermitianRank2Update(CMatrixComplex &a,const bool isupper,const int i1,const int i2,complex &x[],complex &y[],complex &t[],complex &alpha);
+   static void       HermitianMatrixVectorMultiply(CMatrixComplex &a,const bool isupper,const int i1,const int i2,al_complex &x[],al_complex &alpha,al_complex &y[]);
+   static void       HermitianRank2Update(CMatrixComplex &a,const bool isupper,const int i1,const int i2,al_complex &x[],al_complex &y[],al_complex &t[],al_complex &alpha);
   };
 //+------------------------------------------------------------------+
 //| Constructor without parameters                                   |
@@ -3039,21 +3039,21 @@ CHblas::~CHblas(void)
 //| Multiply                                                         |
 //+------------------------------------------------------------------+
 static void CHblas::HermitianMatrixVectorMultiply(CMatrixComplex &a,const bool isupper,
-                                                  const int i1,const int i2,complex &x[],
-                                                  complex &alpha,complex &y[])
+                                                  const int i1,const int i2,al_complex &x[],
+                                                  al_complex &alpha,al_complex &y[])
   {
 //--- create variables
-   int     i=0;
-   int     ba1=0;
-   int     ba2=0;
-   int     by1=0;
-   int     by2=0;
-   int     bx1=0;
-   int     bx2=0;
-   int     n=i2-i1+1;
-   complex v=0;
-   int     i_=0;
-   int     i1_=0;
+   int        i=0;
+   int        ba1=0;
+   int        ba2=0;
+   int        by1=0;
+   int        by2=0;
+   int        bx1=0;
+   int        bx2=0;
+   int        n=i2-i1+1;
+   int        i_=0;
+   int        i1_=0;
+   al_complex v=0;
 //--- check
    if(n<=0)
       return;
@@ -3125,16 +3125,16 @@ static void CHblas::HermitianMatrixVectorMultiply(CMatrixComplex &a,const bool i
 //| Update matrix                                                    |
 //+------------------------------------------------------------------+
 static void CHblas::HermitianRank2Update(CMatrixComplex &a,const bool isupper,
-                                         const int i1,const int i2,complex &x[],
-                                         complex &y[],complex &t[],complex &alpha)
+                                         const int i1,const int i2,al_complex &x[],
+                                         al_complex &y[],al_complex &t[],al_complex &alpha)
   {
 //--- create variables
-   int     i=0;
-   int     tp1=0;
-   int     tp2=0;
-   complex v=0;
-   int     i_=0;
-   int     i1_=0;
+   int        i=0;
+   int        tp1=0;
+   int        tp2=0;
+   al_complex v=0;
+   int        i_=0;
+   int        i1_=0;
 //--- check
    if(isupper)
      {
@@ -3447,9 +3447,9 @@ public:
    void              CComplexReflections(void);
    void             ~CComplexReflections(void);
    //--- methods
-   static void       ComplexGenerateReflection(complex &x[],const int n,complex &tau);
-   static void       ComplexApplyReflectionFromTheLeft(CMatrixComplex &c,complex &tau,complex &v[],const int m1,const int m2,const int n1,const int n2,complex &work[]);
-   static void       ComplexApplyReflectionFromTheRight(CMatrixComplex &c,complex &tau,complex &v[],const int m1,const int m2,const int n1,const int n2,complex &work[]);
+   static void       ComplexGenerateReflection(al_complex &x[],const int n,al_complex &tau);
+   static void       ComplexApplyReflectionFromTheLeft(CMatrixComplex &c,al_complex &tau,al_complex &v[],const int m1,const int m2,const int n1,const int n2,al_complex &work[]);
+   static void       ComplexApplyReflectionFromTheRight(CMatrixComplex &c,al_complex &tau,al_complex &v[],const int m1,const int m2,const int n1,const int n2,al_complex &work[]);
   };
 //+------------------------------------------------------------------+
 //| Constructor without parameters                                   |
@@ -3494,9 +3494,9 @@ CComplexReflections::~CComplexReflections(void)
 //|      Courant Institute, Argonne National Lab, and Rice University|
 //|      September 30, 1994                                          |
 //+------------------------------------------------------------------+
-static void CComplexReflections::ComplexGenerateReflection(complex &x[],
+static void CComplexReflections::ComplexGenerateReflection(al_complex &x[],
                                                            const int n,
-                                                           complex &tau)
+                                                           al_complex &tau)
   {
 //--- check
    if(n<=0)
@@ -3506,18 +3506,18 @@ static void CComplexReflections::ComplexGenerateReflection(complex &x[],
       return;
      }
 //--- create variables
-   int     j=0;
-   complex alpha=0;
-   double  alphi=0;
-   double  alphr=0;
-   double  beta=0;
-   double  xnorm=0;
-   double  mx=0;
-   complex t=0;
-   double  s=1;
-   complex v=0;
-   int     i_=0;
-   complex One(1,0);
+   int        j=0;
+   al_complex alpha=0;
+   double     alphi=0;
+   double     alphr=0;
+   double     beta=0;
+   double     xnorm=0;
+   double     mx=0;
+   al_complex t=0;
+   double     s=1;
+   al_complex v=0;
+   int        i_=0;
+   al_complex One(1,0);
 //--- Scale if needed (to avoid overflow/underflow during intermediate
 //--- calculations).
    for(j=1;j<=n;j++)
@@ -3623,23 +3623,23 @@ static void CComplexReflections::ComplexGenerateReflection(complex &x[],
 //|      September 30, 1994                                          |
 //+------------------------------------------------------------------+
 static void CComplexReflections::ComplexApplyReflectionFromTheLeft(CMatrixComplex &c,
-                                                                   complex &tau,
-                                                                   complex &v[],
+                                                                   al_complex &tau,
+                                                                   al_complex &v[],
                                                                    const int m1,
                                                                    const int m2,
                                                                    const int n1,
                                                                    const int n2,
-                                                                   complex &work[])
+                                                                   al_complex &work[])
   {
-   complex Zero(0,0);
+   al_complex Zero(0,0);
 //--- check
    if(tau==Zero || n1>n2 || m1>m2)
       return;
 //--- create variables
-   complex t=0;
-   int     i=0;
-   int     vm=0;
-   int     i_=0;
+   al_complex t=0;
+   int        i=0;
+   int        vm=0;
+   int        i_=0;
 //--- w := C^T * conj(v)
    vm=m2-m1+1;
    for(i=n1;i<=n2;i++)
@@ -3685,24 +3685,24 @@ static void CComplexReflections::ComplexApplyReflectionFromTheLeft(CMatrixComple
 //|      September 30, 1994                                          |
 //+------------------------------------------------------------------+
 static void CComplexReflections::ComplexApplyReflectionFromTheRight(CMatrixComplex &c,
-                                                                    complex &tau,
-                                                                    complex &v[],
+                                                                    al_complex &tau,
+                                                                    al_complex &v[],
                                                                     const int m1,
                                                                     const int m2,
                                                                     const int n1,
                                                                     const int n2,
-                                                                    complex &work[])
+                                                                    al_complex &work[])
   {
-   complex Zero(0,0);
+   al_complex Zero(0,0);
 //--- check
    if(tau==Zero || n1>n2 || m1>m2)
       return;
 //--- create variables
-   complex t=0;
-   int     i=0;
-   int     vm=0;
-   int     i_=0;
-   int     i1_=0;
+   al_complex t=0;
+   int        i=0;
+   int        vm=0;
+   int        i_=0;
+   int        i1_=0;
 //--- w := C * v
    vm=n2-n1+1;
    for(i=m1;i<=m2;i++)
@@ -6112,14 +6112,14 @@ class CSafeSolve
   {
 private:
    //--- private method
-   static bool       CBasicSolveAndUpdate(complex &alpha,complex &beta,const double lnmax,const double bnorm,const double maxgrowth,double &xnorm,complex &x);
+   static bool       CBasicSolveAndUpdate(al_complex &alpha,al_complex &beta,const double lnmax,const double bnorm,const double maxgrowth,double &xnorm,al_complex &x);
 public:
    //--- constructor, destructor
                      CSafeSolve(void);
                     ~CSafeSolve(void);
    //--- public methods
    static bool       RMatrixScaledTrSafeSolve(CMatrixDouble &a,const double sa,const int n,double &x[],const bool isupper,const int trans,const bool isunit,const double maxgrowth);
-   static bool       CMatrixScaledTrSafeSolve(CMatrixComplex &a,const double sa,const int n,complex &x[],const bool isupper,const int trans,const bool isunit,const double maxgrowth);
+   static bool       CMatrixScaledTrSafeSolve(CMatrixComplex &a,const double sa,const int n,al_complex &x[],const bool isupper,const int trans,const bool isunit,const double maxgrowth);
   };
 //+------------------------------------------------------------------+
 //| Constructor without parameters                                   |
@@ -6144,16 +6144,16 @@ static bool CSafeSolve::RMatrixScaledTrSafeSolve(CMatrixDouble &a,const double s
                                                  const bool isunit,const double maxgrowth)
   {
 //--- create variables
-   bool    result;
-   double  lnmax=0;
-   double  nrmb=0;
-   double  nrmx=0;
-   double  vr=0;
-   complex alpha=0;
-   complex beta=0;
-   complex cx=0;
-   int     i_=0;
-   int     i=0;
+   bool       result;
+   double     lnmax=0;
+   double     nrmb=0;
+   double     nrmx=0;
+   double     vr=0;
+   al_complex alpha=0;
+   al_complex beta=0;
+   al_complex cx=0;
+   int        i_=0;
+   int        i=0;
 //--- create array
    double tmp[];
 //--- check
@@ -6327,23 +6327,23 @@ static bool CSafeSolve::RMatrixScaledTrSafeSolve(CMatrixDouble &a,const double s
 //| than MaxRealNumber/norm(b).                                      |
 //+------------------------------------------------------------------+
 static bool CSafeSolve::CMatrixScaledTrSafeSolve(CMatrixComplex &a,const double sa,
-                                                 const int n,complex &x[],
+                                                 const int n,al_complex &x[],
                                                  const bool isupper,const int trans,
                                                  const bool isunit,const double maxgrowth)
   {
 //--- create variables
-   complex Csa;
-   bool    result;
-   double  lnmax=0;
-   double  nrmb=0;
-   double  nrmx=0;
-   complex alpha=0;
-   complex beta=0;
-   complex vc=0;
-   int     i=0;
-   int     i_=0;
+   al_complex Csa;
+   bool       result;
+   double     lnmax=0;
+   double     nrmb=0;
+   double     nrmx=0;
+   al_complex alpha=0;
+   al_complex beta=0;
+   al_complex vc=0;
+   int        i=0;
+   int        i_=0;
 //--- create array
-   complex tmp[];
+   al_complex tmp[];
 //--- check
    if(!CAp::Assert(n>0,__FUNCTION__+": incorrect N!"))
       return(false);
@@ -6597,10 +6597,10 @@ static bool CSafeSolve::CMatrixScaledTrSafeSolve(CMatrixComplex &a,const double 
 //|                 CBasicSolveAndUpdate.                            |
 //|     X       -   solution                                         |
 //+------------------------------------------------------------------+
-static bool CSafeSolve::CBasicSolveAndUpdate(complex &alpha,complex &beta,
+static bool CSafeSolve::CBasicSolveAndUpdate(al_complex &alpha,al_complex &beta,
                                              const double lnmax,const double bnorm,
                                              const double maxgrowth,
-                                             double &xnorm,complex &x)
+                                             double &xnorm,al_complex &x)
   {
 //--- create variables
    bool   result;
@@ -6649,7 +6649,7 @@ public:
                     ~CXblas(void);
    //--- public methods
    static void       XDot(double &a[],double &b[],const int n,double &temp[],double &r,double &rerr);
-   static void       XCDot(complex &a[],complex &b[],const int n,double &temp[],complex &r,double &rerr);
+   static void       XCDot(al_complex &a[],al_complex &b[],const int n,double &temp[],al_complex &r,double &rerr);
   };
 //+------------------------------------------------------------------+
 //| Constructor without parameters                                   |
@@ -6737,8 +6737,8 @@ static void CXblas::XDot(double &a[],double &b[],const int n,double &temp[],
 //|                 errors introduced by rounding of A and B to fit  |
 //|                 in double (about 1 ulp).                         |
 //+------------------------------------------------------------------+
-static void CXblas::XCDot(complex &a[],complex &b[],const int n,double &temp[],
-                          complex &r,double &rerr)
+static void CXblas::XCDot(al_complex &a[],al_complex &b[],const int n,double &temp[],
+                          al_complex &r,double &rerr)
   {
 //--- create variables
    int    i=0;
