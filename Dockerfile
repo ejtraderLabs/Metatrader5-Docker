@@ -1,4 +1,4 @@
-FROM alpine:3.12 AS st-builder
+FROM alpine:3.15 AS st-builder
 
 RUN apk add --no-cache make gcc git freetype-dev \
             fontconfig-dev musl-dev xproto libx11-dev \
@@ -7,13 +7,13 @@ RUN git clone https://github.com/DenisKramer/st.git /work
 WORKDIR /work
 RUN make
 
-FROM alpine:3.12 AS xdummy-builder
+FROM alpine:3.15 AS xdummy-builder
 
 RUN apk add --no-cache make gcc freetype-dev \
             fontconfig-dev musl-dev xproto libx11-dev \
-            libxft-dev libxext-dev
-RUN apk add --no-cache libressl3.1-libcrypto libressl3.1-libssl linux-headers --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/main/
-RUN apk add x11vnc --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/community/
+            libxft-dev libxext-dev avahi-libs libcrypto3 libssl3 libvncserver libx11 libxdamage libxext libxfixes libxi libxinerama libxrandr libxtst musl
+RUN apk add --no-cache linux-headers
+RUN apk add x11vnc 
 RUN Xdummy -install
 
 # ----------------------------------------------------------------------------
