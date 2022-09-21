@@ -1,4 +1,9 @@
-﻿
+﻿//+------------------------------------------------------------------+
+//|                                                      ProjectName |
+//|                                      Copyright 2020, CompanyName |
+//|                                       http://www.companyname.net |
+//+------------------------------------------------------------------+
+
 
 #property copyright   "Copyright 2022, ejtrader."
 #property link        "https://github.com/ejtraderLabs"
@@ -32,16 +37,17 @@ Socket streamSocket(context,ZMQ_PUSH);
 // Required:
 #include <ejtraderMT/HistoryInfo.mqh>
 #include <ejtraderMT/Broker.mqh>
+#include <ejtraderMT/Calendar.mqh>
 // Optional:
-#include <ejtraderMT/StartIndicator.mqh>
-#include <ejtraderMT/ChartControl.mqh>
+//#include <ejtraderMT/StartIndicator.mqh>
+//#include <ejtraderMT/ChartControl.mqh>
 
 // Global variables \\
 bool debug = false;
-bool liveStream = true;
+bool liveStream = false;
 bool connectedFlag = true;
 int deInitReason = -1;
-double chartAttached = ChartID(); // Chart id where the expert is attached to
+//double chartAttached = ChartID(); // Chart id where the expert is attached to
 
 // Variables for handling price data stream
 struct SymbolSubscription
@@ -318,7 +324,7 @@ void StreamPriceData()
                      Data[3] = (double) rates[0].low;
                      Data[4] = (double) rates[0].close;
                      Data[5] = (double) rates[0].tick_volume;
-                     
+
                     }
                   last["status"] = (string) "CONNECTED";
                   last["symbol"] = (string) symbol;
@@ -358,7 +364,7 @@ void StreamPriceData()
 //+------------------------------------------------------------------+
 void OnTimer()
   {
- tm = TimeTradeServer();
+   tm = TimeTradeServer();
 // Stream live price data
    StreamPriceData();
 
@@ -449,20 +455,23 @@ void RequestHandler(ZmqMsg &request)
                         if(action=="RESET")
                            ResetSubscriptionsAndIndicators();
                         else
-#ifdef START_INDICATOR
-                           if(action=="INDICATOR")
-                              IndicatorControl(incomingMessage);
+                           if(action=="CALENDAR")
+                              GetEconomicCalendar(incomingMessage);
                            else
-#endif
-#ifdef CHART_CONTROL
-                              if(action=="CHART")
-                                 ChartControl(incomingMessage);
+#ifdef START_INDICATOR
+                              if(action=="INDICATOR")
+                                 IndicatorControl(incomingMessage);
                               else
 #endif
-                                {
-                                 mControl.mSetUserError(65538, GetErrorID(65538));
-                                 CheckError(__FUNCTION__);
-                                }
+#ifdef CHART_CONTROL
+                                 if(action=="CHART")
+                                    ChartControl(incomingMessage);
+                                 else
+#endif
+                                   {
+                                    mControl.mSetUserError(65538, GetErrorID(65538));
+                                    CheckError(__FUNCTION__);
+                                   }
 
 
   }
@@ -489,12 +498,15 @@ void ScriptConfiguration(CJAVal &dataObject)
       ActionDoneOrError(ERR_SUCCESS, __FUNCTION__, "ERR_SUCCESS");
   }
 
+
+
+
 //+------------------------------------------------------------------+
 //| Account information                                              |
 //+------------------------------------------------------------------+
 void GetAccountInfo()
   {
-   
+
    CJAVal info;
 
    info["error"] = false;
@@ -509,13 +521,91 @@ void GetAccountInfo()
    info["margin_free"] = AccountInfoDouble(ACCOUNT_MARGIN_FREE);
    info["margin_level"] = AccountInfoDouble(ACCOUNT_MARGIN_LEVEL);
    info["time"] = string(tm); //sendig time to ejtraderMT for localtime dataframe
-   
+
    string t=info.Serialize();
    if(debug)
       Print(t);
    InformClientSocket(dataSocket,t);
   }
 
+
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void GetEconomicCalendar(CJAVal &dataObject)
+  {
+   string actionType = dataObject["actionType"].ToStr();
+
+   string symbol=dataObject["symbol"].ToStr();
+   if(actionType=="DATA")
+     {
+
+      CJAVal data, d;
+
+      datetime fromDate=(datetime)dataObject["fromDate"].ToInt();
+      datetime toDate=TimeCurrent();
+      if(dataObject["toDate"].ToInt()!=NULL)
+         toDate=(datetime)dataObject["toDate"].ToInt();
+
+
+
+      CALENDAR Calendar;
+      string Currencies[2];
+      int Size;
+
+
+      if(symbol == NULL)
+        {
+         Size = Calendar.Set(NULL, CALENDAR_IMPORTANCE_NONE, TimeToString(fromDate,TIME_DATE), TimeToString(toDate,TIME_DATE));
+        }
+      else
+        {
+         Currencies[0] = ::SymbolInfoString(symbol, SYMBOL_CURRENCY_BASE);
+         Currencies[1] = ::SymbolInfoString(symbol, SYMBOL_CURRENCY_PROFIT);
+         // Tomou eventos para todas as moedas (NULL) começando com a menor (NENHUM).
+         Size = Calendar.Set(Currencies, CALENDAR_IMPORTANCE_NONE, TimeToString(fromDate,TIME_DATE), TimeToString(toDate,TIME_DATE));
+
+        }
+
+
+      if(Size)
+        {
+         for(int i = 0; i < Size; i++)
+           {
+            string string_split = Calendar[i].ToString();
+
+            string sep="|";                // A separator as a character
+            ushort u_sep;                  // The code of the separator character
+            string result[];
+            u_sep=StringGetCharacter(sep,0);
+            //--- Split the string to substrings
+            int k=StringSplit(string_split,u_sep,result);
+            for(int b=0; b<k; b++)
+              {
+
+               data[i][b] = result[b];
+
+              }
+
+
+           }
+         d["data"].Set(data);
+        }
+      else
+        {
+         d["data"].Add(data);
+        }
+      Print("Finished preparing Calender data");
+
+
+
+
+      string t=d.Serialize();
+      if(debug)
+         Print(t);
+      InformClientSocket(dataSocket,t);
+     }
+  }
 //+------------------------------------------------------------------+
 //| Balance information                                              |
 //+------------------------------------------------------------------+
@@ -938,4 +1028,6 @@ string getUninitReasonText(int reasonCode)
 //---
    return text;
   }
+//+------------------------------------------------------------------+
+
 //+------------------------------------------------------------------+
