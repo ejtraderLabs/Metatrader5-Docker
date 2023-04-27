@@ -1,3 +1,4 @@
+![example workflow](https://github.com/ejtraderLabs/Metatrader5-Docker/actions/workflows/docker-image.yml/badge.svg)
 
 
 # vnc-alpine
