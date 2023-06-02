@@ -42,7 +42,7 @@ void GetPositions(CJAVal &dataObject)
    string t=data.Serialize();
    if(debug)
       Print(t);
-   InformClientSocket(dataSocket,t);
+   InformClientSocket(sysSocket,t);
   }
 
 //+------------------------------------------------------------------+
@@ -91,7 +91,7 @@ void GetOrders(CJAVal &dataObject)
    string t=data.Serialize();
    if(debug)
       Print(t);
-   InformClientSocket(dataSocket,t);
+   InformClientSocket(sysSocket,t);
   }
 
 //+------------------------------------------------------------------+
@@ -301,7 +301,7 @@ void OnTradeTransaction(const MqlTradeTransaction &trans,
          string t=data.Serialize();
          if(debug)
             Print(t);
-         InformClientSocket(streamSocket,t);
+         InformClientSocket(sysSocket,t);
         }
       break;
       default:
