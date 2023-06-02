@@ -6,7 +6,7 @@
 
 #property copyright "Copyright 2022, ejtrader."
 #property link "https://github.com/ejtraderLabs"
-#property version "3.16"
+#property version "3.04"
 #property description "ejtraderMT"
 #property description "See github link for documentation"
 
@@ -19,7 +19,7 @@
 #include <ControlErrors.mqh>
 
 // Set ports and host for ZeroMQ
-string HOST = "192.168.1.154";
+input string HOST = "*";
 int SYS_PORT = 15557;
 
 // ZeroMQ Connections
@@ -33,7 +33,7 @@ Socket sysSocket(context, ZMQ_REP);
 #include <ejtraderMT/Calendar.mqh>
 
 // Global variables \\
-bool debug = true;
+input bool debug = false;
 bool liveStream = false;
 bool connectedFlag = true;
 int deInitReason = -1;
@@ -59,7 +59,16 @@ bool BindSockets()
    sysSocket.setLinger(1000);
 
    bool result = false;
-   result = sysSocket.connect(StringFormat("tcp://%s:%d", HOST, SYS_PORT));
+
+   if (HOST == "*")
+   {
+      result = sysSocket.bind(StringFormat("tcp://%s:%d", HOST, SYS_PORT));
+   }
+   else
+   {
+      result = sysSocket.connect(StringFormat("tcp://%s:%d", HOST, SYS_PORT));
+   }
+
    if (result == false)
    {
       return result;
@@ -125,9 +134,16 @@ void OnDeinit(const int reason)
    if (reason != REASON_CHARTCHANGE)
    {
       Print(__FUNCTION__, " Deinitialization reason: ", getUninitReasonText(reason));
-
-      Print("Unbinding 'System' socket on port ", SYS_PORT, "..");
-      sysSocket.disconnect(StringFormat("tcp://%s:%d", HOST, SYS_PORT));
+      if (HOST == "*")
+      {
+         Print("Unbinding 'System' socket on port ", SYS_PORT, "..");
+         sysSocket.unbind(StringFormat("tcp://%s:%d", HOST, SYS_PORT));
+      }
+      else
+      {
+         Print("Disconnecting 'System' socket on port ", SYS_PORT, "..");
+         sysSocket.disconnect(StringFormat("tcp://%s:%d", HOST, SYS_PORT));
+      }
 
       // Shutdown ZeroMQ Context
       context.shutdown();
