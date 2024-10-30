@@ -1,7 +1,7 @@
 ![example workflow](https://github.com/ejtraderLabs/Metatrader5-Docker/actions/workflows/docker-image.yml/badge.svg)
 
 
-# vnc-alpine Ny
+# vnc-alpine Nyo
 
 This container provides a [VNC](https://en.wikipedia.org/wiki/Virtual_Network_Computing)-enabled and wine container based on Alpine Linux.
 
