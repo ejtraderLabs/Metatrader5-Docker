@@ -4,5 +4,4 @@ steps:
 images:
   - 'gcr.io/$PROJECT_ID/metatrader5:latest'
 options:
-  default_logs_bucket_behavior: REGIONAL_USER_OWNED_BUCKET  # This specifies the logs behavior
-  logs_bucket: 'gs://bucket1350'  # Point to your Cloud Storage bucket
+  default_logs_bucket_behavior: REGIONAL_USER_OWNED_BUCKET  # Set this for using a user-owned bucket for logs.
