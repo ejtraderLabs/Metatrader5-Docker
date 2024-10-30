@@ -3,3 +3,5 @@ steps:
     args: ['build', '-t', 'gcr.io/$PROJECT_ID/metatrader5:latest', '.']
 images:
   - 'gcr.io/$PROJECT_ID/metatrader5:latest'
+options:
+  logs_bucket: 'gs://bucket1350'  # Use your actual bucket name here
