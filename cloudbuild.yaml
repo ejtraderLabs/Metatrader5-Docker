@@ -4,4 +4,4 @@ steps:
 images:
   - 'gcr.io/$PROJECT_ID/metatrader5:latest'
 options:
-  logs_bucket: 'gs://993708475556-global-cloudbuild-logs'  # Specify your logs bucket here.
+  default_logs_bucket_behavior: REGIONAL_USER_OWNED_BUCKET  # Use this for user-owned logs.
