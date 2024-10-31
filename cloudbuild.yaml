@@ -4,4 +4,4 @@ steps:
 images:
   - 'gcr.io/$PROJECT_ID/metatrader5:latest'
 options:
-  default_logs_bucket_behavior: REGIONAL_USER_OWNED_BUCKET  # Use this for user-owned logs.
+  default_logs_bucket_behavior: REGIONAL_USER_OWNED_BUCKET  # Use this for user-owned logs
