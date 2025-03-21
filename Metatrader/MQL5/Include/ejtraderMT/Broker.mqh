@@ -10,7 +10,7 @@ void GetPositions(CJAVal &dataObject)
 {
    CPositionInfo myposition;
    CJAVal data;
-
+   
    // Get positions
    int positionsTotal=PositionsTotal();
    
