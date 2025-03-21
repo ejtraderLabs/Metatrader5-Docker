@@ -57,40 +57,6 @@ void GetPositions(CJAVal &dataObject)
    InformClientSocket(sysSocket,t);
 }
 
-// Get positions
-   int positionsTotal=PositionsTotal();
-// Create empty array if no positions
-   if(!positionsTotal)
-      data["positions"].Add(position);
-// Go through positions in a loop
-   for(int i=0; i<positionsTotal; i++)
-     {
-      mControl.mResetLastError();
-
-      if(myposition.Select(PositionGetSymbol(i)))
-        {
-         position["id"]=PositionGetInteger(POSITION_IDENTIFIER);
-         position["magic"]=PositionGetInteger(POSITION_MAGIC);
-         position["symbol"]=PositionGetString(POSITION_SYMBOL);
-         position["type"]=EnumToString(ENUM_POSITION_TYPE(PositionGetInteger(POSITION_TYPE)));
-         position["time_setup"]=PositionGetInteger(POSITION_TIME);
-         position["open"]=PositionGetDouble(POSITION_PRICE_OPEN);
-         position["stoploss"]=PositionGetDouble(POSITION_SL);
-         position["takeprofit"]=PositionGetDouble(POSITION_TP);
-         position["volume"]=PositionGetDouble(POSITION_VOLUME);
-
-         data["error"]=(bool) false;
-         data["positions"].Add(position);
-        }
-      CheckError(__FUNCTION__);
-     }
-
-   string t=data.Serialize();
-   if(debug)
-      Print(t);
-   InformClientSocket(sysSocket,t);
-  }
-
 //+------------------------------------------------------------------+
 //| Fetch orders information                                         |
 //+------------------------------------------------------------------+
