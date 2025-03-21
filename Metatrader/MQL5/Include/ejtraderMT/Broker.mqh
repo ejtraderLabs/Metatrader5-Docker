@@ -7,22 +7,33 @@
 //| Fetch positions information                                      |
 //+------------------------------------------------------------------+
 void GetPositions(CJAVal &dataObject)
-  {
+{
    CPositionInfo myposition;
-   CJAVal data, position;
+   CJAVal data;
 
-// Get positions
+   // Get positions
    int positionsTotal=PositionsTotal();
-// Create empty array if no positions
+   
+   // Create empty array if no positions
    if(!positionsTotal)
-      data["positions"].Add(position);
-// Go through positions in a loop
+   {
+      CJAVal emptyPosition;
+      data["positions"].Add(emptyPosition);
+   }
+      
+   // Go through positions in a loop
    for(int i=0; i<positionsTotal; i++)
-     {
+   {
       mControl.mResetLastError();
-
-      if(myposition.Select(PositionGetSymbol(i)))
-        {
+      
+      // Get the position ticket directly by index
+      ulong ticket = PositionGetTicket(i);
+      
+      if(ticket && myposition.SelectByTicket(ticket))
+      {
+         // Create a new position object for each position
+         CJAVal position;
+         
          position["id"]=PositionGetInteger(POSITION_IDENTIFIER);
          position["magic"]=PositionGetInteger(POSITION_MAGIC);
          position["symbol"]=PositionGetString(POSITION_SYMBOL);
@@ -33,17 +44,18 @@ void GetPositions(CJAVal &dataObject)
          position["takeprofit"]=PositionGetDouble(POSITION_TP);
          position["volume"]=PositionGetDouble(POSITION_VOLUME);
 
-         data["error"]=(bool) false;
          data["positions"].Add(position);
-        }
+      }
       CheckError(__FUNCTION__);
-     }
-
+   }
+   
+   data["error"]=(bool) false;
+   
    string t=data.Serialize();
    if(debug)
       Print(t);
    InformClientSocket(sysSocket,t);
-  }
+}
 
 //+------------------------------------------------------------------+
 //| Fetch orders information                                         |
