@@ -31,6 +31,7 @@ Socket sysSocket(context, ZMQ_REP);
 #include <ejtraderMT/HistoryInfo.mqh>
 #include <ejtraderMT/Broker.mqh>
 #include <ejtraderMT/Calendar.mqh>
+#include <ejtraderMT/SymbolsInfo.mqh>
 
 // Global variables \\
 input bool debug = false;
@@ -317,6 +318,8 @@ void RequestHandler(ZmqMsg &request)
       ScriptConfiguration(incomingMessage);
    else if (action == "ACCOUNT")
       GetAccountInfo();
+   else if (action == "SYMBOLINFO")
+      GetSymbolInfo(incomingMessage);
    else if (action == "LISTSYMBOLS")
       GetSymbolsList();
    else if (action == "LISTSYMBOLSDETAILS")
