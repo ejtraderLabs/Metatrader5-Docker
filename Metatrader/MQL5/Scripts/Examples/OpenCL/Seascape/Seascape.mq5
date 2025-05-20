@@ -1,9 +1,9 @@
 //+------------------------------------------------------------------+
 //|                                                     Seascape.mq5 |
-//|                        Copyright 2016, MetaQuotes Software Corp. |
+//|                             Copyright 2000-2025, MetaQuotes Ltd. |
 //|                                             https://www.mql5.com |
 //+------------------------------------------------------------------+
-#property copyright "Copyright 2016, MetaQuotes Software Corp."
+#property copyright "Copyright 2000-2025, MetaQuotes Ltd."
 #property link      "https://www.mql5.com"
 #property version   "1.00"
 
@@ -75,17 +75,20 @@ bool ModelInitialize(int &cl_ctx,int &cl_prg,int &cl_krn,int &cl_mem)
 //+------------------------------------------------------------------+
 bool ModelResize(const int cl_ctx,const int cl_krn,int &cl_mem)
   {
-//--- the same size?
-   if(ExtSizeX!=(uint)ChartGetInteger(0,CHART_WIDTH_IN_PIXELS) || ExtSizeY!=(uint)ChartGetInteger(0,CHART_HEIGHT_IN_PIXELS))
-     {
-      //--- check the dimention
-      ExtSizeX=(uint)ChartGetInteger(0,CHART_WIDTH_IN_PIXELS);
-      if(ExtSizeX<8)
-         ExtSizeX=8;
+   uint width =(uint)ChartGetInteger(0,CHART_WIDTH_IN_PIXELS);
+   uint height=(uint)ChartGetInteger(0,CHART_HEIGHT_IN_PIXELS);
+//--- correction
+   width=(width + 7) & ~7;    // align to 8
+   if(width<8)
+      width=8;
 
-      ExtSizeY=(uint)ChartGetInteger(0,CHART_HEIGHT_IN_PIXELS);
-      if(ExtSizeY<8)
-         ExtSizeY=8;
+   if(height<8)
+      height=8;
+//--- the same size?
+   if(ExtSizeX!=width || ExtSizeY!=height)
+     {
+      ExtSizeX=width;
+      ExtSizeY=height;
       //--- create buffer
       if(cl_mem!=INVALID_HANDLE)
          CLBufferFree(cl_mem);

@@ -7,33 +7,22 @@
 //| Fetch positions information                                      |
 //+------------------------------------------------------------------+
 void GetPositions(CJAVal &dataObject)
-{
+  {
    CPositionInfo myposition;
-   CJAVal data;
-   
-   // Get positions
+   CJAVal data, position;
+
+// Get positions
    int positionsTotal=PositionsTotal();
-   
-   // Create empty array if no positions
+// Create empty array if no positions
    if(!positionsTotal)
-   {
-      CJAVal emptyPosition;
-      data["positions"].Add(emptyPosition);
-   }
-      
-   // Go through positions in a loop
+      data["positions"].Add(position);
+// Go through positions in a loop
    for(int i=0; i<positionsTotal; i++)
-   {
+     {
       mControl.mResetLastError();
-      
-      // Get the position ticket directly by index
-      ulong ticket = PositionGetTicket(i);
-      
-      if(ticket && myposition.SelectByTicket(ticket))
-      {
-         // Create a new position object for each position
-         CJAVal position;
-         
+
+      if(myposition.Select(PositionGetSymbol(i)))
+        {
          position["id"]=PositionGetInteger(POSITION_IDENTIFIER);
          position["magic"]=PositionGetInteger(POSITION_MAGIC);
          position["symbol"]=PositionGetString(POSITION_SYMBOL);
@@ -44,18 +33,17 @@ void GetPositions(CJAVal &dataObject)
          position["takeprofit"]=PositionGetDouble(POSITION_TP);
          position["volume"]=PositionGetDouble(POSITION_VOLUME);
 
+         data["error"]=(bool) false;
          data["positions"].Add(position);
-      }
+        }
       CheckError(__FUNCTION__);
-   }
-   
-   data["error"]=(bool) false;
-   
+     }
+
    string t=data.Serialize();
    if(debug)
       Print(t);
-   InformClientSocket(sysSocket,t);
-}
+   InformClientSocket(dataSocket,t);
+  }
 
 //+------------------------------------------------------------------+
 //| Fetch orders information                                         |
@@ -103,7 +91,7 @@ void GetOrders(CJAVal &dataObject)
    string t=data.Serialize();
    if(debug)
       Print(t);
-   InformClientSocket(sysSocket,t);
+   InformClientSocket(dataSocket,t);
   }
 
 //+------------------------------------------------------------------+
@@ -313,7 +301,7 @@ void OnTradeTransaction(const MqlTradeTransaction &trans,
          string t=data.Serialize();
          if(debug)
             Print(t);
-         InformClientSocket(sysSocket,t);
+         InformClientSocket(streamSocket,t);
         }
       break;
       default:

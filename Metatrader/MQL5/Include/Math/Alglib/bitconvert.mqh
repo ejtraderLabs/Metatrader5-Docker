@@ -1,7 +1,7 @@
 //+------------------------------------------------------------------+
 //|                                                   bitconvert.mqh |
-//|            Copyright 2003-2012 Sergey Bochkanov (ALGLIB project) |
-//|                   Copyright 2012-2017, MetaQuotes Software Corp. |
+//|            Copyright 2003-2022 Sergey Bochkanov (ALGLIB project) |
+//|                             Copyright 2012-2023, MetaQuotes Ltd. |
 //|                                             https://www.mql5.com |
 //+------------------------------------------------------------------+
 //| Implementation of ALGLIB library in MetaQuotes Language 5        |
@@ -38,9 +38,6 @@
 class BitConverter
   {
 public:
-                     BitConverter(void);
-                    ~BitConverter(void);
-
    static void       GetBytes(const int d,uchar &bytes[]);
    static void       GetBytes(const double d,uchar &bytes[]);
    static int        ToInt32(uchar &bytes[]);
@@ -48,23 +45,9 @@ public:
    static bool       IsLittleEndian(void);
   };
 //+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-BitConverter::BitConverter(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-BitConverter::~BitConverter(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
 //| Converting integer to a byte array                               |
 //+------------------------------------------------------------------+
-static void BitConverter::GetBytes(const int d,uchar &bytes[])
+void BitConverter::GetBytes(const int d,uchar &bytes[])
   {
 //--- create variables
    int x;
@@ -73,8 +56,8 @@ static void BitConverter::GetBytes(const int d,uchar &bytes[])
    int i;
    int div;
 //--- allocation
-   ArrayResizeAL(bytes,4);
-   for(i=0;i<4;i++)
+   ArrayResize(bytes,4);
+   for(i=0; i<4; i++)
      {
       //--- check
       if(d>=0)
@@ -113,7 +96,7 @@ static void BitConverter::GetBytes(const int d,uchar &bytes[])
 //+------------------------------------------------------------------+
 //| Converting double to a byte array                                |
 //+------------------------------------------------------------------+
-static void BitConverter::GetBytes(const double d,uchar &bytes[])
+void BitConverter::GetBytes(const double d,uchar &bytes[])
   {
 //--- module
    double abs_d=MathAbs(d);
@@ -176,7 +159,7 @@ static void BitConverter::GetBytes(const double d,uchar &bytes[])
       if(f>abs_d)
         {
          //--- if abs_d < f - this bit is zero
-         ArrayResizeAL(abs_d_to_bitArray,j+1);
+         ArrayResize(abs_d_to_bitArray,j+1);
          abs_d_to_bitArray[j]=0;
          j++;
          step-=1;
@@ -186,7 +169,7 @@ static void BitConverter::GetBytes(const double d,uchar &bytes[])
          //--- if abs_d >= f, then this bit is equal one
          //--- reduction abs_d
          abs_d-=f;
-         ArrayResizeAL(abs_d_to_bitArray,j+1);
+         ArrayResize(abs_d_to_bitArray,j+1);
          abs_d_to_bitArray[j]=1;
          j++;
          step-=1;
@@ -202,7 +185,7 @@ static void BitConverter::GetBytes(const double d,uchar &bytes[])
    exp_shift=1023+power;
 //--- bits from the first and 11 are reserved for the shifted exponential
    j=1;
-   for(int i=10;i>=0;i--)
+   for(int i=10; i>=0; i--)
      {
       if(MathPow(2,i)>exp_shift)
          d_to_bitArray[j]=0;
@@ -219,7 +202,7 @@ static void BitConverter::GetBytes(const double d,uchar &bytes[])
    j=1;
 //--- Bits from 12 to 63 are filled with binary representation of abs_b
 //--- the first element abs_d_to_bitArray is always 1
-   for(int i=12;i<64;i++)
+   for(int i=12; i<64; i++)
      {
       if(j<k)
         {
@@ -232,11 +215,11 @@ static void BitConverter::GetBytes(const double d,uchar &bytes[])
 //--- reverse
    ArrayReverse(d_to_bitArray);
 //--- converting bit array to byte array
-   for(int i=0;i<8;i++)
+   for(int i=0; i<8; i++)
      {
       u=0;
       //--- get byte
-      for(int t=0;t<8;t++)
+      for(int t=0; t<8; t++)
          u+=(uchar)(d_to_bitArray[i*8+t]*MathPow(2,t));
       //--- save byte
       bytes[i]=u;
@@ -245,7 +228,7 @@ static void BitConverter::GetBytes(const double d,uchar &bytes[])
 //+------------------------------------------------------------------+
 //| Converting byte array to a integer                               |
 //+------------------------------------------------------------------+
-static int BitConverter::ToInt32(uchar &bytes[])
+int BitConverter::ToInt32(uchar &bytes[])
   {
 //--- get size
    int size=ArraySize(bytes);
@@ -253,7 +236,7 @@ static int BitConverter::ToInt32(uchar &bytes[])
    int d=0;
    int mul=256*256*256;
 //--- get number
-   for(int i=size-1;i>=0;i--)
+   for(int i=size-1; i>=0; i--)
      {
       d+=bytes[i]*mul;
       mul=mul/256;
@@ -264,7 +247,7 @@ static int BitConverter::ToInt32(uchar &bytes[])
 //+------------------------------------------------------------------+
 //| Converting byte array to a double                                |
 //+------------------------------------------------------------------+
-static double BitConverter::ToDouble(uchar &bytes[])
+double BitConverter::ToDouble(uchar &bytes[])
   {
 //--- create variables
    int    s;
@@ -274,11 +257,11 @@ static double BitConverter::ToDouble(uchar &bytes[])
    double m=0;
 //--- array of bits in IEEE 754
    bool bits[];
-   ArrayResizeAL(bits,64);
+   ArrayResize(bits,64);
 //--- get array of bits from array of bytes
-   for(int i=0;i<8;i++)
+   for(int i=0; i<8; i++)
      {
-      for(int j=7;j>=0;j--)
+      for(int j=7; j>=0; j--)
         {
          //--- if 2 in power >, bits[i*8+j]=0, else bits[i*8+j]=0
          if(MathPow(2,j)>bytes[i])
@@ -293,7 +276,7 @@ static double BitConverter::ToDouble(uchar &bytes[])
      }
 //--- search bits with 1
    bool allzero=true;
-   for(int i=0;i<64;i++)
+   for(int i=0; i<64; i++)
       if(bits[i]==1)
          allzero=false;
 //--- if all bits are 0, then number is 0
@@ -304,10 +287,10 @@ static double BitConverter::ToDouble(uchar &bytes[])
 //--- s-the first bit, determines sign of the number
    s=bits[0];
 //--- calculation exponent shift
-   for(int i=10;i>=0;i--)
+   for(int i=10; i>=0; i--)
       e+=(int)(bits[11-i]*MathPow(2,i));
 //--- get mantissa
-   for(int i=0;i<52;i++)
+   for(int i=0; i<52; i++)
       m+=bits[12+i]*MathPow(2,-1-i);
 //--- return result
    return(MathPow(-1,s)*MathPow(2,e-1023)*(1+m));
@@ -315,63 +298,17 @@ static double BitConverter::ToDouble(uchar &bytes[])
 //+------------------------------------------------------------------+
 //| Byte ordering (forward, backward)                                |
 //+------------------------------------------------------------------+
-static bool BitConverter::IsLittleEndian(void)
+bool BitConverter::IsLittleEndian(void)
   {
 //--- forward
    return(true);
-  }
-//+------------------------------------------------------------------+
-//| Array reverse (uchar)                                            |
-//+------------------------------------------------------------------+
-void ArrayReverse(uchar &array[])
-  {
-//--- size
-   int size=ArraySize(array);
-//--- half of size
-   int half=size/2;
-//--- create a variable
-   uchar temp;
-//--- reverse
-   for(int i=0;i<half;i++)
-     {
-      temp=array[i];
-      array[i]=array[size-1-i];
-      array[size-1-i]=temp;
-     }
-  }
-//+------------------------------------------------------------------+
-//| Array reverse (bool)                                             |
-//+------------------------------------------------------------------+
-void ArrayReverse(bool &array[])
-  {
-//--- size
-   int size=ArraySize(array);
-//--- half of size
-   int half=size/2;
-//--- create a variable
-   bool temp;
-//--- reverse
-   for(int i=0;i<half;i++)
-     {
-      temp=array[i];
-      array[i]=array[size-1-i];
-      array[size-1-i]=temp;
-     }
   }
 //+------------------------------------------------------------------+
 //| Get string from char array                                       |
 //+------------------------------------------------------------------+
 string GetSelectionString(char &buf[],int startIndex,int lenght)
   {
-//--- create array
-   ushort res[];
-   int    size=ArraySize(buf);
-   ArrayResizeAL(res,size);
-//--- converting
-   for(int i=0;i<size;i++)
-      res[i]=(ushort)buf[i];
-//--- return result
-   return(ShortArrayToString(res,startIndex,lenght));
+   return(CharArrayToString(buf,startIndex,lenght));
   }
 //+------------------------------------------------------------------+
 //| Get sign of number                                               |
@@ -387,32 +324,7 @@ double MathSign(const double x)
 //--- ?<0
    return(-1);
   }
-#ifndef __MQL5__
-//+------------------------------------------------------------------+
-//| Hyperbolic sine                                                  |
-//+------------------------------------------------------------------+
-double MathSinh(const double x)
-  {
-//--- return result
-   return((MathPow(M_E,x)-MathPow(M_E,-x))/2);
-  }
-//+------------------------------------------------------------------+
-//| Hyperbolic cosine                                                |
-//+------------------------------------------------------------------+
-double MathCosh(const double x)
-  {
-//--- return result
-   return((MathPow(M_E,x)+MathPow(M_E,-x))/2);
-  }
-//+------------------------------------------------------------------+
-//| Hyperbolic tangent                                               |
-//+------------------------------------------------------------------+
-double MathTanh(const double x)
-  {
-//--- return result
-   return(MathSinh(x)/MathCosh(x));
-  }
-#endif
+
 //+------------------------------------------------------------------+
 //| Structure stores a variable of type double                       |
 //+------------------------------------------------------------------+
@@ -421,8 +333,8 @@ union UDoubleValue
    double            value;
    long              bits;
 
-                     UDoubleValue(double dbl):value(dbl) { }
-                     UDoubleValue(long bit_value):bits(bit_value) { }
+   UDoubleValue(double dbl): value(dbl) { }
+   UDoubleValue(long bit_value): bits(bit_value) { }
   };
 //+------------------------------------------------------------------+
 //| Work with infinity and NaN                                       |
@@ -430,9 +342,6 @@ union UDoubleValue
 class CInfOrNaN
   {
 public:
-   //--- constructor, destructor
-                     CInfOrNaN(void);
-                    ~CInfOrNaN(void);
    //--- checks
    static bool       IsPositiveInfinity(const double x);
    static bool       IsNegativeInfinity(const double x);
@@ -444,23 +353,9 @@ public:
    static double     NaN(void);
   };
 //+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CInfOrNaN::CInfOrNaN(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CInfOrNaN::~CInfOrNaN(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
 //| Check for +inf                                                   |
 //+------------------------------------------------------------------+
-static bool CInfOrNaN::IsPositiveInfinity(const double x)
+bool CInfOrNaN::IsPositiveInfinity(const double x)
   {
    UDoubleValue val=x;
 //--- check
@@ -469,7 +364,7 @@ static bool CInfOrNaN::IsPositiveInfinity(const double x)
 //+------------------------------------------------------------------+
 //| Check for -inf                                                   |
 //+------------------------------------------------------------------+
-static bool CInfOrNaN::IsNegativeInfinity(const double x)
+bool CInfOrNaN::IsNegativeInfinity(const double x)
   {
    UDoubleValue val=x;
 //--- check
@@ -478,36 +373,21 @@ static bool CInfOrNaN::IsNegativeInfinity(const double x)
 //+------------------------------------------------------------------+
 //| Check for +-inf                                                  |
 //+------------------------------------------------------------------+
-static bool CInfOrNaN::IsInfinity(const double x)
+bool CInfOrNaN::IsInfinity(const double x)
   {
-   UDoubleValue val=x;
-//--- check
-   return(val.bits==0x7FF0000000000000 || val.bits==0xFFF0000000000000);
+   return(MathClassify(x)==FP_INFINITE);
   }
 //+------------------------------------------------------------------+
 //| Check for NaN                                                    |
 //+------------------------------------------------------------------+
-static bool CInfOrNaN::IsNaN(const double x)
+bool CInfOrNaN::IsNaN(const double x)
   {
-//--- check
-   if(MathIsValidNumber(x))
-     {
-      //--- is valid number
-      return(false);
-     }
-//--- check
-   if(IsInfinity(x))
-     {
-      //--- +-inf
-      return(false);
-     }
-//--- is NaN
-   return(true);
+   return(MathClassify(x)==FP_NAN);
   }
 //+------------------------------------------------------------------+
 //| Return +inf                                                      |
 //+------------------------------------------------------------------+
-static double CInfOrNaN::PositiveInfinity(void)
+double CInfOrNaN::PositiveInfinity(void)
   {
    UDoubleValue val(0x7FF0000000000000);
    return(val.value);
@@ -515,7 +395,7 @@ static double CInfOrNaN::PositiveInfinity(void)
 //+------------------------------------------------------------------+
 //| Return -inf                                                      |
 //+------------------------------------------------------------------+
-static double CInfOrNaN::NegativeInfinity(void)
+double CInfOrNaN::NegativeInfinity(void)
   {
    UDoubleValue val(0xFFF0000000000000);
    return(val.value);
@@ -523,7 +403,7 @@ static double CInfOrNaN::NegativeInfinity(void)
 //+------------------------------------------------------------------+
 //| Return NaN                                                       |
 //+------------------------------------------------------------------+
-static double CInfOrNaN::NaN(void)
+double CInfOrNaN::NaN(void)
   {
    UDoubleValue val(0x7FFFFFFFFFFFFFFF);
    return(val.value);

@@ -1,7 +1,7 @@
 //+------------------------------------------------------------------+
 //|                                                  arrayresize.mqh |
-//|            Copyright 2003-2012 Sergey Bochkanov (ALGLIB project) |
-//|                   Copyright 2012-2017, MetaQuotes Software Corp. |
+//|            Copyright 2003-2022 Sergey Bochkanov (ALGLIB project) |
+//|                             Copyright 2012-2023, MetaQuotes Ltd. |
 //|                                             https://www.mql5.com |
 //+------------------------------------------------------------------+
 //| Implementation of ALGLIB library in MetaQuotes Language 5        |
@@ -31,27 +31,12 @@
 //| MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the     |
 //| GNU General Public License for more details.                     |
 //+------------------------------------------------------------------+
-#include "complex.mqh"
 
-//--- declaration
+//--- forward declaration
 class CRowInt;
-class CRowDouble;
-class CRowComplex;
+
 //+------------------------------------------------------------------+
-//| ArrayResizeAL for Alglib library with MQL4 and MQL5 features     |
-//+------------------------------------------------------------------+
-int ArrayResizeAL(double &arr[],const int size)
-  {
-   int old=ArraySize(arr);
-   int res=ArrayResize(arr,size);
-//--- fill array if necessary
-   if(res>0 && old<size)
-      ArrayFill(arr,old,size-old,0.0);
-//--- return result
-   return(res);
-  }
-//+------------------------------------------------------------------+
-//| ArrayResizeAL for Alglib library with MQL4 and MQL5 features     |
+//| ArrayResizeAL for Alglib library with MQL5 features              |
 //+------------------------------------------------------------------+
 int ArrayResizeAL(int &arr[],const int size)
   {
@@ -64,7 +49,7 @@ int ArrayResizeAL(int &arr[],const int size)
    return(res);
   }
 //+------------------------------------------------------------------+
-//| ArrayResizeAL for Alglib library with MQL4 and MQL5 features     |
+//| ArrayResizeAL for Alglib library with MQL5 features              |
 //+------------------------------------------------------------------+
 int ArrayResizeAL(short &arr[],const int size)
   {
@@ -77,7 +62,7 @@ int ArrayResizeAL(short &arr[],const int size)
    return(res);
   }
 //+------------------------------------------------------------------+
-//| ArrayResizeAL for Alglib library with MQL4 and MQL5 features     |
+//| ArrayResizeAL for Alglib library with MQL5 features              |
 //+------------------------------------------------------------------+
 int ArrayResizeAL(char &arr[],const int size)
   {
@@ -90,7 +75,7 @@ int ArrayResizeAL(char &arr[],const int size)
    return(res);
   }
 //+------------------------------------------------------------------+
-//| ArrayResizeAL for Alglib library with MQL4 and MQL5 features     |
+//| ArrayResizeAL for Alglib library with MQL5 features              |
 //+------------------------------------------------------------------+
 int ArrayResizeAL(bool &arr[],const int size)
   {
@@ -103,54 +88,17 @@ int ArrayResizeAL(bool &arr[],const int size)
    return(res);
   }
 //+------------------------------------------------------------------+
-//| ArrayResizeAL for Alglib library with MQL4 and MQL5 features     |
+//| ArrayResizeAL for Alglib library with MQL5 features              |
 //+------------------------------------------------------------------+
 int ArrayResizeAL(string &arr[],const int size)
   {
-//---
    return(ArrayResize(arr,size));
-  }
-//+------------------------------------------------------------------+
-//| ArrayResizeAL for Alglib library with MQL4 and MQL5 features     |
-//+------------------------------------------------------------------+
-int ArrayResizeAL(al_complex &arr[],const int size)
-  {
-   int old=ArraySize(arr);
-   int res=ArrayResize(arr,size);
-//--- fill array if necessary
-   if(res>0 && old<size)
-     {
-      for(int i=old,len=size-old;i<len;i++)
-        {
-         arr[i].re=0.0;
-         arr[i].im=0.0;
-        }
-     }
-//--- return result
-   return(res);
   }
 //+------------------------------------------------------------------+
 //| ArrayResizeAL for Alglib library with MQL4 and MQL5 features     |
 //+------------------------------------------------------------------+
 int ArrayResizeAL(CRowInt &arr[],const int size)
   {
-//---
-   return(ArrayResize(arr,size));
-  }
-//+------------------------------------------------------------------+
-//| ArrayResizeAL for Alglib library with MQL4 and MQL5 features     |
-//+------------------------------------------------------------------+
-int ArrayResizeAL(CRowDouble &arr[],const int size)
-  {
-//---
-   return(ArrayResize(arr,size));
-  }
-//+------------------------------------------------------------------+
-//| ArrayResizeAL for Alglib library with MQL4 and MQL5 features     |
-//+------------------------------------------------------------------+
-int ArrayResizeAL(CRowComplex &arr[],const int size)
-  {
-//---
    return(ArrayResize(arr,size));
   }
 //+------------------------------------------------------------------+

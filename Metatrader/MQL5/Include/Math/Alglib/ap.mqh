@@ -1,7 +1,7 @@
 //+------------------------------------------------------------------+
 //|                                                           ap.mqh |
-//|            Copyright 2003-2012 Sergey Bochkanov (ALGLIB project) |
-//|                   Copyright 2012-2017, MetaQuotes Software Corp. |
+//|            Copyright 2003-2022 Sergey Bochkanov (ALGLIB project) |
+//|                             Copyright 2012-2023, MetaQuotes Ltd. |
 //|                                             https://www.mql5.com |
 //+------------------------------------------------------------------+
 //| Implementation of ALGLIB library in MetaQuotes Language 5        |
@@ -32,9 +32,17 @@
 //| GNU General Public License for more details.                     |
 //+------------------------------------------------------------------+
 #include <Object.mqh>
-#include "complex.mqh"
 #include "matrix.mqh"
 #include "bitconvert.mqh"
+//---
+#define IsPosInf(value) (AL_POSINF==value)
+#define IsNegInf(value) (AL_NEGINF==value)
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+double AL_NaN  =CInfOrNaN::NaN();  //---AL_NaN
+double AL_POSINF=CInfOrNaN::PositiveInfinity(); //---+infinity 1.#INF
+double AL_NEGINF=CInfOrNaN::NegativeInfinity(); //----infinity -1.#INF
 //+------------------------------------------------------------------+
 //| Reverse communication structure                                  |
 //+------------------------------------------------------------------+
@@ -42,44 +50,48 @@ struct RCommState
   {
 public:
    int               stage;
-   int               ia[];
+   CRowInt           ia;
    bool              ba[];
-   double            ra[];
-   al_complex        ca[];
+   CRowDouble        ra;
+   CRowComplex       ca;
 
                      RCommState(void) { stage=-1; }
-                    ~RCommState(void) { };
-   void              Copy(RCommState &obj);
+                    ~RCommState(void) {}
+   void              Copy(const RCommState &obj);
+   //--- overloading
+   void              operator=(const RCommState &obj) { Copy(obj); }
   };
 //+------------------------------------------------------------------+
 //| Create a copy                                                    |
 //+------------------------------------------------------------------+
-void RCommState::Copy(RCommState &obj)
+void RCommState::Copy(const RCommState &obj)
   {
 //--- copy a variable
    stage=obj.stage;
 //--- copy arrays
-   ArrayCopy(ia,obj.ia);
+   ia=obj.ia;
    ArrayCopy(ba,obj.ba);
-   ArrayCopy(ra,obj.ra);
-   ArrayCopy(ca,obj.ca);
+   ra=obj.ra;
+   ca=obj.ca;
   }
 //+------------------------------------------------------------------+
 //| Internal functions                                               |
+//+------------------------------------------------------------------+
+enum TRACE_MODE { TRACE_NONE,TRACE_FILE };
+//+------------------------------------------------------------------+
+//|                                                                  |
 //+------------------------------------------------------------------+
 class CAp
   {
 public:
    //--- variable that determines whether an exception happened
    static bool       exception_happened;
-   //--- constructor, destructor
-                     CAp(void);
-                    ~CAp(void);
    //--- len
-   static int        Len(const int &a[]);
-   static int        Len(const bool &a[]);
-   static int        Len(const double &a[]);
-   static int        Len(const al_complex &a[]);
+   template <typename T>
+   static int        Len(const T &a[]);
+   static int        Len(const CRowInt &a);
+   static int        Len(const CRowDouble &a);
+   static int        Len(const CRowComplex &a);
    //--- rows count
    static int        Rows(const CMatrixInt &a);
    static int        Rows(const CMatrixDouble &a);
@@ -89,110 +101,117 @@ public:
    static int        Cols(const CMatrixDouble &a);
    static int        Cols(const CMatrixComplex &a);
    //--- swap
-   static void       Swap(int &a,int &b);
-   static void       Swap(double &a,double &b);
-   static void       Swap(al_complex &a,al_complex &b);
-   static void       Swap(bool &a[],bool &b[]);
-   static void       Swap(int &a[],int &b[]);
-   static void       Swap(double &a[],double &b[]);
-   static void       Swap(al_complex &a[],al_complex &b[]);
+   template <typename T>
+   static void       Swap(T &a,T &b);
+   template <typename T>
+   static void       Swap(T &a[],T &b[]);
+   static void       Swap(vector<double> &a,vector<double> &b);
+   static void       Swap(vector<float> &a,vector<float> &b);
+   static void       Swap(vector<complex> &a,vector<complex> &b);
    static void       Swap(CMatrixInt &a,CMatrixInt &b);
    static void       Swap(CMatrixDouble &a,CMatrixDouble &b);
    static void       Swap(CMatrixComplex &a,CMatrixComplex &b);
    //--- check assertions
    static bool       Assert(const bool cond);
    static bool       Assert(const bool cond,const string s);
+   static bool       SetErrorFlag(bool &flag,bool cond,string xdesc);
+   static void       SetErrorFlagDiff(bool &flag,double val,double refval,double tol,double s);
    //--- determination of accuracy
    static int        ThresHoldToDPS(const double threshold);
    //--- join string
    static string     StringJoin(const string sep,const string &a[]);
    //--- convert to string
-   static string     Format(const al_complex &a,const int dps);
+   static string     Format(const complex &a,const int dps);
    static string     Format(const bool &a[]);
    static string     Format(const int &a[]);
    static string     Format(const double &a[],const int dps);
-   static string     Format(const al_complex &a[],const int dps);
-   static string     FormatB(const CMatrixInt &a);
-   static string     Format(const CMatrixInt &a);
-   static string     Format(const CMatrixDouble &a,const int dps);
-   static string     Format(const CMatrixComplex &a,const int dps);
+   static string     Format(const vector<double> &a,const int dps);
+   static string     Format(const complex &a[],const int dps);
+   static string     Format(const vector<complex> &a,const int dps);
+   static string     FormatB(CMatrixInt &a);
+   static string     Format(CMatrixInt &a);
+   static string     Format(CMatrixDouble &a,const int dps);
+   static string     Format(CMatrixComplex &a,const int dps);
    //--- work with matrix
    static bool       IsSymmetric(const CMatrixDouble &a);
    static bool       IsHermitian(const CMatrixComplex &a);
    static bool       ForceSymmetric(CMatrixDouble &a);
    static bool       ForceHermitian(CMatrixComplex &a);
+   //--- trace
+   static void       TraceFile(string tags,string filename);
+   static void       TraceDisable(void);
+   static bool       IsTraceEnabled(string tag);
+   static void       Trace(string s);
+
+private:
+   static TRACE_MODE m_TraceMode;
+   static string     m_TraceTags;
+   static string     m_TraceFilename;
   };
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+TRACE_MODE CAp::m_TraceMode=TRACE_NONE;
+string CAp::m_TraceTags="";
+string CAp::m_TraceFilename="";
 //+------------------------------------------------------------------+
 //| Initialize variable                                              |
 //+------------------------------------------------------------------+
 bool CAp::exception_happened=false;
 //+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CAp::CAp(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CAp::~CAp(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
 //| Get array lenght                                                 |
 //+------------------------------------------------------------------+
-static int CAp::Len(const int &a[])
+template <typename T>
+int CAp::Len(const T &a[])
   {
    return(ArraySize(a));
   }
 //+------------------------------------------------------------------+
 //| Get array lenght                                                 |
 //+------------------------------------------------------------------+
-static int CAp::Len(const bool &a[])
+int CAp::Len(const CRowInt &a)
   {
-   return(ArraySize(a));
+   return((int)a.Size());
   }
 //+------------------------------------------------------------------+
 //| Get array lenght                                                 |
 //+------------------------------------------------------------------+
-static int CAp::Len(const double &a[])
+int CAp::Len(const CRowDouble &a)
   {
-   return(ArraySize(a));
+   return((int)a.Size());
   }
 //+------------------------------------------------------------------+
 //| Get array lenght                                                 |
 //+------------------------------------------------------------------+
-static int CAp::Len(const al_complex &a[])
+int CAp::Len(const CRowComplex &a)
   {
-   return(ArraySize(a));
+   return((int)a.Size());
   }
 //+------------------------------------------------------------------+
 //| Get rows count                                                   |
 //+------------------------------------------------------------------+
-static int CAp::Rows(const CMatrixInt &a)
+int CAp::Rows(const CMatrixInt &a)
   {
    return(a.Size());
   }
 //+------------------------------------------------------------------+
 //| Get rows count                                                   |
 //+------------------------------------------------------------------+
-static int CAp::Rows(const CMatrixDouble &a)
+int CAp::Rows(const CMatrixDouble &a)
   {
    return(a.Size());
   }
 //+------------------------------------------------------------------+
 //| Get rows count                                                   |
 //+------------------------------------------------------------------+
-static int CAp::Rows(const CMatrixComplex &a)
+int CAp::Rows(const CMatrixComplex &a)
   {
    return(a.Size());
   }
 //+------------------------------------------------------------------+
 //| Get cols count                                                   |
 //+------------------------------------------------------------------+
-static int CAp::Cols(const CMatrixInt &a)
+int CAp::Cols(const CMatrixInt &a)
   {
 //--- check
    if(a.Size()==0)
@@ -203,128 +222,60 @@ static int CAp::Cols(const CMatrixInt &a)
 //+------------------------------------------------------------------+
 //| Get rows count                                                   |
 //+------------------------------------------------------------------+
-static int CAp::Cols(const CMatrixDouble &a)
+int CAp::Cols(const CMatrixDouble &a)
   {
-//--- check
-   if(a.Size()==0)
-      return(0);
-//--- return result
-   return(a[0].Size());
+   return(a.Cols());
   }
 //+------------------------------------------------------------------+
 //| Get rows count                                                   |
 //+------------------------------------------------------------------+
-static int CAp::Cols(const CMatrixComplex &a)
+int CAp::Cols(const CMatrixComplex &a)
   {
-//--- check
-   if(a.Size()==0)
-      return(0);
-//--- return result
-   return(a[0].Size());
+   return(a.Cols());
   }
 //+------------------------------------------------------------------+
 //| Swap                                                             |
 //+------------------------------------------------------------------+
-static void CAp::Swap(int &a,int &b)
+template <typename T>
+void CAp::Swap(T &a,T &b)
   {
-   int t=a;
+   T t=a;
    a=b;
    b=t;
   }
 //+------------------------------------------------------------------+
 //| Swap                                                             |
 //+------------------------------------------------------------------+
-static void CAp::Swap(double &a,double &b)
+template <typename T>
+void CAp::Swap(T &a[],T &b[])
   {
-   double t=a;
-   a=b;
-   b=t;
+   ArraySwap(a,b);
   }
 //+------------------------------------------------------------------+
 //| Swap                                                             |
 //+------------------------------------------------------------------+
-static void CAp::Swap(al_complex &a,al_complex &b)
+void CAp::Swap(vector<double> &a,vector<double> &b)
   {
-   al_complex t(a.re,a.im);
-   a=b;
-   b=t;
+   a.Swap(b);
   }
 //+------------------------------------------------------------------+
 //| Swap                                                             |
 //+------------------------------------------------------------------+
-static void CAp::Swap(bool &a[],bool &b[])
+void CAp::Swap(vector<float> &a,vector<float> &b)
   {
-//--- calculation
-   int na=ArraySize(a);
-   int nb=ArraySize(b);
-//--- create array
-   bool t[];
-   ArrayResizeAL(t,na);
-//--- swap
-   ArrayCopy(t,a);
-   ArrayResizeAL(a,nb);
-   ArrayCopy(a,b);
-   ArrayResizeAL(b,na);
-   ArrayCopy(b,t);
+   a.Swap(b);
   }
 //+------------------------------------------------------------------+
 //| Swap                                                             |
 //+------------------------------------------------------------------+
-static void CAp::Swap(int &a[],int &b[])
+void CAp::Swap(vector<complex> &a,vector<complex> &b)
   {
-//--- calculation
-   int na=ArraySize(a);
-   int nb=ArraySize(b);
-//--- create array
-   int t[];
-   ArrayResizeAL(t,na);
-//--- swap
-   ArrayCopy(t,a);
-   ArrayResizeAL(a,nb);
-   ArrayCopy(a,b);
-   ArrayResizeAL(b,na);
-   ArrayCopy(b,t);
+   a.Swap(b);
   }
 //+------------------------------------------------------------------+
 //| Swap                                                             |
 //+------------------------------------------------------------------+
-static void CAp::Swap(double &a[],double &b[])
-  {
-//--- calculation
-   int na=ArraySize(a);
-   int nb=ArraySize(b);
-//--- create array
-   double t[];
-   ArrayResizeAL(t,na);
-//--- swap
-   ArrayCopy(t,a);
-   ArrayResizeAL(a,nb);
-   ArrayCopy(a,b);
-   ArrayResizeAL(b,na);
-   ArrayCopy(b,t);
-  }
-//+------------------------------------------------------------------+
-//| Swap                                                             |
-//+------------------------------------------------------------------+
-static void CAp::Swap(al_complex &a[],al_complex &b[])
-  {
-//--- calculation
-   int na=ArraySize(a);
-   int nb=ArraySize(b);
-//--- create array
-   al_complex t[];
-   ArrayResizeAL(t,na);
-//--- swap
-   ArrayCopy(t,a);
-   ArrayResizeAL(a,nb);
-   ArrayCopy(a,b);
-   ArrayResizeAL(b,na);
-   ArrayCopy(b,t);
-  }
-//+------------------------------------------------------------------+
-//| Swap                                                             |
-//+------------------------------------------------------------------+
-static void CAp::Swap(CMatrixInt &a,CMatrixInt &b)
+void CAp::Swap(CMatrixInt &a,CMatrixInt &b)
   {
 //--- create matrix
    CMatrixInt t;
@@ -336,7 +287,7 @@ static void CAp::Swap(CMatrixInt &a,CMatrixInt &b)
 //+------------------------------------------------------------------+
 //| Swap                                                             |
 //+------------------------------------------------------------------+
-static void CAp::Swap(CMatrixDouble &a,CMatrixDouble &b)
+void CAp::Swap(CMatrixDouble &a,CMatrixDouble &b)
   {
 //--- create matrix
    CMatrixDouble t;
@@ -348,7 +299,7 @@ static void CAp::Swap(CMatrixDouble &a,CMatrixDouble &b)
 //+------------------------------------------------------------------+
 //| Swap                                                             |
 //+------------------------------------------------------------------+
-static void CAp::Swap(CMatrixComplex &a,CMatrixComplex &b)
+void CAp::Swap(CMatrixComplex &a,CMatrixComplex &b)
   {
 //--- create matrix
    CMatrixComplex t;
@@ -360,24 +311,50 @@ static void CAp::Swap(CMatrixComplex &a,CMatrixComplex &b)
 //+------------------------------------------------------------------+
 //| Check assertions                                                 |
 //+------------------------------------------------------------------+
-static bool CAp::Assert(const bool cond)
+bool CAp::Assert(const bool cond)
   {
    return(Assert(cond,"ALGLIB: assertion failed"));
   }
 //+------------------------------------------------------------------+
 //| Check assertions                                                 |
 //+------------------------------------------------------------------+
-static bool CAp::Assert(const bool cond,const string s)
+bool CAp::Assert(const bool cond,const string s)
   {
 //--- check
-   if(cond==0)
+   if(!cond)
      {
-      Print(__FUNCTION__+" "+s);
+      Print(__FUNCTION__+" " + s);
       exception_happened=true;
       return(false);
      }
 //--- the assertion is true
    return(true);
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+bool CAp::SetErrorFlag(bool &flag,bool cond,string xdesc)
+  {
+   if(cond)
+     {
+      flag=true;
+      Print(xdesc);
+     }
+//---
+   return(flag);
+  }
+//+------------------------------------------------------------------+
+//| Internally calls SetErrorFlag() with condition:                  |
+//|            Abs(Val-RefVal)>Tol*Max(Abs(RefVal),S)                |
+//| This function is used to test relative error in Val against      |
+//| RefVal, with relative error being replaced by absolute when scale|
+//| of  RefVal  is  less than S.                                     |
+//| This function returns value of COND.                             |
+//+------------------------------------------------------------------+
+void CAp::SetErrorFlagDiff(bool &flag,double val,double refval,
+                           double tol,double s)
+  {
+   CAp::SetErrorFlag(flag,MathAbs(val-refval)>(tol*MathMax(MathAbs(refval),s)),"apserv.ap:162");
   }
 //+------------------------------------------------------------------+
 //| returns dps (digits-of-precision) value corresponding to         |
@@ -386,12 +363,12 @@ static bool CAp::Assert(const bool cond,const string s)
 //| dps(0.09) = dps(0.05) = dps(0.01) = 1                            |
 //| and so on                                                        |
 //+------------------------------------------------------------------+
-static int CAp::ThresHoldToDPS(const double threshold)
+int CAp::ThresHoldToDPS(const double threshold)
   {
 //--- initialization
    int    res=0;
    double t=1.0;
-   for(res=0;t/10>threshold*(1+1E-10);res++)
+   for(res=0; t/10>threshold*(1+1E-10); res++)
       t/=10;
 //--- return result
    return(res);
@@ -399,7 +376,7 @@ static int CAp::ThresHoldToDPS(const double threshold)
 //+------------------------------------------------------------------+
 //| Concatenation                                                    |
 //+------------------------------------------------------------------+
-static string CAp::StringJoin(const string sep,const string &a[])
+string CAp::StringJoin(const string sep,const string &a[])
   {
    int size=ArraySize(a);
 //--- check
@@ -410,7 +387,7 @@ static string CAp::StringJoin(const string sep,const string &a[])
      }
 //--- concatenation
    string res="";
-   for(int i=0;i<size;i++)
+   for(int i=0; i<size; i++)
      {
       StringAdd(res,a[i]);
       if(i!=size-1)
@@ -422,23 +399,27 @@ static string CAp::StringJoin(const string sep,const string &a[])
 //+------------------------------------------------------------------+
 //| Prints formatted complex                                         |
 //+------------------------------------------------------------------+
-static string CAp::Format(const al_complex &a,const int dps)
+string CAp::Format(const complex &a,const int dps)
   {
 //--- definition of output style
    string fmt;
-   if(dps>=0) fmt="f";
-   else       fmt="e";
+   if(dps>=0)
+      fmt="f";
+   else
+      fmt="e";
 //--- get sign of the imaginary part
    string sign;
-   if(a.im>=0) sign="+";
-   else        sign="-";
+   if(a.imag>=0)
+      sign="+";
+   else
+      sign="-";
 //--- converting
    int    d=(int)MathAbs(dps);
-   string fmtx=StringFormat(".%d"+fmt,d);
-   string fmty=StringFormat(".%d"+fmt,d);
+   string fmtx=StringFormat(".%d" + fmt,d);
+   string fmty=StringFormat(".%d" + fmt,d);
 //--- get result
-   string res=StringFormat("%"+fmtx,a.re)+sign+
-              StringFormat("%"+fmty,MathAbs(a.im))+"i";
+   string res=StringFormat("%" + fmtx,a.real) + sign +
+                StringFormat("%" + fmty,MathAbs(a.imag)) + "i";
    StringReplace(res,",",".");
 //--- return result
    return(res);
@@ -446,7 +427,7 @@ static string CAp::Format(const al_complex &a,const int dps)
 //+------------------------------------------------------------------+
 //| Prints formatted array                                           |
 //+------------------------------------------------------------------+
-static string CAp::Format(const bool &a[])
+string CAp::Format(const bool &a[])
   {
    int size=ArraySize(a);
 //--- check
@@ -458,18 +439,20 @@ static string CAp::Format(const bool &a[])
 //--- converting
    string result[];
    ArrayResizeAL(result,size);
-   for(int i=0;i<size;i++)
+   for(int i=0; i<size; i++)
      {
-      if(a[i]==0) result[i]="true";
-      else        result[i]="false";
+      if(a[i]==0)
+         result[i]="true";
+      else
+         result[i]="false";
      }
 //--- return result
-   return("{"+StringJoin(",",result)+"}");
+   return("{" + StringJoin(",",result) + "}");
   }
 //+------------------------------------------------------------------+
 //| Prints formatted array                                           |
 //+------------------------------------------------------------------+
-static string CAp::Format(const int &a[])
+string CAp::Format(const int &a[])
   {
    int size=ArraySize(a);
 //--- check
@@ -481,15 +464,15 @@ static string CAp::Format(const int &a[])
 //--- converting
    string result[];
    ArrayResizeAL(result,size);
-   for(int i=0;i<size;i++)
+   for(int i=0; i<size; i++)
       result[i]=IntegerToString(a[i]);
 //--- return result
-   return("{"+StringJoin(",",result)+"}");
+   return("{" + StringJoin(",",result) + "}");
   }
 //+------------------------------------------------------------------+
 //| Prints formatted array                                           |
 //+------------------------------------------------------------------+
-static string CAp::Format(const double &a[],const int dps)
+string CAp::Format(const double &a[],const int dps)
   {
    int size=ArraySize(a);
 //--- check
@@ -500,25 +483,58 @@ static string CAp::Format(const double &a[],const int dps)
      }
    string result[];
    ArrayResizeAL(result,size);
-//--- definition of output style 
+//--- definition of output style
    string sfmt;
-   if(dps>=0) sfmt="f";
-   else       sfmt="e";
+   if(dps>=0)
+      sfmt="f";
+   else
+      sfmt="e";
 //--- converting
    int    d=(int)MathAbs(dps);
-   string fmt=StringFormat(".%d"+sfmt,d);
-   for(int i=0;i<size;i++)
+   string fmt=StringFormat(".%d" + sfmt,d);
+   for(int i=0; i<size; i++)
      {
-      result[i]=StringFormat("%"+fmt,a[i]);
+      result[i]=StringFormat("%" + fmt,a[i]);
       StringReplace(result[i],",",".");
      }
 //--- return result
-   return("{"+StringJoin(",",result)+"}");
+   return("{" + StringJoin(",",result) + "}");
   }
 //+------------------------------------------------------------------+
 //| Prints formatted array                                           |
 //+------------------------------------------------------------------+
-static string CAp::Format(const al_complex &a[],const int dps)
+string CAp::Format(const vector<double> &a,const int dps)
+  {
+   ulong size=a.Size();
+//--- check
+   if(size==0)
+     {
+      Print(__FUNCTION__+": vector size error");
+      return(NULL);
+     }
+   string result[];
+   ArrayResizeAL(result,(int)size);
+//--- definition of output style
+   string sfmt;
+   if(dps>=0)
+      sfmt="f";
+   else
+      sfmt="e";
+//--- converting
+   int    d=(int)MathAbs(dps);
+   string fmt=StringFormat(".%d" + sfmt,d);
+   for(ulong i=0; i<size; i++)
+     {
+      result[i]=StringFormat("%" + fmt,a[i]);
+      StringReplace(result[i],",",".");
+     }
+//--- return result
+   return("{" + StringJoin(",",result) + "}");
+  }
+//+------------------------------------------------------------------+
+//| Prints formatted array                                           |
+//+------------------------------------------------------------------+
+string CAp::Format(const complex &a[],const int dps)
   {
    int size=ArraySize(a);
 //--- check
@@ -529,41 +545,45 @@ static string CAp::Format(const al_complex &a[],const int dps)
      }
    string result[];
    ArrayResizeAL(result,size);
-//--- definition of output style 
+//--- definition of output style
    string fmt;
-   if(dps>=0) fmt="f";
-   else       fmt="e";
+   if(dps>=0)
+      fmt="f";
+   else
+      fmt="e";
 //--- converting
    int    d=(int)MathAbs(dps);
-   string fmtx=StringFormat(".%d"+fmt,d);
-   string fmty=StringFormat(".%d"+fmt,d);
+   string fmtx=StringFormat(".%d" + fmt,d);
+   string fmty=StringFormat(".%d" + fmt,d);
    string sign;
-   for(int i=0;i<size;i++)
+   for(int i=0; i<size; i++)
      {
       //--- definition of the sign
-      if(a[i].im>=0) sign="+";
-      else           sign="-";
+      if(a[i].imag>=0)
+         sign="+";
+      else
+         sign="-";
       //--- fill result
-      result[i]=StringFormat("%"+fmtx,a[i].re)+sign+
-                StringFormat("%"+fmty,MathAbs(a[i].im))+"i";
+      result[i]=StringFormat("%" + fmtx,a[i].real) + sign +
+                  StringFormat("%" + fmty,MathAbs(a[i].imag)) + "i";
       StringReplace(result[i],",",".");
      }
 //--- return result
-   return("{"+StringJoin(",",result)+"}");
+   return("{" + StringJoin(",",result) + "}");
   }
 //+------------------------------------------------------------------+
 //| Prints formatted matrix                                          |
 //+------------------------------------------------------------------+
-static string CAp::FormatB(const CMatrixInt &a)
+string CAp::FormatB(CMatrixInt &a)
   {
-   int m=a.Size();
+   int m=a.Rows();
 //--- check
    if(m==0)
      {
       Print(__FUNCTION__+": array size error");
       return(NULL);
      }
-   int n=a[0].Size();
+   int n=a.Cols();
 //--- check
    if(n==0)
      {
@@ -576,28 +596,28 @@ static string CAp::FormatB(const CMatrixInt &a)
    ArrayResizeAL(line,n);
    ArrayResizeAL(result,m);
 //--- converting
-   for(int i=0;i<m;i++)
+   for(int i=0; i<m; i++)
      {
-      for(int j=0;j<n;j++)
-         line[j]=(bool)(a[i][j]);
+      for(int j=0; j<n; j++)
+         line[j]=(bool)(a.Get(i,j));
       result[i]=Format(line);
      }
 //--- return result
-   return("{"+StringJoin(",",result)+"}");
+   return("{" + StringJoin(",",result) + "}");
   }
 //+------------------------------------------------------------------+
 //| Prints formatted matrix                                          |
 //+------------------------------------------------------------------+
-static string CAp::Format(const CMatrixInt &a)
+string CAp::Format(CMatrixInt &a)
   {
-   int m=a.Size();
+   int m=a.Rows();
 //--- check
    if(m==0)
      {
       Print(__FUNCTION__+": array size error");
       return(NULL);
      }
-   int n=a[0].Size();
+   int n=a.Cols();
 //--- check
    if(n==0)
      {
@@ -610,28 +630,28 @@ static string CAp::Format(const CMatrixInt &a)
    ArrayResizeAL(line,n);
    ArrayResizeAL(result,m);
 //--- converting
-   for(int i=0;i<m;i++)
+   for(int i=0; i<m; i++)
      {
-      for(int j=0;j<n;j++)
-         line[j]=a[i][j];
+      for(int j=0; j<n; j++)
+         line[j]=a.Get(i,j);
       result[i]=Format(line);
      }
 //--- return result
-   return("{"+StringJoin(",",result)+"}");
+   return("{" + StringJoin(",",result) + "}");
   }
 //+------------------------------------------------------------------+
 //| Prints formatted matrix                                          |
 //+------------------------------------------------------------------+
-static string CAp::Format(const CMatrixDouble &a,const int dps)
+string CAp::Format(CMatrixDouble &a,const int dps)
   {
-   int m=a.Size();
+   ulong m=a.Rows();
 //--- check
    if(m==0)
      {
       Print(__FUNCTION__+": array size error");
       return(NULL);
      }
-   int n=a[0].Size();
+   ulong n=a.Cols();
 //--- check
    if(n==0)
      {
@@ -639,94 +659,90 @@ static string CAp::Format(const CMatrixDouble &a,const int dps)
       return(NULL);
      }
 //--- prepare arrays
-   double line[];
    string result[];
-   ArrayResizeAL(line,n);
-   ArrayResizeAL(result,m);
+   ArrayResizeAL(result,(int)m);
 //--- converting
-   for(int i=0;i<m;i++)
+   for(ulong i=0; i<m; i++)
      {
-      for(int j=0;j<n;j++)
-         line[j]=a[i][j];
-      result[i]=Format(line,dps);
+      vector<double> v=a[i];
+      result[i]=Format(v,dps);
      }
 //--- return result
-   return("{"+StringJoin(",",result)+"}");
+   return("{" + StringJoin(",",result) + "}");
   }
 //+------------------------------------------------------------------+
 //| Prints formatted matrix                                          |
 //+------------------------------------------------------------------+
-static string CAp::Format(const CMatrixComplex &a,const int dps)
+string CAp::Format(CMatrixComplex &a,const int dps)
   {
-   int m=a.Size();
+   ulong m=a.Rows();
 //--- check
    if(m==0)
      {
-      Print(__FUNCTION__+": array size error");
+      Print(__FUNCTION__+": matrix size error");
       return(NULL);
      }
-   int n=a[0].Size();
+   ulong n=a.Cols();
 //--- check
    if(n==0)
      {
-      Print(__FUNCTION__+": array size error");
+      Print(__FUNCTION__+": matrix size error");
       return(NULL);
      }
 //--- prepare arrays
-   al_complex line[];
    string     result[];
-   ArrayResizeAL(line,n);
-   ArrayResizeAL(result,m);
+   ArrayResizeAL(result,(int)m);
 //--- converting
-   for(int i=0;i<m;i++)
+   for(ulong i=0; i<m; i++)
      {
-      for(int j=0;j<n;j++)
-         line[j]=a[i][j];
-      result[i]=Format(line,dps);
+      vector<complex> v=a[i];
+      result[i]=Format(v,dps);
      }
 //--- return result
-   return("{"+StringJoin(",",result)+"}");
+   return("{" + StringJoin(",",result) + "}");
   }
 //+------------------------------------------------------------------+
 //| checks that matrix is symmetric.                                 |
 //| max|A-A^T| is calculated; if it is within 1.0E-14 of max|A|,     |
 //| matrix is considered symmetric                                   |
 //+------------------------------------------------------------------+
-static bool CAp::IsSymmetric(const CMatrixDouble &a)
+bool CAp::IsSymmetric(const CMatrixDouble &a)
   {
-   int n=a.Size();
+   ulong n=a.Rows();
 //--- check
-   if(n!=a[0].Size()) return(false);
+   if(n!=a.Cols())
+      return(false);
 //--- check
-   if(n==0) return(true);
-//--- initialization
-   double v1,v2;
-   double mx=0.0;
-   double err=0.0;
+   if(n==0)
+      return(true);
 //--- check for symmetry
-   for(int i=0;i<n;i++)
+   double mx=0;
+   double err=0;
+   for(ulong i=0; i<n; i++)
      {
-      for(int j=i+1;j<n;j++)
+      for(ulong j=i+1; j<n; j++)
         {
-         v1=a[i][j];
-         v2=a[j][i];
-         //--- checks
-         if(!CMath::IsFinite(v1)) return(false);
-         if(!CMath::IsFinite(v2)) return(false);
-         //--- change values
+         double v1=a.Get(i,j);
+         double v2=a.Get(j,i);
+         if(!MathIsValidNumber(v1))
+            return(false);
+         if(!MathIsValidNumber(v2))
+            return(false);
          err=MathMax(err,MathAbs(v1-v2));
-         mx=MathMax(mx,MathAbs(v1));
-         mx=MathMax(mx,MathAbs(v2));
+         mx =MathMax(mx,MathAbs(v1));
+         mx =MathMax(mx,MathAbs(v2));
         }
-      v1=a[i][i];
-      //--- check
-      if(!CMath::IsFinite(v1)) return(false);
-      mx=MathMax(mx,MathAbs(v1));
+      double v=a.Get(i,i);
+      if(!MathIsValidNumber(v))
+         return(false);
+      mx=MathMax(mx,MathAbs(v));
      }
 //--- check
-   if(mx==0) return(true);
+   if(mx==0)
+      return(true);
 //--- check
-   if(err/mx<=1.0E-14) return(true);
+   if(err/mx<=1.0E-14)
+      return(true);
 //--- return result
    return(false);
   }
@@ -735,89 +751,156 @@ static bool CAp::IsSymmetric(const CMatrixDouble &a)
 //| max|A-A^H| is calculated; if it is within 1.0E-14 of max|A|,     |
 //| matrix is considered Hermitian                                   |
 //+------------------------------------------------------------------+
-static bool CAp::IsHermitian(const CMatrixComplex &a)
+bool CAp::IsHermitian(const CMatrixComplex &a)
   {
-   int n=a.Size();
+   ulong n=a.Rows();
 //--- check
-   if(n!=a[0].Size()) return(false);
+   if(n!=a.Cols())
+      return(false);
 //--- check
-   if(n==0) return(true);
+   if(n==0)
+      return(true);
 //--- initialization
    double     mx=0;
    double     err=0;
-   al_complex v1,v2,vt;
+   complex v1,v2,vt;
 //--- check for Hermitian
-   for(int i=0;i<n;i++)
+   for(ulong i=0; i<n; i++)
      {
-      for(int j=i+1;j<n;j++)
+      for(ulong j=i+1; j<n; j++)
         {
-         v1=a[i][j];
-         v2=a[j][i];
+         v1=a.Get(i,j);
+         v2=a.Get(j,i);
          //--- checks
-         if(!CMath::IsFinite(v1.re)) return(false);
-         if(!CMath::IsFinite(v1.im)) return(false);
-         if(!CMath::IsFinite(v2.re)) return(false);
-         if(!CMath::IsFinite(v2.im)) return(false);
+         if(!CMath::IsFinite(v1.real))
+            return(false);
+         if(!CMath::IsFinite(v1.imag))
+            return(false);
+         if(!CMath::IsFinite(v2.real))
+            return(false);
+         if(!CMath::IsFinite(v2.imag))
+            return(false);
          //--- change values
-         vt.re=v1.re-v2.re;
-         vt.im=v1.im+v2.im;
+         vt.real=v1.real-v2.real;
+         vt.imag=v1.imag+v2.imag;
          err=MathMax(err,CMath::AbsComplex(vt));
          mx=MathMax(mx,CMath::AbsComplex(v1));
          mx=MathMax(mx,CMath::AbsComplex(v2));
         }
-      v1=a[i][i];
+      v1=a.Get(i,i);
       //--- checks
-      if(!CMath::IsFinite(v1.re)) return(false);
-      if(!CMath::IsFinite(v1.im)) return(false);
+      if(!CMath::IsFinite(v1.real))
+         return(false);
+      if(!CMath::IsFinite(v1.imag))
+         return(false);
       //--- change values
-      err=MathMax(err,MathAbs(v1.im));
+      err=MathMax(err,MathAbs(v1.imag));
       mx=MathMax(mx,CMath::AbsComplex(v1));
      }
 //--- check
-   if(mx==0) return(true);
+   if(mx==0)
+      return(true);
 //--- check
-   if(err/mx<=1.0E-14) return(true);
+   if(err/mx<=1.0E-14)
+      return(true);
 //--- return result
    return(false);
   }
 //+------------------------------------------------------------------+
 //| Forces symmetricity by copying upper half of A to the lower one  |
 //+------------------------------------------------------------------+
-static bool CAp::ForceSymmetric(CMatrixDouble &a)
+bool CAp::ForceSymmetric(CMatrixDouble &a)
   {
-   int n=a.Size();
+   ulong n=a.Rows();
 //--- check
-   if(n!=a[0].Size()) return(false);
+   if(n!=a.Cols())
+      return(false);
 //--- check
-   if(n==0) return(true);
+   if(n==0)
+      return(true);
 //--- change matrix
-   for(int i=0;i<n;i++)
-      for(int j=i+1;j<n;j++)
-         a[i].Set(j,a[j][i]);
+   matrix<double> m=a.Transpose();
+   a=a.TriL()+m.TriU(1);
 //--- return result
    return(true);
   }
 //+------------------------------------------------------------------+
 //| Forces Hermiticity by copying upper half of A to the lower one   |
 //+------------------------------------------------------------------+
-static bool CAp::ForceHermitian(CMatrixComplex &a)
+bool CAp::ForceHermitian(CMatrixComplex &a)
   {
-   int n=a.Size();
+   ulong n=a.Rows();
 //--- check
-   if(n!=a[0].Size()) return(false);
+   if(n!=a.Cols())
+      return(false);
 //--- check
-   if(n==0) return(true);
+   if(n==0)
+      return(true);
 //--- change matrix
-   al_complex c;
-   for(int i=0;i<n;i++)
-      for(int j=i+1;j<n;j++)
+   complex c;
+   for(ulong i=0; i<n; i++)
+      for(ulong j=i+1; j<n; j++)
         {
-         c=a[j][i];
-         c.im=-c.im;
-         a[i].Set(j,c);
+         c=a.Get(j,i);
+         c.imag=-c.imag;
+         a.Set(i,j,c);
         }
 //--- return result
    return(true);
+  }
+//+------------------------------------------------------------------+
+//| Start trace                                                      |
+//+------------------------------------------------------------------+
+void CAp::TraceFile(string tags,string filename)
+  {
+   m_TraceMode    =TRACE_FILE;
+   StringToLower(tags);
+   m_TraceTags    ="," + tags + ",";
+   m_TraceFilename=filename;
+   Trace("####################################################################################################\r\n");
+   Trace("# TRACING ENABLED: " + TimeToString(TimeCurrent(),TIME_DATE | TIME_SECONDS) + "\r\n");
+   Trace("# TRACE TAGS:      '" + tags + "'\r\n");
+   Trace("####################################################################################################\r\n");
+  }
+//+------------------------------------------------------------------+
+//| Stop trace                                                       |
+//+------------------------------------------------------------------+
+void CAp::TraceDisable(void)
+  {
+   m_TraceMode    =TRACE_NONE;
+   m_TraceTags    ="";
+  }
+//+------------------------------------------------------------------+
+//| Check trace enabled                                              |
+//+------------------------------------------------------------------+
+bool CAp::IsTraceEnabled(string tag)
+  {
+//--- trace disabled
+   if(m_TraceMode==TRACE_NONE)
+      return(false);
+//--- contains tag (followed by comma, which means exact match)
+   StringToLower(tag);
+   if(StringFind(m_TraceTags,("," + tag + ",")) >= 0)
+      return(true);
+//--- contains tag (followed by dot, which means match with child)
+   if(StringFind(m_TraceTags,("," + tag + ".")) >= 0)
+      return(true);
+//---nothing
+   return(false);
+  }
+//+------------------------------------------------------------------+
+//| Trace                                                            |
+//+------------------------------------------------------------------+
+void CAp::Trace(string s)
+  {
+   if(m_TraceMode==TRACE_FILE)
+     {
+      int handle=FileOpen(m_TraceFilename,FILE_READ|FILE_WRITE|FILE_TXT|FILE_ANSI);
+      if(handle<=0 || !FileSeek(handle,0,SEEK_END))
+         return;
+      FileWriteString(handle,s);
+      FileClose(handle);
+     }
   }
 //+------------------------------------------------------------------+
 //| Portable high quality random number generator state.             |
@@ -837,22 +920,22 @@ public:
    double            m_v;
    int               m_magicv;
    //--- constructor, destructor
-                     CHighQualityRandState(void);
-                    ~CHighQualityRandState(void);
+                     CHighQualityRandState(void) { ZeroMemory(this); }
+                    ~CHighQualityRandState(void) {}
+   //---
+   void              Copy(const CHighQualityRandState &obj);
+   //--- overloading
+   void              operator=(const CHighQualityRandState &obj) { Copy(obj); }
   };
 //+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
+//|                                                                  |
 //+------------------------------------------------------------------+
-CHighQualityRandState::CHighQualityRandState(void)
+void CHighQualityRandState::Copy(const CHighQualityRandState &obj)
   {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CHighQualityRandState::~CHighQualityRandState(void)
-  {
-
+   m_s1=obj.m_s1;
+   m_s2=obj.m_s2;
+   m_magicv=obj.m_magicv;
+   m_v=obj.m_v;
   }
 //+------------------------------------------------------------------+
 //| Portable high quality random number generator state.             |
@@ -860,28 +943,22 @@ CHighQualityRandState::~CHighQualityRandState(void)
 //| Fields:                                                          |
 //|     S1, S2      -   seed values                                  |
 //|     V           -   precomputed value                            |
-//|     MagicV      -   'magic' value used to determine whether State| 
+//|     MagicV      -   'magic' value used to determine whether State|
 //|                     structure was correctly initialized.         |
 //+------------------------------------------------------------------+
 class CHighQualityRandStateShell
   {
 private:
    CHighQualityRandState m_innerobj;
+
 public:
    //--- constructors, destructor
-                     CHighQualityRandStateShell(void);
+                     CHighQualityRandStateShell(void) {}
                      CHighQualityRandStateShell(CHighQualityRandState &obj);
-                    ~CHighQualityRandStateShell(void);
+                    ~CHighQualityRandStateShell(void) {}
    //--- method
-   CHighQualityRandState *GetInnerObj(void);
+   CHighQualityRandState *GetInnerObj(void) { return(GetPointer(m_innerobj)); }
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CHighQualityRandStateShell::CHighQualityRandStateShell(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| Copy                                                             |
 //+------------------------------------------------------------------+
@@ -894,72 +971,49 @@ CHighQualityRandStateShell::CHighQualityRandStateShell(CHighQualityRandState &ob
    m_innerobj.m_magicv=obj.m_magicv;
   }
 //+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CHighQualityRandStateShell::~CHighQualityRandStateShell(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Return object of CHighQualityRandState                           |
-//+------------------------------------------------------------------+
-CHighQualityRandState *CHighQualityRandStateShell::GetInnerObj(void)
-  {
-   return(GetPointer(m_innerobj));
-  }
-//+------------------------------------------------------------------+
 //| Portable high quality random number generator                    |
 //+------------------------------------------------------------------+
 class CHighQualityRand
   {
-private:
-   //--- private method
-   static int        HQRndIntegerBase(CHighQualityRandState &state);
 public:
    //--- static class members
    static const int  m_HQRndMax;
    static const int  m_HQRndM1;
    static const int  m_HQRndM2;
    static const int  m_HQRndMagic;
-   //--- constructor, destructor
-                     CHighQualityRand(void);
-                    ~CHighQualityRand(void);
    //--- public methods
    static void       HQRndRandomize(CHighQualityRandState &state);
    static void       HQRndSeed(const int s1,const int s2,CHighQualityRandState &state);
    static double     HQRndUniformR(CHighQualityRandState &state);
    static int        HQRndUniformI(CHighQualityRandState &state,const int n);
    static double     HQRndNormal(CHighQualityRandState &state);
+   static void       HQRndNormalV(CHighQualityRandState &state,int n,CRowDouble &x);
+   static void       HQRndNormalM(CHighQualityRandState &state,int m,int n,CMatrixDouble &x);
    static void       HQRndUnit2(CHighQualityRandState &state,double &x,double &y);
    static void       HQRndNormal2(CHighQualityRandState &state,double &x1,double &x2);
    static double     HQRndExponential(CHighQualityRandState &state,const double lambdav);
+   static double     HQRndDiscrete(CHighQualityRandState &state,int n,CRowDouble &x);
+   template <typename T>
+   static T          HQRndDiscrete(CHighQualityRandState &state,int n,vector<T> &x);
+   static double     HQRndContinuous(CHighQualityRandState &state,int n,CRowDouble &x);
+   template <typename T>
+   static T          HQRndContinuous(CHighQualityRandState &state,int n,vector<T> &x);
+
+private:
+   static int        HQRndIntegerBase(CHighQualityRandState &state);
   };
 //+------------------------------------------------------------------+
 //| Initialize constants                                             |
 //+------------------------------------------------------------------+
-const int CHighQualityRand::m_HQRndMax=2147483563;
-const int CHighQualityRand::m_HQRndM1=2147483563;
-const int CHighQualityRand::m_HQRndM2=2147483399;
+const int CHighQualityRand::m_HQRndMax=2147483561;
+const int CHighQualityRand::m_HQRndM1 =2147483563;
+const int CHighQualityRand::m_HQRndM2 =2147483399;
 const int CHighQualityRand::m_HQRndMagic=1634357784;
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CHighQualityRand::CHighQualityRand(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CHighQualityRand::~CHighQualityRand(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| HQRNDState initialization with random values which come from     |
 //| standard RNG.                                                    |
 //+------------------------------------------------------------------+
-static void CHighQualityRand::HQRndRandomize(CHighQualityRandState &state)
+void CHighQualityRand::HQRndRandomize(CHighQualityRandState &state)
   {
 //--- get result
    HQRndSeed(CMath::RandomInteger(m_HQRndM1),CMath::RandomInteger(m_HQRndM2),state);
@@ -967,8 +1021,8 @@ static void CHighQualityRand::HQRndRandomize(CHighQualityRandState &state)
 //+------------------------------------------------------------------+
 //| HQRNDState initialization with seed values                       |
 //+------------------------------------------------------------------+
-static void CHighQualityRand::HQRndSeed(const int s1,const int s2,
-                                        CHighQualityRandState &state)
+void CHighQualityRand::HQRndSeed(const int s1,const int s2,
+                                 CHighQualityRandState &state)
   {
 //--- calculation parameters
    state.m_s1=s1%(m_HQRndM1-1)+1;
@@ -981,9 +1035,8 @@ static void CHighQualityRand::HQRndSeed(const int s1,const int s2,
 //| State structure must be initialized with HQRNDRandomize() or     |
 //| HQRNDSeed().                                                     |
 //+------------------------------------------------------------------+
-static double CHighQualityRand::HQRndUniformR(CHighQualityRandState &state)
+double CHighQualityRand::HQRndUniformR(CHighQualityRandState &state)
   {
-//--- return result
    return(state.m_v*(HQRndIntegerBase(state)-1));
   }
 //+------------------------------------------------------------------+
@@ -992,25 +1045,89 @@ static double CHighQualityRand::HQRndUniformR(CHighQualityRandState &state)
 //| 2. State structure must be initialized with HQRNDRandomize() or  |
 //| HQRNDSeed()                                                      |
 //+------------------------------------------------------------------+
-static int CHighQualityRand::HQRndUniformI(CHighQualityRandState &state,const int n)
+int CHighQualityRand::HQRndUniformI(CHighQualityRandState &state,const int n)
   {
 //--- create variables
    int result=0;
+   int maxcnt=0;
    int mx=0;
-//--- Correct handling of N's close to RNDBaseMax
-//--- (avoiding skewed distributions for RNDBaseMax<>K*N)
-   if(!CAp::Assert(n>0,__FUNCTION__+": N<=0!"))
-      return(-1);
+   int a=0;
+   int b=0;
 //--- check
-   if(!CAp::Assert(n<m_HQRndMax-1,__FUNCTION__+": N>=RNDBaseMax-1!"))
-      return(-1);
-//--- initialization
-   mx=m_HQRndMax-1-(m_HQRndMax-1)%n;
-   do
-      result=HQRndIntegerBase(state)-1;
-   while(result>=mx);
-//--- get result
-   result=result%n;
+   if(!CAp::Assert(n>0,__FUNCTION__+": N<=0!"))
+      return(INT_MAX);
+//---
+   maxcnt=m_HQRndMax+1;
+//---Two branches: one for N<=MaxCnt, another for N>MaxCnt.
+   if(n>maxcnt)
+     {
+      //---N>=MaxCnt.
+      //---We have two options here:
+      //---a) N is exactly divisible by MaxCnt
+      //---b) N is not divisible by MaxCnt
+      //---In both cases we reduce problem on interval spanning [0,N)
+      //---to several subproblems on intervals spanning [0,MaxCnt).
+      if(n%maxcnt==0)
+        {
+         //---N is exactly divisible by MaxCnt.
+         //---[0,N) range is dividided into N/MaxCnt bins,
+         //---each of them having length equal to MaxCnt.
+         //---We generate:
+         //---* random bin number B
+         //---* random offset within bin A
+         //---Both random numbers are generated by recursively
+         //---calling HQRNDUniformI().
+         //---Result is equal to A+MaxCnt*B.
+         //--- check
+         if(!CAp::Assert(n/maxcnt<=maxcnt,__FUNCTION__+": N is too large"))
+            return(INT_MAX);
+         a=HQRndUniformI(state,maxcnt);
+         b=HQRndUniformI(state,n/maxcnt);
+         result=a+maxcnt*b;
+        }
+      else
+        {
+         //---N is NOT exactly divisible by MaxCnt.
+         //---[0,N) range is dividided into Ceil(N/MaxCnt) bins,
+         //---each of them having length equal to MaxCnt.
+         //---We generate:
+         //---* random bin number B in [0, Ceil(N/MaxCnt)-1]
+         //---* random offset within bin A
+         //---* if both of what is below is true
+         //---  1) bin number B is that of the last bin
+         //---  2) A >= N mod MaxCnt
+         //---  then we repeat generation of A/B.
+         //---  This stage is essential in order to avoid bias in the result.
+         //---* otherwise, we return A*MaxCnt+N
+         //--- check
+         if(!CAp::Assert(n/maxcnt+1<=maxcnt,__FUNCTION__+": N is too large"))
+            return(INT_MAX);
+         result=-1;
+         do
+           {
+            a=HQRndUniformI(state,maxcnt);
+            b=HQRndUniformI(state,n/maxcnt+1);
+            if(b==n/maxcnt && a>=n%maxcnt)
+               continue;
+            result=a+maxcnt*b;
+           }
+         while(result<0);
+        }
+     }
+   else
+     {
+      //---N<=MaxCnt
+      //---Code below is a bit complicated because we can not simply
+      //---return "HQRNDIntegerBase() mod N" - it will be skewed for
+      //---large N's in [0.1*HQRNDMax...HQRNDMax].
+      mx=maxcnt-maxcnt%n;
+      do
+        {
+         result=HQRndIntegerBase(state);
+        }
+      while(result>=mx);
+      result=result%n;
+     }
 //--- return result
    return(result);
   }
@@ -1022,7 +1139,7 @@ static int CHighQualityRand::HQRndUniformI(CHighQualityRandState &state,const in
 //| State structure must be initialized with HQRNDRandomize() or     |
 //| HQRNDSeed().                                                     |
 //+------------------------------------------------------------------+
-static double CHighQualityRand::HQRndNormal(CHighQualityRandState &state)
+double CHighQualityRand::HQRndNormal(CHighQualityRandState &state)
   {
 //--- create variables
    double v1=0;
@@ -1033,12 +1150,99 @@ static double CHighQualityRand::HQRndNormal(CHighQualityRandState &state)
    return(v1);
   }
 //+------------------------------------------------------------------+
+//| Random number generator: vector with random entries (normal      |
+//| distribution)                                                    |
+//| This function generates N random numbers from normal             |
+//| distribution.                                                    |
+//| State structure must be initialized with HQRNDRandomize() or     |
+//| HQRNDSeed().                                                     |
+//+------------------------------------------------------------------+
+void CHighQualityRand::HQRndNormalV(CHighQualityRandState &state,
+                                    int n,CRowDouble &x)
+  {
+//--- create variables
+   int    n2=0;
+   double v1=0;
+   double v2=0;
+//--- function call
+   if(n<0)
+     {
+      n=(int)x.Size();
+     }
+   else
+     {
+      if((int)x.Size()<n)
+         x.Resize(n);
+     }
+   n2=n/2;
+   for(int i=0; i<n2; i++)
+     {
+      HQRndNormal2(state,v1,v2);
+      x.Set(2*i,v1);
+      x.Set(2*i+1,v2);
+     }
+   if(n%2!=0)
+     {
+      HQRndNormal2(state,v1,v2);
+      x.Set(n-1,v1);
+     }
+  }
+//+------------------------------------------------------------------+
+//| Random number generator: matrix with random entries (normal      |
+//| distribution)                                                    |
+//| This function generates MxN random matrix.                       |
+//| State structure must be initialized with HQRNDRandomize() or     |
+//| HQRNDSeed().                                                     |
+//+------------------------------------------------------------------+
+void CHighQualityRand::HQRndNormalM(CHighQualityRandState &state,
+                                    int m,int n,CMatrixDouble &x)
+  {
+//--- create variables
+   int    n2=0;
+   double v1=0;
+   double v2=0;
+//--- function call
+   if(n<0)
+     {
+      n=(int)x.Cols();
+     }
+   else
+     {
+      if((int)x.Cols()<n)
+         x.Resize(x.Rows(),n);
+     }
+   if(m<0)
+     {
+      m=(int)x.Rows();
+     }
+   else
+     {
+      if((int)x.Rows()<m)
+         x.Resize(m,x.Cols());
+     }
+   n2=n/2;
+   for(int i=0; i<m; i++)
+     {
+      for(int j=0; j<n2; j++)
+        {
+         HQRndNormal2(state,v1,v2);
+         x.Set(i,2*j,v1);
+         x.Set(i,2*j+1,v2);
+        }
+      if(n%2!=0)
+        {
+         HQRndNormal2(state,v1,v2);
+         x.Set(i,n-1,v1);
+        }
+     }
+  }
+//+------------------------------------------------------------------+
 //| Random number generator: random X and Y such that X^2+Y^2=1      |
 //| State structure must be initialized with HQRNDRandomize() or     |
 //| HQRNDSeed().                                                     |
 //+------------------------------------------------------------------+
-static void CHighQualityRand::HQRndUnit2(CHighQualityRandState &state,
-                                         double &x,double &y)
+void CHighQualityRand::HQRndUnit2(CHighQualityRandState &state,
+                                  double &x,double &y)
   {
 //--- create variables
    double v=0;
@@ -1060,15 +1264,15 @@ static void CHighQualityRand::HQRndUnit2(CHighQualityRandState &state,
    y=y/v;
   }
 //+------------------------------------------------------------------+
-//| Random number generator: normal numbers  	   	   	   	   |
+//| Random number generator: normal numbers                  |
 //| This function generates two independent random numbers from      |
 //| normal distribution. Its performance is equal to that of         |
-//| HQRNDNormal()   	   	   	   	   	   	   	   	      |
+//| HQRNDNormal()                                      |
 //| State structure must be initialized with HQRNDRandomize() or     |
-//| HQRNDSeed().    	   	   	   	   	   	   	   	      |
+//| HQRNDSeed().                                       |
 //+------------------------------------------------------------------+
-static void CHighQualityRand::HQRndNormal2(CHighQualityRandState &state,
-                                           double &x1,double &x2)
+void CHighQualityRand::HQRndNormal2(CHighQualityRandState &state,
+                                    double &x1,double &x2)
   {
 //--- create variables
    double u=0;
@@ -1101,8 +1305,8 @@ static void CHighQualityRand::HQRndNormal2(CHighQualityRandState &state,
 //| State structure must be initialized with HQRNDRandomize() or     |
 //| HQRNDSeed().                                                     |
 //+------------------------------------------------------------------+
-static double CHighQualityRand::HQRndExponential(CHighQualityRandState &state,
-                                                 const double lambdav)
+double CHighQualityRand::HQRndExponential(CHighQualityRandState &state,
+                                          const double lambdav)
   {
 //--- check
    if(!CAp::Assert(lambdav>0.0,__FUNCTION__+": LambdaV<=0!"))
@@ -1111,10 +1315,154 @@ static double CHighQualityRand::HQRndExponential(CHighQualityRandState &state,
    return(-(MathLog(HQRndUniformR(state))/lambdav));
   }
 //+------------------------------------------------------------------+
+//| This function generates  random number from discrete distribution|
+//| given by finite sample X.                                        |
+//| INPUT PARAMETERS                                                 |
+//|   State   -   high quality random number generator, must be      |
+//|               initialized with HQRNDRandomize() or HQRNDSeed().  |
+//|   X   -   finite sample                                          |
+//|   N   -   number of elements to use, N>=1                        |
+//| RESULT                                                           |
+//|   this function returns one of the X[i] for random i=0..N-1      |
+//+------------------------------------------------------------------+
+double CHighQualityRand::HQRndDiscrete(CHighQualityRandState &state,
+                                       int n,CRowDouble &x)
+  {
+   double result=0;
+//--- check
+   if(!CAp::Assert(n>0,__FUNCTION__+": N<=0"))
+      return (EMPTY_VALUE);
+   if(!CAp::Assert(n<=(int)x.Size(),__FUNCTION__+": Length(X)<N"))
+      return (EMPTY_VALUE);
+//--- call function
+   result=x[HQRndUniformI(state,n)];
+//--- return result
+   return(result);
+  }
+//+------------------------------------------------------------------+
+//| This function generates  random number from discrete distribution|
+//| given by finite sample X.                                        |
+//| INPUT PARAMETERS                                                 |
+//|   State   -   high quality random number generator, must be      |
+//|               initialized with HQRNDRandomize() or HQRNDSeed().  |
+//|   X   -   finite sample                                          |
+//|   N   -   number of elements to use, N>=1                        |
+//| RESULT                                                           |
+//|   this function returns one of the X[i] for random i=0..N-1      |
+//+------------------------------------------------------------------+
+template <typename T>
+T CHighQualityRand::HQRndDiscrete(CHighQualityRandState &state,
+      int n,vector<T> &x)
+  {
+   T result=0;
+//--- check
+   if(!CAp::Assert(n>0,__FUNCTION__+": N<=0"))
+      return (EMPTY_VALUE);
+   if(!CAp::Assert(n<=(int)x.Size(),__FUNCTION__+": Length(X)<N"))
+      return (EMPTY_VALUE);
+//--- call function
+   result=x[HQRndUniformI(state,n)];
+//--- return result
+   return(result);
+  }
+//+------------------------------------------------------------------+
+//| This function generates random number from continuous            |
+//| distribution  given by finite sample X.                          |
+//| INPUT PARAMETERS                                                 |
+//|   State   -   high quality random number generator, must be      |
+//|               initialized with HQRNDRandomize() or HQRNDSeed().  |
+//|   X       -   finite sample, array[N] (can be larger, in this    |
+//|               case only leading N elements are used). THIS ARRAY |
+//|               MUST BE SORTED BY ASCENDING.                       |
+//|   N       -   number of elements to use, N>=1                    |
+//| RESULT                                                           |
+//|   this function returns random number from continuous            |
+//|   distribution which tries to approximate X as mush as possible. |
+//|   min(X)<=Result<=max(X).                                        |
+//+------------------------------------------------------------------+
+double CHighQualityRand::HQRndContinuous(CHighQualityRandState &state,
+                                         int n,CRowDouble &x)
+  {
+//--- create variables
+   double result=0;
+   double mx=0;
+   double mn=0;
+   int    i=0;
+//--- check
+   if(!CAp::Assert(n>0,__FUNCTION__+": N<=0"))
+      return (EMPTY_VALUE);
+   if(!CAp::Assert(n<=(int)x.Size(),__FUNCTION__+": Length(X)<N"))
+      return (EMPTY_VALUE);
+//--- call function
+   if(n==1)
+     {
+      result=x[0];
+      return(result);
+     }
+   i=HQRndUniformI(state,n-1);
+   mn=x[i];
+   mx=x[i+1];
+   if(!CAp::Assert(mx>=mn,__FUNCTION__+": X is not sorted by ascending"))
+      return(EMPTY_VALUE);
+   if(mx!=mn)
+      result=(mx-mn)*HQRndUniformR(state)+mn;
+   else
+      result=mn;
+//--- return result
+   return(result);
+  }
+//+------------------------------------------------------------------+
+//| This function generates random number from continuous            |
+//| distribution  given by finite sample X.                          |
+//| INPUT PARAMETERS                                                 |
+//|   State   -   high quality random number generator, must be      |
+//|               initialized with HQRNDRandomize() or HQRNDSeed().  |
+//|   X       -   finite sample, array[N] (can be larger, in this    |
+//|               case only leading N elements are used). THIS ARRAY |
+//|               MUST BE SORTED BY ASCENDING.                       |
+//|   N       -   number of elements to use, N>=1                    |
+//| RESULT                                                           |
+//|   this function returns random number from continuous            |
+//|   distribution which tries to approximate X as mush as possible. |
+//|   min(X)<=Result<=max(X).                                        |
+//+------------------------------------------------------------------+
+template <typename T>
+T CHighQualityRand::HQRndContinuous(CHighQualityRandState &state,
+      int n,vector<T> &x)
+  {
+//--- create variables
+   T      result=0;
+   double mx=0;
+   double mn=0;
+   int    i=0;
+//--- check
+   if(!CAp::Assert(n>0,__FUNCTION__+": N<=0"))
+      return (EMPTY_VALUE);
+   if(!CAp::Assert(n<=(int)x.Size(),__FUNCTION__+": Length(X)<N"))
+      return (EMPTY_VALUE);
+//--- call function
+   if(n==1)
+     {
+      result=x[0];
+      return(result);
+     }
+   i=HQRndUniformI(state,n-1);
+   mn=x[i];
+   mx=x[i+1];
+   if(!CAp::Assert(mx>=mn,__FUNCTION__+": X is not sorted by ascending"))
+      return(EMPTY_VALUE);
+   if(mx!=mn)
+      result=(T)((mx-mn)*HQRndUniformR(state)+mn);
+   else
+      result=mn;
+//--- return result
+   return(result);
+  }
+//+------------------------------------------------------------------+
 //| L'Ecuyer, Efficient and portable combined random number          |
 //| generators                                                       |
 //+------------------------------------------------------------------+
-static int CHighQualityRand::HQRndIntegerBase(CHighQualityRandState &state)
+int CHighQualityRand::HQRndIntegerBase(CHighQualityRandState &state)
   {
 //--- create variables
    int result=0;
@@ -1156,18 +1504,15 @@ public:
    static const double m_machineepsilon;
    static const double m_maxrealnumber;
    static const double m_minrealnumber;
-   //--- constructor, destructor
-                     CMath(void);
-                    ~CMath(void);
    //--- methods
    static bool       IsFinite(const double d);
    static double     RandomReal(void);
    static int        RandomInteger(const int n);
    static double     Sqr(const double x) { return(x*x); }
-   static double     AbsComplex(const al_complex &z);
+   static double     AbsComplex(const complex z);
    static double     AbsComplex(const double r);
-   static al_complex Conj(const al_complex &z);
-   static al_complex Csqr(const al_complex &z);
+   static complex    Conj(const complex z);
+   static complex    Csqr(const complex z);
   };
 //+------------------------------------------------------------------+
 //| Initialize class constants                                       |
@@ -1179,33 +1524,17 @@ bool         CMath::m_first_call=true;
 double       CMath::m_last=0.0;
 CHighQualityRandState CMath::m_state;
 //+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CMath::CMath(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CMath::~CMath(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
 //| Check on +-inf                                                   |
 //+------------------------------------------------------------------+
-static bool CMath::IsFinite(const double d)
+bool CMath::IsFinite(const double d)
   {
-//--- return result
    return(MathIsValidNumber(d));
   }
 //+------------------------------------------------------------------+
 //| Random real value [0,1)                                          |
 //+------------------------------------------------------------------+
-static double CMath::RandomReal(void)
+double CMath::RandomReal(void)
   {
-//--- create variable
    double result;
 //--- check
    if(m_first_call)
@@ -1229,7 +1558,7 @@ static double CMath::RandomReal(void)
 //+------------------------------------------------------------------+
 //| Random integer value                                             |
 //+------------------------------------------------------------------+
-static int CMath::RandomInteger(const int n)
+int CMath::RandomInteger(const int n)
   {
 //--- check
    if(m_first_call)
@@ -1246,44 +1575,44 @@ static int CMath::RandomInteger(const int n)
 //+------------------------------------------------------------------+
 //| The absolute value of a complex number                           |
 //+------------------------------------------------------------------+
-static double CMath::AbsComplex(const al_complex &z)
+double CMath::AbsComplex(const complex z)
   {
 //--- initialization
-   double w=0.0;
-   double v=0.0;
-   double xabs=MathAbs(z.re);
-   double yabs=MathAbs(z.im);
+   double xabs=MathAbs(z.real);
+   double yabs=MathAbs(z.imag);
 //--- check
-   if(xabs>yabs) w=xabs;
-   else          w=yabs;
+   if(xabs==0)
+      return(yabs);
 //--- check
-   if(xabs<yabs) v=xabs;
-   else          v=yabs;
+   if(yabs==0)
+      return(xabs);
 //--- check
-   if(v==0)
-      return(w);
 //--- calculation
-   double t=v/w;
+   double t=MathSqrt(MathPow(xabs,2)+MathPow(yabs,2));
 //--- return result
-   return(w*MathSqrt(1+t*t));
+   return(t);
   }
 //+------------------------------------------------------------------+
 //| The absolute value of a complex number                           |
 //+------------------------------------------------------------------+
-static double CMath::AbsComplex(const double r)
+double CMath::AbsComplex(const double r)
   {
 //--- initialization
-   al_complex z=r;
-   double     w=0.0;
-   double     v=0.0;
-   double     xabs=MathAbs(z.re);
-   double     yabs=MathAbs(z.im);
+   complex z=r;
+   double  w=0.0;
+   double  v=0.0;
+   double  xabs=MathAbs(z.real);
+   double  yabs=MathAbs(z.imag);
 //--- check
-   if(xabs>yabs) w=xabs;
-   else          w=yabs;
+   if(xabs>yabs)
+      w=xabs;
+   else
+      w=yabs;
 //--- check
-   if(xabs<yabs) v=xabs;
-   else          v=yabs;
+   if(xabs<yabs)
+      v=xabs;
+   else
+      v=yabs;
 //--- check
    if(v==0)
       return(w);
@@ -1295,29 +1624,29 @@ static double CMath::AbsComplex(const double r)
 //+------------------------------------------------------------------+
 //| Get conjugate                                                    |
 //+------------------------------------------------------------------+
-static al_complex CMath::Conj(const al_complex &z)
+complex CMath::Conj(const complex z)
   {
-   al_complex res;
-   res.re=z.re;
-   res.im=-z.im;
+   complex res;
+   res.real=z.real;
+   res.imag=-z.imag;
 //--- return result
    return(res);
   }
 //+------------------------------------------------------------------+
 //| Squaring                                                         |
 //+------------------------------------------------------------------+
-static al_complex CMath::Csqr(const al_complex &z)
+complex CMath::Csqr(const complex z)
   {
-   al_complex res;
-   res.re=z.re*z.re-z.im*z.im;
-   res.im=2*z.re*z.im;
+   complex res;
+   res.real=z.real*z.real-z.imag*z.imag;
+   res.imag=2*z.real*z.imag;
 //--- return result
    return(res);
   }
 //+------------------------------------------------------------------+
 //| Global array of constants                                        |
 //+------------------------------------------------------------------+
-char _sixbits2char_tbl[]=
+char _sixbits2char_tbl[] =
   {
    '0','1','2','3','4','5','6','7',
    '8','9','A','B','C','D','E','F',
@@ -1331,7 +1660,7 @@ char _sixbits2char_tbl[]=
 //+------------------------------------------------------------------+
 //| Global array of constants                                        |
 //+------------------------------------------------------------------+
-int _char2sixbits_tbl[128]=
+int _char2sixbits_tbl[128] =
   {
    -1,-1,-1,-1,-1,-1,-1,-1,
    -1,-1,-1,-1,-1,-1,-1,-1,
@@ -1339,8 +1668,8 @@ int _char2sixbits_tbl[128]=
    -1,-1,-1,-1,-1,-1,-1,-1,
    -1,-1,-1,-1,-1,-1,-1,-1,
    -1,-1,-1,-1,-1,62,-1,-1,
-   0,1,2,3,4,5,6,7,
-   8,9,-1,-1,-1,-1,-1,-1,
+    0,1,2,3,4,5,6,7,
+    8,9,-1,-1,-1,-1,-1,-1,
    -1,10,11,12,13,14,15,16,
    17,18,19,20,21,22,23,24,
    25,26,27,28,29,30,31,32,
@@ -1357,6 +1686,7 @@ class CSerializer
   {
    //--- enumeration
    enum SMODE { DEFAULT,ALLOC,TO_STRING,FROM_STRING };
+
 private:
    //--- class constants
    static const int  m_ser_entries_per_row;
@@ -1370,6 +1700,10 @@ private:
    int               m_bytes_read;
    char              m_out_str[];
    char              m_in_str[];
+   //---local temporaries
+   char              m_entry_buf_char[];
+   char              m_entry_buf_byte[];
+
    //--- private methods
    int               Get_Alloc_Size(void);
    static char       SixBits2Char(const int v);
@@ -1382,13 +1716,17 @@ private:
    static int        Str2Int(char &buf[],int &offs);
    static void       Double2Str(const double v,char &buf[],int &offs);
    static double     Str2Double(char &buf[],int &offs);
+
 public:
    //--- constructor, destructor
                      CSerializer(void);
                     ~CSerializer(void);
    //--- public methods
+   void              ClearBuffers(void);
    void              Alloc_Start(void);
    void              Alloc_Entry(void);
+   void              Alloc_Byte_Array(char &a[]);
+
    void              SStart_Str(void);
    void              UStart_Str(const string s);
    void              Reset(void);
@@ -1413,16 +1751,24 @@ const int CSerializer::m_ser_entry_length=11;
 //| Constructor without parameters                                   |
 //+------------------------------------------------------------------+
 CSerializer::CSerializer(void): m_mode(DEFAULT),m_entries_needed(0),
-                                m_bytes_asked(0)
+   m_bytes_asked(0)
   {
-
+   ArrayRemove(m_entry_buf_byte,m_ser_entry_length+2);
+   ArrayRemove(m_entry_buf_char,m_ser_entry_length+2);
   }
 //+------------------------------------------------------------------+
 //| Destructor                                                       |
 //+------------------------------------------------------------------+
 CSerializer::~CSerializer(void)
   {
-
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void CSerializer::ClearBuffers(void)
+  {
+   ArrayFree(m_out_str);
+   ArrayFree(m_in_str);
   }
 //+------------------------------------------------------------------+
 //| Start                                                            |
@@ -1449,12 +1795,29 @@ void CSerializer::Alloc_Entry(void)
    m_entries_needed++;
   }
 //+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void CSerializer::Alloc_Byte_Array(char &a[])
+  {
+   if(m_mode!=ALLOC)
+     {
+      Print(__FUNCTION__": internal error during (un)serialization");
+      return;
+     }
+   int n=CAp::Len(a);
+   n=n/8+(n%8>0?1:0);
+   m_entries_needed+=1+n;
+  }
+//+------------------------------------------------------------------+
 //| Switching state on TO_STRING                                     |
 //+------------------------------------------------------------------+
 void CSerializer::SStart_Str(void)
   {
 //--- get size
    int allocsize=Get_Alloc_Size();
+//--- clear input/output buffers which may hold pointers to unneeded memory
+//--- NOTE: it also helps us to avoid errors when data are written to incorrect location
+   ClearBuffers();
 //--- check and change m_mode
    if(m_mode!=ALLOC)
      {
@@ -1492,6 +1855,7 @@ void CSerializer::Reset(void)
    m_mode=DEFAULT;
    m_entries_needed=0;
    m_bytes_asked=0;
+   ClearBuffers();
   }
 //+------------------------------------------------------------------+
 //| Serialize bool                                                   |
@@ -1627,14 +1991,27 @@ double CSerializer::Unserialize_Double(void)
 //+------------------------------------------------------------------+
 void CSerializer::Stop(void)
   {
-
+   if(m_mode==TO_STRING)
+     {
+      m_out_str[m_bytes_written]='.';
+      m_bytes_written++;
+      return;
+     }
+   if(m_mode==FROM_STRING)
+     {
+      //--- because input string may be from pre-3.11 serializer,
+      //--- which does not include trailing dot, we do not test
+      //--- string for presence of "." symbol. Anyway, because string
+      //--- is not stream, we do not have to read ALL trailing symbols.
+      return;
+     }
+   Print(__FUNCTION__": internal error during unserialization");
   }
 //+------------------------------------------------------------------+
 //| Get string                                                       |
 //+------------------------------------------------------------------+
 string CSerializer::Get_String(void)
   {
-//--- return result
    return(GetSelectionString(m_out_str,0,m_bytes_written));
   }
 //+------------------------------------------------------------------+
@@ -1679,12 +2056,12 @@ int CSerializer::Get_Alloc_Size(void)
    return(result);
   }
 //+------------------------------------------------------------------+
-//| This function converts six-bit value (from 0 to 63) to character | 
+//| This function converts six-bit value (from 0 to 63) to character |
 //| (only digits, lowercase and uppercase letters, minus and         |
 //| underscore are used). If v is negative or greater than 63, this  |
 //| function returns '?'.                                            |
 //+------------------------------------------------------------------+
-static char CSerializer::SixBits2Char(const int v)
+char CSerializer::SixBits2Char(const int v)
   {
 //--- check
    if(v<0 || v>63)
@@ -1697,7 +2074,7 @@ static char CSerializer::SixBits2Char(const int v)
 //| This function is inverse of ae_sixbits2char()                    |
 //| If c is not correct character, this function returns -1.         |
 //+------------------------------------------------------------------+
-static int CSerializer::Char2SixBits(const char c)
+int CSerializer::Char2SixBits(const char c)
   {
 //--- check
    if(c>=0 && c<127)
@@ -1713,13 +2090,13 @@ static int CSerializer::Char2SixBits(const char c)
 //| dst         array for ints                                       |
 //| dst_offs    offset of four-ints chunk                            |
 //+------------------------------------------------------------------+
-static void CSerializer::ThreeBytes2FourSixBits(uchar &src[],const int src_offs,
-                                                int &dst[],const int dst_offs)
+void CSerializer::ThreeBytes2FourSixBits(uchar &src[],const int src_offs,
+                                         int &dst[],const int dst_offs)
   {
 //--- get bits
-   dst[dst_offs+0]=src[src_offs+0] & 0x3F;
-   dst[dst_offs+1]=(src[src_offs+0]>>6) | ((src[src_offs+1]&0x0F)<<2);
-   dst[dst_offs+2]=(src[src_offs+1]>>4) | ((src[src_offs+2]&0x03)<<4);
+   dst[dst_offs+0]=src[src_offs+0]&0x3F;
+   dst[dst_offs+1]=(src[src_offs+0]>>6)|((src[src_offs+1]&0x0F)<<2);
+   dst[dst_offs+2]=(src[src_offs+1]>>4)|((src[src_offs+2]&0x03)<<4);
    dst[dst_offs+3]=src[src_offs+2]>>2;
   }
 //+------------------------------------------------------------------+
@@ -1730,34 +2107,32 @@ static void CSerializer::ThreeBytes2FourSixBits(uchar &src[],const int src_offs,
 //| dst         pointer to three bytes                               |
 //| dst_offs    offset of the chunk                                  |
 //+------------------------------------------------------------------+
-static void CSerializer::FourSixBits2ThreeBytes(int &src[],const int src_offs,
-                                                uchar &dst[],const int dst_offs)
+void CSerializer::FourSixBits2ThreeBytes(int &src[],const int src_offs,
+                                         uchar &dst[],const int dst_offs)
   {
 //--- get bytes
-   dst[dst_offs+0]=(uchar)(src[src_offs+0] | ((src[src_offs+1]&0x03)<<6));
-   dst[dst_offs+1]=(uchar)((src[src_offs+1]>>2) | ((src[src_offs+2]&0x0F)<<4));
-   dst[dst_offs+2]=(uchar)((src[src_offs+2]>>4) | (src[src_offs+3]<<2));
+   dst[dst_offs+0]=(uchar)(src[src_offs+0]|((src[src_offs+1]&0x03)<<6));
+   dst[dst_offs+1]=(uchar)((src[src_offs+1]>>2)|((src[src_offs+2]&0x0F)<<4));
+   dst[dst_offs+2]=(uchar)((src[src_offs+2]>>4)|(src[src_offs+3]<<2));
   }
 //+------------------------------------------------------------------+
 //| This function serializes boolean value into buffer               |
 //| v           boolean value to be serialized                       |
 //| buf         buffer, at least 11 characters wide                  |
 //| offs        offset in the buffer                                 |
-//| after return(from this function, offs points to the char's past  | 
+//| after return(from this function, offs points to the char's past  |
 //| the value being read.                                            |
 //+------------------------------------------------------------------+
-static void CSerializer::Bool2Str(const bool v,char &buf[],int &offs)
+void CSerializer::Bool2Str(const bool v,char &buf[],int &offs)
   {
-//--- create variables
    char c;
-   int  i;
 //--- check
    if(v)
       c='1';
    else
       c='0';
 //--- copy c
-   for(i=0;i<m_ser_entry_length;i++)
+   for(int i=0; i<m_ser_entry_length; i++)
       buf[offs+i]=c;
 //--- change value
    offs+=m_ser_entry_length;
@@ -1773,7 +2148,7 @@ static void CSerializer::Bool2Str(const bool v,char &buf[],int &offs)
 //| the value being read.                                            |
 //| This function raises an error in case unexpected symbol is found |
 //+------------------------------------------------------------------+
-static bool CSerializer::Str2Bool(char &buf[],int &offs)
+bool CSerializer::Str2Bool(char &buf[],int &offs)
   {
 //--- create variables
    bool   was0;
@@ -1802,21 +2177,21 @@ static bool CSerializer::Str2Bool(char &buf[],int &offs)
          offs++;
          continue;
         }
-      Print(__FUNCTION__+" "+emsg);
+      Print(__FUNCTION__+" " + emsg);
       //--- return result
       return(false);
      }
 //--- check
    if((!was0) && (!was1))
      {
-      Print(__FUNCTION__+" "+emsg);
+      Print(__FUNCTION__+" " + emsg);
       //--- return result
       return(false);
      }
 //--- check
    if(was0 && was1)
      {
-      Print(__FUNCTION__+" "+emsg);
+      Print(__FUNCTION__+" " + emsg);
       //--- return result
       return(false);
      }
@@ -1835,7 +2210,7 @@ static bool CSerializer::Str2Bool(char &buf[],int &offs)
 //| the value being read.                                            |
 //| This function raises an error in case unexpected symbol is found |
 //+------------------------------------------------------------------+
-static void CSerializer::Int2Str(const int v,char &buf[],int &offs)
+void CSerializer::Int2Str(const int v,char &buf[],int &offs)
   {
 //--- create variables
    int   i;
@@ -1849,9 +2224,9 @@ static void CSerializer::Int2Str(const int v,char &buf[],int &offs)
 //--- allocation
    ArrayResizeAL(bytes,9);
    ArrayResizeAL(sixbits,12);
-//--- copy v to array of bytes, sign extending it and 
-//--- converting to little endian order. Additionally, 
-//--- we set 9th byte to zero in order to simplify 
+//--- copy v to array of bytes, sign extending it and
+//--- converting to little endian order. Additionally,
+//--- we set 9th byte to zero in order to simplify
 //--- conversion to six-bit representation
    if(!BitConverter::IsLittleEndian())
       ArrayReverse(_bytes);
@@ -1861,10 +2236,10 @@ static void CSerializer::Int2Str(const int v,char &buf[],int &offs)
    else
       c=(uchar)0x00;
 //--- copy
-   for(i=0;i<sizeof(int);i++)
+   for(i=0; i<sizeof(int); i++)
       bytes[i]=_bytes[i];
 //--- fill remaining part
-   for(i=sizeof(int);i<8;i++)
+   for(i=sizeof(int); i<8; i++)
       bytes[i]=c;
    bytes[8]=0;
 //--- convert to six-bit representation, output
@@ -1873,7 +2248,7 @@ static void CSerializer::Int2Str(const int v,char &buf[],int &offs)
    ThreeBytes2FourSixBits(bytes,3,sixbits,4);
    ThreeBytes2FourSixBits(bytes,6,sixbits,8);
 //--- copy
-   for(i=0;i<m_ser_entry_length;i++)
+   for(i=0; i<m_ser_entry_length; i++)
       buf[offs+i]=SixBits2Char(sixbits[i]);
 //--- change value
    offs+=m_ser_entry_length;
@@ -1885,11 +2260,11 @@ static void CSerializer::Int2Str(const int v,char &buf[],int &offs)
 //|             spaces/tabs/newlines are treated as end of the       |
 //|             integer value.                                       |
 //| offs        offset in the buffer                                 |
-//| after return(from this function, offs points to the char's past  | 
+//| after return(from this function, offs points to the char's past  |
 //| the value being read.                                            |
 //| This function raises an error in case unexpected symbol is found |
 //+------------------------------------------------------------------+
-static int CSerializer::Str2Int(char &buf[],int &offs)
+int CSerializer::Str2Int(char &buf[],int &offs)
   {
 //--- create variables
    string emsg=": unable to read integer value from stream";
@@ -1922,7 +2297,7 @@ static int CSerializer::Str2Int(char &buf[],int &offs)
       //--- check
       if(d<0 || sixbitsread>=m_ser_entry_length)
         {
-         Print(__FUNCTION__+" "+emsg);
+         Print(__FUNCTION__+" " + emsg);
          //--- return result
          return(-1);
         }
@@ -1933,11 +2308,11 @@ static int CSerializer::Str2Int(char &buf[],int &offs)
 //--- check
    if(sixbitsread==0)
      {
-      Print(__FUNCTION__+" "+emsg);
+      Print(__FUNCTION__+" " + emsg);
       //--- return result
       return(-1);
      }
-   for(i=sixbitsread;i<12;i++)
+   for(i=sixbitsread; i<12; i++)
       sixbits[i]=0;
 //--- function call
    FourSixBits2ThreeBytes(sixbits,0,bytes,0);
@@ -1946,20 +2321,20 @@ static int CSerializer::Str2Int(char &buf[],int &offs)
 //--- function call
    FourSixBits2ThreeBytes(sixbits,8,bytes,6);
 //--- check
-   if((bytes[sizeof(int)-1]&0x80)!=0)
+   if((bytes[sizeof(int) -1]&0x80)!=0)
       c=(uchar)0xFF;
    else
       c=(uchar)0x00;
-   for(i=sizeof(int);i<8;i++)
+   for(i=sizeof(int); i<8; i++)
       //--- check
       if(bytes[i]!=c)
         {
-         Print(__FUNCTION__+" "+emsg3264);
+         Print(__FUNCTION__+" " + emsg3264);
          //--- return result
          return(-1);
         }
 //--- copy
-   for(i=0;i<sizeof(int);i++)
+   for(i=0; i<sizeof(int); i++)
       _bytes[i]=bytes[i];
 //--- check
    if(!BitConverter::IsLittleEndian())
@@ -1972,12 +2347,12 @@ static int CSerializer::Str2Int(char &buf[],int &offs)
 //| v           double value to be serialized                        |
 //| buf         buffer, at least 11 characters wide                  |
 //| offs        offset in the buffer                                 |
-//| after return(from this function, offs points to the char's past  | 
+//| after return(from this function, offs points to the char's past  |
 //| the value being read.                                            |
 //+------------------------------------------------------------------+
-static void CSerializer::Double2Str(const double v,char &buf[],int &offs)
+void CSerializer::Double2Str(const double v,char &buf[],int &offs)
   {
-//--- create variables
+//--- create variable
    int i;
 //--- create arrays
    uchar bytes[];
@@ -2006,17 +2381,17 @@ static void CSerializer::Double2Str(const double v,char &buf[],int &offs)
 //--- check
    if(CInfOrNaN::IsPositiveInfinity(v))
      {
-      buf[offs+0] = '.';
-      buf[offs+1] = 'p';
-      buf[offs+2] = 'o';
-      buf[offs+3] = 's';
-      buf[offs+4] = 'i';
-      buf[offs+5] = 'n';
-      buf[offs+6] = 'f';
-      buf[offs+7] = '_';
-      buf[offs+8] = '_';
-      buf[offs+9] = '_';
-      buf[offs+10]= '_';
+      buf[offs+0]='.';
+      buf[offs+1]='p';
+      buf[offs+2]='o';
+      buf[offs+3]='s';
+      buf[offs+4]='i';
+      buf[offs+5]='n';
+      buf[offs+6]='f';
+      buf[offs+7]='_';
+      buf[offs+8]='_';
+      buf[offs+9]='_';
+      buf[offs+10]='_';
       offs+=m_ser_entry_length;
       //--- exit the function
       return;
@@ -2024,17 +2399,17 @@ static void CSerializer::Double2Str(const double v,char &buf[],int &offs)
 //--- check
    if(CInfOrNaN::IsNegativeInfinity(v))
      {
-      buf[offs+0] = '.';
-      buf[offs+1] = 'n';
-      buf[offs+2] = 'e';
-      buf[offs+3] = 'g';
-      buf[offs+4] = 'i';
-      buf[offs+5] = 'n';
-      buf[offs+6] = 'f';
-      buf[offs+7] = '_';
-      buf[offs+8] = '_';
-      buf[offs+9] = '_';
-      buf[offs+10]= '_';
+      buf[offs+0]='.';
+      buf[offs+1]='n';
+      buf[offs+2]='e';
+      buf[offs+3]='g';
+      buf[offs+4]='i';
+      buf[offs+5]='n';
+      buf[offs+6]='f';
+      buf[offs+7]='_';
+      buf[offs+8]='_';
+      buf[offs+9]='_';
+      buf[offs+10]='_';
       offs+=m_ser_entry_length;
       //--- exit the function
       return;
@@ -2051,10 +2426,10 @@ static void CSerializer::Double2Str(const double v,char &buf[],int &offs)
    if(!BitConverter::IsLittleEndian())
       ArrayReverse(_bytes);
 //--- copy
-   for(i=0;i<sizeof(double);i++)
+   for(i=0; i<sizeof(double); i++)
       bytes[i]=_bytes[i];
 //--- filling
-   for(i=sizeof(double);i<9;i++)
+   for(i=sizeof(double); i<9; i++)
       bytes[i]=0;
 //--- function call
    ThreeBytes2FourSixBits(bytes,0,sixbits,0);
@@ -2063,7 +2438,7 @@ static void CSerializer::Double2Str(const double v,char &buf[],int &offs)
 //--- function call
    ThreeBytes2FourSixBits(bytes,6,sixbits,8);
 //--- function call
-   for(i=0;i<m_ser_entry_length;i++)
+   for(i=0; i<m_ser_entry_length; i++)
       buf[offs+i]=SixBits2Char(sixbits[i]);
 //--- change value
    offs+=m_ser_entry_length;
@@ -2079,12 +2454,11 @@ static void CSerializer::Double2Str(const double v,char &buf[],int &offs)
 //| the value being read.                                            |
 //| This function raises an error in case unexpected symbol is found |
 //+------------------------------------------------------------------+
-static double CSerializer::Str2Double(char &buf[],int &offs)
+double CSerializer::Str2Double(char &buf[],int &offs)
   {
 //--- create variables
    string emsg="ALGLIB: unable to read double value from stream";
    int    sixbitsread;
-   int    i;
 //--- create arrays
    uchar bytes[];
    uchar _bytes[];
@@ -2164,7 +2538,7 @@ static double CSerializer::Str2Double(char &buf[],int &offs)
 //--- function call
    FourSixBits2ThreeBytes(sixbits,8,bytes,6);
 //--- copy
-   for(i=0;i<sizeof(double);i++)
+   for(int i=0; i<sizeof(double); i++)
       _bytes[i]=bytes[i];
 //--- check
    if(!BitConverter::IsLittleEndian())

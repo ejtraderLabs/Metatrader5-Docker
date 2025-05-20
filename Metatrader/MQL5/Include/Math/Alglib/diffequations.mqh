@@ -1,7 +1,7 @@
 //+------------------------------------------------------------------+
 //|                                                diffequations.mqh |
-//|            Copyright 2003-2012 Sergey Bochkanov (ALGLIB project) |
-//|                   Copyright 2012-2017, MetaQuotes Software Corp. |
+//|            Copyright 2003-2022 Sergey Bochkanov (ALGLIB project) |
+//|                             Copyright 2012-2023, MetaQuotes Ltd. |
 //|                                             https://www.mql5.com |
 //+------------------------------------------------------------------+
 //| Implementation of ALGLIB library in MetaQuotes Language 5        |
@@ -69,23 +69,26 @@ public:
 
 public:
                      CODESolverState(void);
-                    ~CODESolverState(void);
+                    ~CODESolverState(void) {}
 
    void              Copy(CODESolverState &obj);
   };
 //+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
+//| Constructor                                                      |
 //+------------------------------------------------------------------+
 CODESolverState::CODESolverState(void)
   {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CODESolverState::~CODESolverState(void)
-  {
-
+   m_n=0;
+   m_m=0;
+   m_xscale=0;
+   m_h=0;
+   m_eps=0;
+   m_fraceps=false;
+   m_repterminationtype=0;
+   m_repnfev=0;
+   m_solvertype=0;
+   m_needdy=false;
+   m_x=0;
   }
 //+------------------------------------------------------------------+
 //| Copy                                                             |
@@ -128,46 +131,24 @@ class CODESolverStateShell
   {
 private:
    CODESolverState   m_innerobj;
+
 public:
    //--- constructors, destructor
-                     CODESolverStateShell(void);
-                     CODESolverStateShell(CODESolverState &obj);
-                    ~CODESolverStateShell(void);
+                     CODESolverStateShell(void) {}
+                     CODESolverStateShell(CODESolverState &obj) { m_innerobj.Copy(obj); }
+                    ~CODESolverStateShell(void) {}
    //--- methods
    bool              GetNeedDY(void);
    void              SetNeedDY(const bool b);
    double            GetX(void);
    void              SetX(const double d);
-   CODESolverState *GetInnerObj(void);
+   CODESolverState  *GetInnerObj(void);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CODESolverStateShell::CODESolverStateShell(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Copy constructor                                                 |
-//+------------------------------------------------------------------+
-CODESolverStateShell::CODESolverStateShell(CODESolverState &obj)
-  {
-//--- copy
-   m_innerobj.Copy(obj);
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CODESolverStateShell::~CODESolverStateShell(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| Returns the value of the variable needdy                         |
 //+------------------------------------------------------------------+
 bool CODESolverStateShell::GetNeedDY(void)
   {
-//--- return result
    return(m_innerobj.m_needdy);
   }
 //+------------------------------------------------------------------+
@@ -175,7 +156,6 @@ bool CODESolverStateShell::GetNeedDY(void)
 //+------------------------------------------------------------------+
 void CODESolverStateShell::SetNeedDY(const bool b)
   {
-//--- change value
    m_innerobj.m_needdy=b;
   }
 //+------------------------------------------------------------------+
@@ -183,7 +163,6 @@ void CODESolverStateShell::SetNeedDY(const bool b)
 //+------------------------------------------------------------------+
 double CODESolverStateShell::GetX(void)
   {
-//--- return result
    return(m_innerobj.m_x);
   }
 //+------------------------------------------------------------------+
@@ -191,7 +170,6 @@ double CODESolverStateShell::GetX(void)
 //+------------------------------------------------------------------+
 void CODESolverStateShell::SetX(const double d)
   {
-//--- change value
    m_innerobj.m_x=d;
   }
 //+------------------------------------------------------------------+
@@ -199,7 +177,6 @@ void CODESolverStateShell::SetX(const double d)
 //+------------------------------------------------------------------+
 CODESolverState *CODESolverStateShell::GetInnerObj(void)
   {
-//--- return result
    return(GetPointer(m_innerobj));
   }
 //+------------------------------------------------------------------+
@@ -212,25 +189,11 @@ public:
    int               m_nfev;
    int               m_terminationtype;
    //--- constructor, destructor
-                     CODESolverReport(void);
-                    ~CODESolverReport(void);
+                     CODESolverReport(void) { ZeroMemory(this); }
+                    ~CODESolverReport(void) {}
    //--- copy
    void              Copy(CODESolverReport &obj);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CODESolverReport::CODESolverReport(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CODESolverReport::~CODESolverReport(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| Copy                                                             |
 //+------------------------------------------------------------------+
@@ -247,11 +210,12 @@ class CODESolverReportShell
   {
 private:
    CODESolverReport  m_innerobj;
+
 public:
    //--- constructor, destructor
-                     CODESolverReportShell(void);
-                     CODESolverReportShell(CODESolverReport &obj);
-                    ~CODESolverReportShell(void);
+                     CODESolverReportShell(void) {}
+                     CODESolverReportShell(CODESolverReport &obj) { m_innerobj.Copy(obj); }
+                    ~CODESolverReportShell(void) {}
    //--- methods
    int               GetNFev(void);
    void              SetNFev(const int i);
@@ -260,33 +224,10 @@ public:
    CODESolverReport *GetInnerObj(void);
   };
 //+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CODESolverReportShell::CODESolverReportShell(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Copy constructor                                                 |
-//+------------------------------------------------------------------+
-CODESolverReportShell::CODESolverReportShell(CODESolverReport &obj)
-  {
-//--- copy
-   m_innerobj.Copy(obj);
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CODESolverReportShell::~CODESolverReportShell(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
 //| Returns the value of the variable nfev                           |
 //+------------------------------------------------------------------+
 int CODESolverReportShell::GetNFev(void)
   {
-//--- return result
    return(m_innerobj.m_nfev);
   }
 //+------------------------------------------------------------------+
@@ -294,7 +235,6 @@ int CODESolverReportShell::GetNFev(void)
 //+------------------------------------------------------------------+
 void CODESolverReportShell::SetNFev(const int i)
   {
-//--- change value
    m_innerobj.m_nfev=i;
   }
 //+------------------------------------------------------------------+
@@ -302,7 +242,6 @@ void CODESolverReportShell::SetNFev(const int i)
 //+------------------------------------------------------------------+
 int CODESolverReportShell::GetTerminationType(void)
   {
-//--- return result
    return(m_innerobj.m_terminationtype);
   }
 //+------------------------------------------------------------------+
@@ -310,7 +249,6 @@ int CODESolverReportShell::GetTerminationType(void)
 //+------------------------------------------------------------------+
 void CODESolverReportShell::SetTerminationType(const int i)
   {
-//--- change value
    m_innerobj.m_terminationtype=i;
   }
 //+------------------------------------------------------------------+
@@ -318,7 +256,6 @@ void CODESolverReportShell::SetTerminationType(const int i)
 //+------------------------------------------------------------------+
 CODESolverReport *CODESolverReportShell::GetInnerObj(void)
   {
-//--- return result
    return(GetPointer(m_innerobj));
   }
 //+------------------------------------------------------------------+
@@ -326,6 +263,15 @@ CODESolverReport *CODESolverReportShell::GetInnerObj(void)
 //+------------------------------------------------------------------+
 class CODESolver
   {
+public:
+   //--- class constants
+   static const double m_odesolvermaxgrow;
+   static const double m_odesolvermaxshrink;
+   //--- public methods
+   static void       ODESolverRKCK(double &y[],const int n,double &x[],const int m,const double eps,const double h,CODESolverState &state);
+   static void       ODESolverResults(CODESolverState &state,int &m,double &xtbl[],CMatrixDouble &ytbl,CODESolverReport &rep);
+   static bool       ODESolverIteration(CODESolverState &state);
+
 private:
    //--- private method
    static void       ODESolverInit(int solvertype,double &y[],const int n,double &x[],const int m,const double eps,double h,CODESolverState &state);
@@ -334,37 +280,12 @@ private:
    static bool       Func_lbl_6(CODESolverState &state,int &n,int &m,int &i,int &j,int &k,int &klimit,bool &gridpoint,double &xc,double &v,double &h,double &h2,double &err,double &maxgrowpow);
    static bool       Func_lbl_8(CODESolverState &state,int &n,int &m,int &i,int &j,int &k,int &klimit,bool &gridpoint,double &xc,double &v,double &h,double &h2,double &err,double &maxgrowpow);
    static bool       Func_lbl_10(CODESolverState &state,int &n,int &m,int &i,int &j,int &k,int &klimit,bool &gridpoint,double &xc,double &v,double &h,double &h2,double &err,double &maxgrowpow);
-public:
-   //--- class constants
-   static const double m_odesolvermaxgrow;
-   static const double m_odesolvermaxshrink;
-   //--- constructor, destructor
-                     CODESolver(void);
-                    ~CODESolver(void);
-   //--- public methods
-   static void       ODESolverRKCK(double &y[],const int n,double &x[],const int m,const double eps,const double h,CODESolverState &state);
-   static void       ODESolverResults(CODESolverState &state,int &m,double &xtbl[],CMatrixDouble &ytbl,CODESolverReport &rep);
-   static bool       ODESolverIteration(CODESolverState &state);
   };
 //+------------------------------------------------------------------+
 //| Initialize constants                                             |
 //+------------------------------------------------------------------+
 const double CODESolver::m_odesolvermaxgrow=3.0;
 const double CODESolver::m_odesolvermaxshrink=10.0;
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CODESolver::CODESolver(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CODESolver::~CODESolver(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| Cash-Karp adaptive ODE solver.                                   |
 //| This subroutine solves ODE  Y'=f(Y,x) with initial conditions    |
@@ -409,9 +330,9 @@ CODESolver::~CODESolver(void)
 //| SEE ALSO                                                         |
 //|     AutoGKSmoothW, AutoGKSingular, AutoGKIteration, AutoGKResults|
 //+------------------------------------------------------------------+
-static void CODESolver::ODESolverRKCK(double &y[],const int n,double &x[],
-                                      const int m,const double eps,
-                                      const double h,CODESolverState &state)
+void CODESolver::ODESolverRKCK(double &y[],const int n,double &x[],
+                               const int m,const double eps,
+                               const double h,CODESolverState &state)
   {
 //--- check
    if(!CAp::Assert(n>=1,"ODESolverRKCK: N<1!"))
@@ -462,9 +383,9 @@ static void CODESolver::ODESolverRKCK(double &y[],const int n,double &x[],
 //|                 * Rep.NFEV contains number of function           |
 //|                   calculations                                   |
 //+------------------------------------------------------------------+
-static void CODESolver::ODESolverResults(CODESolverState &state,int &m,
-                                         double &xtbl[],CMatrixDouble &ytbl,
-                                         CODESolverReport &rep)
+void CODESolver::ODESolverResults(CODESolverState &state,int &m,
+                                  double &xtbl[],CMatrixDouble &ytbl,
+                                  CODESolverReport &rep)
   {
 //--- create variables
    double v=0;
@@ -480,17 +401,17 @@ static void CODESolver::ODESolverResults(CODESolverState &state,int &m,
       m=state.m_m;
       rep.m_nfev=state.m_repnfev;
       //--- allocation
-      ArrayResizeAL(xtbl,state.m_m);
+      ArrayResize(xtbl,state.m_m);
       v=state.m_xscale;
       //--- calculation
-      for(i_=0;i_<=state.m_m-1;i_++)
+      for(i_=0; i_<=state.m_m-1; i_++)
          xtbl[i_]=v*state.m_xg[i_];
       //--- allocation
       ytbl.Resize(state.m_m,state.m_n);
-      for(i=0;i<=state.m_m-1;i++)
+      for(i=0; i<=state.m_m-1; i++)
         {
-         for(i_=0;i_<=state.m_n-1;i_++)
-            ytbl[i].Set(i_,state.m_ytbl[i][i_]);
+         for(i_=0; i_<=state.m_n-1; i_++)
+            ytbl.Set(i,i_,state.m_ytbl[i][i_]);
         }
      }
    else
@@ -499,18 +420,18 @@ static void CODESolver::ODESolverResults(CODESolverState &state,int &m,
 //+------------------------------------------------------------------+
 //| Internal initialization subroutine                               |
 //+------------------------------------------------------------------+
-static void CODESolver::ODESolverInit(int solvertype,double &y[],const int n,
-                                      double &x[],const int m,const double eps,
-                                      double h,CODESolverState &state)
+void CODESolver::ODESolverInit(int solvertype,double &y[],const int n,
+                               double &x[],const int m,const double eps,
+                               double h,CODESolverState &state)
   {
 //--- create variables
    int    i=0;
    double v=0;
    int    i_=0;
 //--- Prepare RComm
-   ArrayResizeAL(state.m_rstate.ia,6);
+   state.m_rstate.ia.Resize(6);
    ArrayResizeAL(state.m_rstate.ba,1);
-   ArrayResizeAL(state.m_rstate.ra,6);
+   state.m_rstate.ra.Resize(6);
    state.m_rstate.stage=-1;
    state.m_needdy=false;
 //--- check parameters.
@@ -530,11 +451,11 @@ static void CODESolver::ODESolverInit(int solvertype,double &y[],const int n,
       state.m_repnfev=0;
       state.m_repterminationtype=1;
       state.m_ytbl.Resize(1,n);
-      for(i_=0;i_<=n-1;i_++)
-         state.m_ytbl[0].Set(i_,y[i_]);
+      for(i_=0; i_<=n-1; i_++)
+         state.m_ytbl.Set(0,i_,y[i_]);
       //--- allocation
-      ArrayResizeAL(state.m_xg,m);
-      for(i_=0;i_<=m-1;i_++)
+      ArrayResize(state.m_xg,m);
+      for(i_=0; i_<=m-1; i_++)
          state.m_xg[i_]=x[i_];
       //--- exit the function
       return;
@@ -545,7 +466,7 @@ static void CODESolver::ODESolverInit(int solvertype,double &y[],const int n,
       state.m_repterminationtype=-2;
       return;
      }
-   for(i=1;i<=m-1;i++)
+   for(i=1; i<=m-1; i++)
      {
       //--- check
       if((x[1]>x[0] && x[i]<=x[i-1]) || (x[1]<x[0] && x[i]>=x[i-1]))
@@ -558,7 +479,7 @@ static void CODESolver::ODESolverInit(int solvertype,double &y[],const int n,
    if(h==0.0)
      {
       v=MathAbs(x[1]-x[0]);
-      for(i=2;i<=m-1;i++)
+      for(i=2; i<=m-1; i++)
          v=MathMin(v,MathAbs(x[i]-x[i-1]));
       h=0.001*v;
      }
@@ -569,8 +490,8 @@ static void CODESolver::ODESolverInit(int solvertype,double &y[],const int n,
    state.m_eps=MathAbs(eps);
    state.m_fraceps=eps<0.0;
 //--- allocation
-   ArrayResizeAL(state.m_xg,m);
-   for(i_=0;i_<=m-1;i_++)
+   ArrayResize(state.m_xg,m);
+   for(i_=0; i_<=m-1; i_++)
       state.m_xg[i_]=x[i_];
 //--- check
    if(x[1]>x[0])
@@ -578,24 +499,24 @@ static void CODESolver::ODESolverInit(int solvertype,double &y[],const int n,
    else
      {
       state.m_xscale=-1;
-      for(i_=0;i_<=m-1;i_++)
+      for(i_=0; i_<=m-1; i_++)
          state.m_xg[i_]=-1*state.m_xg[i_];
      }
 //--- allocation
-   ArrayResizeAL(state.m_yc,n);
-   for(i_=0;i_<=n-1;i_++)
+   ArrayResize(state.m_yc,n);
+   for(i_=0; i_<=n-1; i_++)
       state.m_yc[i_]=y[i_];
 //--- change values
    state.m_solvertype=solvertype;
    state.m_repterminationtype=0;
 //--- Allocate arrays
-   ArrayResizeAL(state.m_y,n);
-   ArrayResizeAL(state.m_dy,n);
+   ArrayResize(state.m_y,n);
+   ArrayResize(state.m_dy,n);
   }
 //+------------------------------------------------------------------+
 //| Iterative method                                                 |
 //+------------------------------------------------------------------+
-static bool CODESolver::ODESolverIteration(CODESolverState &state)
+bool CODESolver::ODESolverIteration(CODESolverState &state)
   {
 //--- create variables
    int    n=0;
@@ -657,14 +578,14 @@ static bool CODESolver::ODESolverIteration(CODESolverState &state)
       state.m_needdy=false;
       state.m_repnfev=state.m_repnfev+1;
       v=h*state.m_xscale;
-      for(i_=0;i_<=n-1;i_++)
-         state.m_rkk[k].Set(i_,v*state.m_dy[i_]);
+      for(i_=0; i_<=n-1; i_++)
+         state.m_rkk.Set(k,i_,v*state.m_dy[i_]);
       //--- update YN/YNS
       v=state.m_rkc[k];
-      for(i_=0;i_<=n-1;i_++)
+      for(i_=0; i_<=n-1; i_++)
          state.m_yn[i_]=state.m_yn[i_]+v*state.m_rkk[k][i_];
       v=state.m_rkcs[k];
-      for(i_=0;i_<=n-1;i_++)
+      for(i_=0; i_<=n-1; i_++)
          state.m_yns[i_]=state.m_yns[i_]+v*state.m_rkk[k][i_];
       k=k+1;
       return(Func_lbl_8(state,n,m,i,j,k,klimit,gridpoint,xc,v,h,h2,err,maxgrowpow));
@@ -692,7 +613,7 @@ static bool CODESolver::ODESolverIteration(CODESolverState &state)
 //--- Cask-Karp solver
 //--- Prepare coefficients table.
 //--- Check it for errors
-   ArrayResizeAL(state.m_rka,6);
+   ArrayResize(state.m_rka,6);
 //--- calculation
    state.m_rka[0]=0;
    state.m_rka[1]=1.0/5.0;
@@ -701,23 +622,23 @@ static bool CODESolver::ODESolverIteration(CODESolverState &state)
    state.m_rka[4]=1;
    state.m_rka[5]=7.0/8.0;
    state.m_rkb.Resize(6,5);
-   state.m_rkb[1].Set(0,1.0/5.0);
-   state.m_rkb[2].Set(0,3.0/40.0);
-   state.m_rkb[2].Set(1,9.0/40.0);
-   state.m_rkb[3].Set(0,3.0/10.0);
-   state.m_rkb[3].Set(1,-(9.0/10.0));
-   state.m_rkb[3].Set(2,6.0/5.0);
-   state.m_rkb[4].Set(0,-(11.0/54.0));
-   state.m_rkb[4].Set(1,5.0/2.0);
-   state.m_rkb[4].Set(2,-(70.0/27.0));
-   state.m_rkb[4].Set(3,35.0/27.0);
-   state.m_rkb[5].Set(0,1631.0/55296.0);
-   state.m_rkb[5].Set(1,175.0/512.0);
-   state.m_rkb[5].Set(2,575.0/13824.0);
-   state.m_rkb[5].Set(3,44275.0/110592.0);
-   state.m_rkb[5].Set(4,253.0/4096.0);
+   state.m_rkb.Set(1,0,1.0/5.0);
+   state.m_rkb.Set(2,0,3.0/40.0);
+   state.m_rkb.Set(2,1,9.0/40.0);
+   state.m_rkb.Set(3,0,3.0/10.0);
+   state.m_rkb.Set(3,1,-(9.0/10.0));
+   state.m_rkb.Set(3,2,6.0/5.0);
+   state.m_rkb.Set(4,0,-(11.0/54.0));
+   state.m_rkb.Set(4,1,5.0/2.0);
+   state.m_rkb.Set(4,2,-(70.0/27.0));
+   state.m_rkb.Set(4,3,35.0/27.0);
+   state.m_rkb.Set(5,0,1631.0/55296.0);
+   state.m_rkb.Set(5,1,175.0/512.0);
+   state.m_rkb.Set(5,2,575.0/13824.0);
+   state.m_rkb.Set(5,3,44275.0/110592.0);
+   state.m_rkb.Set(5,4,253.0/4096.0);
 //--- allocation
-   ArrayResizeAL(state.m_rkc,6);
+   ArrayResize(state.m_rkc,6);
 //--- calculation
    state.m_rkc[0]=37.0/378.0;
    state.m_rkc[1]=0;
@@ -726,7 +647,7 @@ static bool CODESolver::ODESolverIteration(CODESolverState &state)
    state.m_rkc[4]=0;
    state.m_rkc[5]=512.0/1771.0;
 //--- allocation
-   ArrayResizeAL(state.m_rkcs,6);
+   ArrayResize(state.m_rkcs,6);
 //--- calculation
    state.m_rkcs[0]=2825.0/27648.0;
    state.m_rkcs[1]=0;
@@ -739,14 +660,14 @@ static bool CODESolver::ODESolverIteration(CODESolverState &state)
 //--- * outer where we travel from X[i-1] to X[i]
 //--- * inner where we travel inside [X[i-1],X[i]]
    state.m_ytbl.Resize(m,n);
-   ArrayResizeAL(state.m_escale,n);
-   ArrayResizeAL(state.m_yn,n);
-   ArrayResizeAL(state.m_yns,n);
+   ArrayResize(state.m_escale,n);
+   ArrayResize(state.m_yn,n);
+   ArrayResize(state.m_yns,n);
 //--- change value
    xc=state.m_xg[0];
-   for(i_=0;i_<=n-1;i_++)
-      state.m_ytbl[0].Set(i_,state.m_yc[i_]);
-   for(j=0;j<=n-1;j++)
+   for(i_=0; i_<=n-1; i_++)
+      state.m_ytbl.Set(0,i_,state.m_yc[i_]);
+   for(j=0; j<=n-1; j++)
       state.m_escale[j]=0;
    i=1;
 //--- check
@@ -763,36 +684,36 @@ static bool CODESolver::ODESolverIteration(CODESolverState &state)
 //| Auxiliary function for ODESolverIteration. Is a product to get   |
 //| rid of the operator unconditional jump goto                      |
 //+------------------------------------------------------------------+
-static void CODESolver::Func_lbl_rcomm(CODESolverState &state,int n,int m,
-                                       int i,int j,int k,int klimit,
-                                       bool gridpoint,double xc,double v,
-                                       double h,double h2,double err,
-                                       double maxgrowpow)
+void CODESolver::Func_lbl_rcomm(CODESolverState &state,int n,int m,
+                                int i,int j,int k,int klimit,
+                                bool gridpoint,double xc,double v,
+                                double h,double h2,double err,
+                                double maxgrowpow)
   {
 //--- save
-   state.m_rstate.ia[0]=n;
-   state.m_rstate.ia[1]=m;
-   state.m_rstate.ia[2]=i;
-   state.m_rstate.ia[3]=j;
-   state.m_rstate.ia[4]=k;
-   state.m_rstate.ia[5]=klimit;
-   state.m_rstate.ba[0]=gridpoint;
-   state.m_rstate.ra[0]=xc;
-   state.m_rstate.ra[1]=v;
-   state.m_rstate.ra[2]=h;
-   state.m_rstate.ra[3]=h2;
-   state.m_rstate.ra[4]=err;
-   state.m_rstate.ra[5]=maxgrowpow;
+   state.m_rstate.ia.Set(0,n);
+   state.m_rstate.ia.Set(1,m);
+   state.m_rstate.ia.Set(2,i);
+   state.m_rstate.ia.Set(3,j);
+   state.m_rstate.ia.Set(4,k);
+   state.m_rstate.ia.Set(5,klimit);
+   state.m_rstate.ba[0]= gridpoint;
+   state.m_rstate.ra.Set(0,xc);
+   state.m_rstate.ra.Set(1,v);
+   state.m_rstate.ra.Set(2,h);
+   state.m_rstate.ra.Set(3,h2);
+   state.m_rstate.ra.Set(4,err);
+   state.m_rstate.ra.Set(5,maxgrowpow);
   }
 //+------------------------------------------------------------------+
 //| Auxiliary function for ODESolverIteration. Is a product to get   |
 //| rid of the operator unconditional jump goto                      |
 //+------------------------------------------------------------------+
-static bool CODESolver::Func_lbl_6(CODESolverState &state,int &n,int &m,
-                                   int &i,int &j,int &k,int &klimit,
-                                   bool &gridpoint,double &xc,double &v,
-                                   double &h,double &h2,double &err,
-                                   double &maxgrowpow)
+bool CODESolver::Func_lbl_6(CODESolverState &state,int &n,int &m,
+                            int &i,int &j,int &k,int &klimit,
+                            bool &gridpoint,double &xc,double &v,
+                            double &h,double &h2,double &err,
+                            double &maxgrowpow)
   {
 //--- truncate step if needed (beyond right boundary).
 //--- determine should we store X or not
@@ -806,7 +727,7 @@ static bool CODESolver::Func_lbl_6(CODESolverState &state,int &n,int &m,
 //--- Update error scale maximums
 //--- These maximums are initialized by zeros,
 //--- then updated every iterations.
-   for(j=0;j<=n-1;j++)
+   for(j=0; j<=n-1; j++)
       state.m_escale[j]=MathMax(state.m_escale[j],MathAbs(state.m_yc[j]));
 //--- make one step:
 //--- 1. calculate all info needed to do step
@@ -816,9 +737,9 @@ static bool CODESolver::Func_lbl_6(CODESolverState &state,int &n,int &m,
 //--- to the form where x[0] < x[1] < ... < x[n-1]. So X is
 //--- replaced by x=xscale*t,and dy/dx=f(y,x) is replaced
 //--- by dy/dt=xscale*f(y,xscale*t).
-   for(int i_=0;i_<=n-1;i_++)
+   for(int i_=0; i_<=n-1; i_++)
       state.m_yn[i_]=state.m_yc[i_];
-   for(int i_=0;i_<=n-1;i_++)
+   for(int i_=0; i_<=n-1; i_++)
       state.m_yns[i_]=state.m_yc[i_];
    k=0;
 //--- function call, return result
@@ -828,24 +749,24 @@ static bool CODESolver::Func_lbl_6(CODESolverState &state,int &n,int &m,
 //| Auxiliary function for ODESolverIteration. Is a product to get   |
 //| rid of the operator unconditional jump goto                      |
 //+------------------------------------------------------------------+
-static bool CODESolver::Func_lbl_8(CODESolverState &state,int &n,int &m,
-                                   int &i,int &j,int &k,int &klimit,
-                                   bool &gridpoint,double &xc,double &v,
-                                   double &h,double &h2,double &err,
-                                   double &maxgrowpow)
+bool CODESolver::Func_lbl_8(CODESolverState &state,int &n,int &m,
+                            int &i,int &j,int &k,int &klimit,
+                            bool &gridpoint,double &xc,double &v,
+                            double &h,double &h2,double &err,
+                            double &maxgrowpow)
   {
 //--- check
    if(k>5)
       return(Func_lbl_10(state,n,m,i,j,k,klimit,gridpoint,xc,v,h,h2,err,maxgrowpow));
 //--- prepare data for the next update of YN/YNS
    state.m_x=state.m_xscale*(xc+state.m_rka[k]*h);
-   for(int i_=0;i_<=n-1;i_++)
+   for(int i_=0; i_<=n-1; i_++)
       state.m_y[i_]=state.m_yc[i_];
 //--- calculation
-   for(j=0;j<=k-1;j++)
+   for(j=0; j<=k-1; j++)
      {
       v=state.m_rkb[k][j];
-      for(int i_=0;i_<=n-1;i_++)
+      for(int i_=0; i_<=n-1; i_++)
          state.m_y[i_]=state.m_y[i_]+v*state.m_rkk[j][i_];
      }
    state.m_needdy=true;
@@ -859,15 +780,15 @@ static bool CODESolver::Func_lbl_8(CODESolverState &state,int &n,int &m,
 //| Auxiliary function for ODESolverIteration. Is a product to get   |
 //| rid of the operator unconditional jump goto                      |
 //+------------------------------------------------------------------+
-static bool CODESolver::Func_lbl_10(CODESolverState &state,int &n,int &m,
-                                    int &i,int &j,int &k,int &klimit,
-                                    bool &gridpoint,double &xc,double &v,
-                                    double &h,double &h2,double &err,
-                                    double &maxgrowpow)
+bool CODESolver::Func_lbl_10(CODESolverState &state,int &n,int &m,
+                             int &i,int &j,int &k,int &klimit,
+                             bool &gridpoint,double &xc,double &v,
+                             double &h,double &h2,double &err,
+                             double &maxgrowpow)
   {
 //--- estimate error
    err=0;
-   for(j=0;j<=n-1;j++)
+   for(j=0; j<=n-1; j++)
      {
       //--- check
       if(!state.m_fraceps)
@@ -902,7 +823,7 @@ static bool CODESolver::Func_lbl_10(CODESolverState &state,int &n,int &m,
      }
 //--- advance position
    xc=xc+h;
-   for(int i_=0;i_<=n-1;i_++)
+   for(int i_=0; i_<=n-1; i_++)
       state.m_yc[i_]=state.m_yn[i_];
 //--- update H
    h=h2;
@@ -910,8 +831,8 @@ static bool CODESolver::Func_lbl_10(CODESolverState &state,int &n,int &m,
    if(gridpoint)
      {
       //--- save result
-      for(int i_=0;i_<=n-1;i_++)
-         state.m_ytbl[i].Set(i_,state.m_yc[i_]);
+      for(int i_=0; i_<=n-1; i_++)
+         state.m_ytbl.Set(i,i_,state.m_yc[i_]);
       i=i+1;
       //--- check
       if(i>m-1)

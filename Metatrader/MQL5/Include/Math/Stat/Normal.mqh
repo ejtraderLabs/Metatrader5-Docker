@@ -1,6 +1,6 @@
 //+------------------------------------------------------------------+
 //|                                                       Normal.mqh |
-//|                   Copyright 2016-2017, MetaQuotes Software Corp. |
+//|                             Copyright 2000-2025, MetaQuotes Ltd. |
 //|                                             https://www.mql5.com |
 //+------------------------------------------------------------------+
 #include "Math.mqh"
@@ -259,8 +259,8 @@ bool MathProbabilityDensityNormal(const double &x[],const double mu,const double
 //| parameters mu and sigma, evaluated at x.                         |
 //+------------------------------------------------------------------+
 //| Comment from original FORTRAN code                               |
-//| http://www.netlib.org/toms-2014-06-10/639                        |
-//| http://www.netlib.org/toms-2014-06-10/715                        |
+//| https://www.netlib.org/toms-2014-06-10/639                       |
+//| https://www.netlib.org/toms-2014-06-10/715                       |
 //|                                                                  |
 //| This function evaluates the normal distribution function:        |
 //|                                                                  |
@@ -560,7 +560,7 @@ bool MathCumulativeDistributionNormal(const double &x[],const double mu,const do
 //| of the Normal distribution with parameters mu and sigma.         |
 //+------------------------------------------------------------------+
 //| Comment from original FORTRAN code                               |
-//| http://www1.fpl.fs.fed.us/ni241.f                                |
+//| https://www1.fpl.fs.fed.us/ni241.f                               |
 //| Produces the normal deviate Z corresponding to a given lower     |
 //| tail area of P; Z is accurate to about 1 part in 10**16.         |
 //| Wichura, M.J. (1988). Algorithm AS 241: The Percentage Points of |

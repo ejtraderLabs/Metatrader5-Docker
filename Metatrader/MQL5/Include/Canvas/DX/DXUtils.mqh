@@ -1,9 +1,9 @@
 //+------------------------------------------------------------------+
 //|                                                      DXUtils.mqh |
-//|                        Copyright 2019, MetaQuotes Software Corp. |
+//|                             Copyright 2000-2025, MetaQuotes Ltd. |
 //|                                             https://www.mql5.com |
 //+------------------------------------------------------------------+
-#property copyright "Copyright 2019, MetaQuotes Software Corp."
+#property copyright "Copyright 2000-2025, MetaQuotes Ltd."
 #property link      "https://www.mql5.com"
 //---
 #include "DXMath.mqh"

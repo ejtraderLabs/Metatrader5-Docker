@@ -1,9 +1,9 @@
 //+------------------------------------------------------------------+
 //|                                                     TestStat.mq5 |
-//|                   Copyright 2016-2017, MetaQuotes Software Corp. |
+//|                             Copyright 2000-2025, MetaQuotes Ltd. |
 //|                                             https://www.mql5.com |
 //+------------------------------------------------------------------+
-#property copyright "Copyright 2016-2017, MetaQuotes Software Corp."
+#property copyright "Copyright 2000-2025, MetaQuotes Ltd."
 #property link      "https://www.mql5.com"
 #property version   "1.00"
 

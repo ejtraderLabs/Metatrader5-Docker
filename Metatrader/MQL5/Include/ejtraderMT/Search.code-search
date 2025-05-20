@@ -1,0 +1,37 @@
+# Query: ejtraderLAbs
+# ContextLines: 1
+
+7 results - 6 files
+
+Experts/ejtraderMT.mq5:
+  3  #property copyright   "Copyright 2021, ejtrader."
+  4: #property link        "https://github.com/ejtraderLabs"
+  5  #property version     "3.03"
+
+Include/ejtraderMT/Broker.mqh:
+  1  #property copyright "ejtrader"
+  2: #property link      "https://github.com/ejtraderLAbs/MQL5-ejtraderMT"
+  3  
+
+Include/ejtraderMT/ChartControl.mqh:
+  3  #property copyright "ejtrader"
+  4: #property link      "https://github.com/ejtraderLAbs/MQL5-ejtraderMT"
+  5  
+
+Include/ejtraderMT/HistoryInfo.mqh:
+  3  #property copyright "ejtrader"
+  4: #property link      "https://github.com/ejtraderLAbs/MQL5-ejtraderMT"
+  5  //+------------------------------------------------------------------+
+
+Include/ejtraderMT/StartIndicator.mqh:
+  3  //|                                                   Gunther Schulz |
+  4: //|                        https://github.com/ejtraderLabs/MQL5-ejtraderMT
+  5  //+------------------------------------------------------------------+
+  6  #property copyright "Gunther Schulz"
+  7: #property link      "https://github.com/ejtraderLAbs/MQL5-ejtraderMT"
+  8  
+
+Indicators/ejtraderMTIndicator.mq5:
+  7  #property copyright "2021 ejtrader"
+  8: #property link      "https://github.com/ejtraderLabs"
+  9  #property version   "1.00"

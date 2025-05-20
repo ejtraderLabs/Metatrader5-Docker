@@ -1,7 +1,7 @@
 //+------------------------------------------------------------------+
 //|                                               TestInterfaces.mqh |
-//|            Copyright 2003-2012 Sergey Bochkanov (ALGLIB project) |
-//|                   Copyright 2012-2017, MetaQuotes Software Corp. |
+//|            Copyright 2003-2022 Sergey Bochkanov (ALGLIB project) |
+//|                             Copyright 2012-2023, MetaQuotes Ltd. |
 //|                                             https://www.mql5.com |
 //+------------------------------------------------------------------+
 //| Implementation of ALGLIB library in MetaQuotes Language 5        |
@@ -39,29 +39,24 @@
 class CNDimensional_Func1 : public CNDimensional_Func
   {
 public:
-                     CNDimensional_Func1(void);
-                    ~CNDimensional_Func1(void);
+   //--- constructor, destructor
+                     CNDimensional_Func1(void) {}
+                    ~CNDimensional_Func1(void) {}
 
    virtual void      Func(double &x[],double &func,CObject &obj);
+   virtual void      Func(CRowDouble &x,double &func,CObject &obj);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CNDimensional_Func1::CNDimensional_Func1(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CNDimensional_Func1::~CNDimensional_Func1(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| This callback calculates f(x0,x1)=100*(x0+3)^4 + (x1-3)^4        |
 //+------------------------------------------------------------------+
 void CNDimensional_Func1::Func(double &x[],double &func,CObject &obj)
+  {
+   func=100*MathPow(x[0]+3,4)+MathPow(x[1]-3,4);
+  }
+//+------------------------------------------------------------------+
+//| This callback calculates f(x0,x1)=100*(x0+3)^4 + (x1-3)^4        |
+//+------------------------------------------------------------------+
+void CNDimensional_Func1::Func(CRowDouble &x,double &func,CObject &obj)
   {
    func=100*MathPow(x[0]+3,4)+MathPow(x[1]-3,4);
   }
@@ -72,29 +67,23 @@ class CNDimensional_Func2 : public CNDimensional_Func
   {
 public:
    //--- constructor, destructor
-                     CNDimensional_Func2(void);
-                    ~CNDimensional_Func2(void);
-   //--- method
+                     CNDimensional_Func2(void) {}
+                    ~CNDimensional_Func2(void) {}
+
    virtual void      Func(double &x[],double &func,CObject &obj);
+   virtual void      Func(CRowDouble &x,double &func,CObject &obj);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CNDimensional_Func2::CNDimensional_Func2(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CNDimensional_Func2::~CNDimensional_Func2(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| This callback calculates f(x0,x1)=(x0^2+1)^2 + (x1-1)^2          |
 //+------------------------------------------------------------------+
 void CNDimensional_Func2::Func(double &x[],double &func,CObject &obj)
+  {
+   func=MathPow(x[0]*x[0]+1,2)+MathPow(x[1]-1,2);
+  }
+//+------------------------------------------------------------------+
+//| This callback calculates f(x0,x1)=(x0^2+1)^2 + (x1-1)^2          |
+//+------------------------------------------------------------------+
+void CNDimensional_Func2::Func(CRowDouble &x,double &func,CObject &obj)
   {
    func=MathPow(x[0]*x[0]+1,2)+MathPow(x[1]-1,2);
   }
@@ -105,30 +94,25 @@ class CNDimensional_Bad_Func : public CNDimensional_Func
   {
 public:
    //--- constructor, destructor
-                     CNDimensional_Bad_Func(void);
-                    ~CNDimensional_Bad_Func(void);
-   //--- method
+                     CNDimensional_Bad_Func(void) {}
+                    ~CNDimensional_Bad_Func(void) {}
+
    virtual void      Func(double &x[],double &func,CObject &obj);
+   virtual void      Func(CRowDouble &x,double &func,CObject &obj);
   };
 //+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CNDimensional_Bad_Func::CNDimensional_Bad_Func(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CNDimensional_Bad_Func::~CNDimensional_Bad_Func(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| This callback calculates 'bad' function, i.e. function with      | 
+//| This callback calculates 'bad' function, i.e. function with      |
 //| incorrectly calculated derivatives                               |
 //+------------------------------------------------------------------+
 void CNDimensional_Bad_Func::Func(double &x[],double &func,CObject &obj)
+  {
+   func=100*MathPow(x[0]+3,4)+MathPow(x[1]-3,4);
+  }
+//+------------------------------------------------------------------+
+//| This callback calculates 'bad' function, i.e. function with      |
+//| incorrectly calculated derivatives                               |
+//+------------------------------------------------------------------+
+void CNDimensional_Bad_Func::Func(CRowDouble &x,double &func,CObject &obj)
   {
    func=100*MathPow(x[0]+3,4)+MathPow(x[1]-3,4);
   }
@@ -139,27 +123,14 @@ class CNDimensional_Grad1 : public CNDimensional_Grad
   {
 public:
    //--- constructor, destructor
-                     CNDimensional_Grad1(void);
-                    ~CNDimensional_Grad1(void);
-   //--- method
+                     CNDimensional_Grad1(void) {}
+                    ~CNDimensional_Grad1(void) {}
+
    virtual void      Grad(double &x[],double &func,double &grad[],CObject &obj);
+   virtual void      Grad(CRowDouble &x,double &func,CRowDouble &grad,CObject &obj);
   };
 //+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CNDimensional_Grad1::CNDimensional_Grad1(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CNDimensional_Grad1::~CNDimensional_Grad1(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| This callback calculates f(x0,x1)=100*(x0+3)^4 + (x1-3)^4 and its| 
+//| This callback calculates f(x0,x1)=100*(x0+3)^4 + (x1-3)^4 and its|
 //| derivatives df/d0 and df/dx1                                     |
 //+------------------------------------------------------------------+
 void CNDimensional_Grad1::Grad(double &x[],double &func,
@@ -170,31 +141,28 @@ void CNDimensional_Grad1::Grad(double &x[],double &func,
    grad[1]=4*MathPow(x[1]-3,3);
   }
 //+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void CNDimensional_Grad1::Grad(CRowDouble &x,double &func,
+                               CRowDouble &grad,CObject &obj)
+  {
+   func=100*MathPow(x[0]+3,4)+MathPow(x[1]-3,4);
+   grad.Set(0,400*MathPow(x[0]+3,3));
+   grad.Set(1,4*MathPow(x[1]-3,3));
+  }
+//+------------------------------------------------------------------+
 //| Derived class from CNDimensional_Grad                            |
 //+------------------------------------------------------------------+
 class CNDimensional_Grad2 : public CNDimensional_Grad
   {
 public:
    //--- constructor, destructor
-                     CNDimensional_Grad2(void);
-                    ~CNDimensional_Grad2(void);
-   //--- method
+                     CNDimensional_Grad2(void) {}
+                    ~CNDimensional_Grad2(void) {}
+
    virtual void      Grad(double &x[],double &func,double &grad[],CObject &obj);
+   virtual void      Grad(CRowDouble &x,double &func,CRowDouble &grad,CObject &obj);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CNDimensional_Grad2::CNDimensional_Grad2(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CNDimensional_Grad2::~CNDimensional_Grad2(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| This callback calculates f(x0,x1)=(x0^2+1)^2 + (x1-1)^2 and its  |
 //| derivatives df/d0 and df/dx1                                     |
@@ -207,31 +175,29 @@ void CNDimensional_Grad2::Grad(double &x[],double &func,
    grad[1]=2*(x[1]-1);
   }
 //+------------------------------------------------------------------+
+//| This callback calculates f(x0,x1)=(x0^2+1)^2 + (x1-1)^2 and its  |
+//| derivatives df/d0 and df/dx1                                     |
+//+------------------------------------------------------------------+
+void CNDimensional_Grad2::Grad(CRowDouble &x,double &func,
+                               CRowDouble &grad,CObject &obj)
+  {
+   func=MathPow(x[0]*x[0]+1,2)+MathPow(x[1]-1,2);
+   grad.Set(0,4*(x[0]*x[0]+1)*x[0]);
+   grad.Set(1,2*(x[1]-1));
+  }
+//+------------------------------------------------------------------+
 //| Derived class from CNDimensional_Grad                            |
 //+------------------------------------------------------------------+
 class CNDimensional_Bad_Grad : public CNDimensional_Grad
   {
 public:
    //--- constructor, destructor
-                     CNDimensional_Bad_Grad(void);
-                    ~CNDimensional_Bad_Grad(void);
-   //--- method
+                     CNDimensional_Bad_Grad(void) {}
+                    ~CNDimensional_Bad_Grad(void) {}
+
    virtual void      Grad(double &x[],double &func,double &grad[],CObject &obj);
+   virtual void      Grad(CRowDouble &x,double &func,CRowDouble &grad,CObject &obj);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CNDimensional_Bad_Grad::CNDimensional_Bad_Grad(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CNDimensional_Bad_Grad::~CNDimensional_Bad_Grad(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| This callback calculates 'bad' function, i.e. function with      |
 //| incorrectly calculated derivatives                               |
@@ -243,30 +209,27 @@ void CNDimensional_Bad_Grad::Grad(double &x[],double &func,double &grad[],CObjec
    grad[1]=40*MathPow(x[1]-3,3);
   }
 //+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void CNDimensional_Bad_Grad::Grad(CRowDouble &x,double &func,CRowDouble &grad,CObject &obj)
+  {
+   func=100*MathPow(x[0]+3,4)+MathPow(x[1]-3,4);
+   grad.Set(0,40*MathPow(x[0]+3,3));
+   grad.Set(1,40*MathPow(x[1]-3,3));
+  }
+//+------------------------------------------------------------------+
 //| Derived class from CNDimensional_Grad                            |
 //+------------------------------------------------------------------+
 class CNDimensional_S1_Grad : public CNDimensional_Grad
   {
 public:
-                     CNDimensional_S1_Grad(void);
-                    ~CNDimensional_S1_Grad(void);
+   //--- constructor, destructor
+                     CNDimensional_S1_Grad(void) {}
+                    ~CNDimensional_S1_Grad(void) {}
 
    virtual void      Grad(double &x[],double &func,double &grad[],CObject &obj);
+   virtual void      Grad(CRowDouble &x,double &func,CRowDouble &grad,CObject &obj);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CNDimensional_S1_Grad::CNDimensional_S1_Grad(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CNDimensional_S1_Grad::~CNDimensional_S1_Grad(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| This callback calculates f(x)=(1+x)^(-0.2)+(1-x)^(-0.3)+1000*x   |
 //| and its gradient. function is trimmed when we calculate it near  |
@@ -284,30 +247,31 @@ void CNDimensional_S1_Grad::Grad(double &x[],double &func,double &grad[],CObject
    grad[0]=-0.2*MathPow(1+x[0],-1.2)+0.3*MathPow(1-x[0],-1.3)+1000;
   }
 //+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void CNDimensional_S1_Grad::Grad(CRowDouble &x,double &func,CRowDouble &grad,CObject &obj)
+  {
+   if((x[0]<=-0.999999999999) || (x[0]>=+0.999999999999))
+     {
+      func=1.0E+300;
+      return;
+     }
+   func=MathPow(1+x[0],-0.2)+MathPow(1-x[0],-0.3)+1000*x[0];
+   grad.Set(0,-0.2*MathPow(1+x[0],-1.2)+0.3*MathPow(1-x[0],-1.3)+1000);
+  }
+//+------------------------------------------------------------------+
 //| Derived class from CNDimensional_Hess                            |
 //+------------------------------------------------------------------+
 class CNDimensional_Hess1 : public CNDimensional_Hess
   {
 public:
-                     CNDimensional_Hess1(void);
-                    ~CNDimensional_Hess1(void);
+   //--- constructor, destructor
+                     CNDimensional_Hess1(void) {}
+                    ~CNDimensional_Hess1(void) {}
 
    virtual void      Hess(double &x[],double &func,double &grad[],CMatrixDouble &hess,CObject &obj);
+   virtual void      Hess(CRowDouble &x,double &func,CRowDouble &grad,CMatrixDouble &hess,CObject &obj);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CNDimensional_Hess1::CNDimensional_Hess1(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CNDimensional_Hess1::~CNDimensional_Hess1(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| This callback calculates f(x0,x1)=100*(x0+3)^4 + (x1-3)^4        |
 //| its derivatives df/d0 and df/dx1                                 |
@@ -319,10 +283,26 @@ void CNDimensional_Hess1::Hess(double &x[],double &func,double &grad[],
    func=100*MathPow(x[0]+3,4)+MathPow(x[1]-3,4);
    grad[0]=400*MathPow(x[0]+3,3);
    grad[1]=4*MathPow(x[1]-3,3);
-   hess[0].Set(0,1200*MathPow(x[0]+3,2));
-   hess[0].Set(1,0);
-   hess[1].Set(0,0);
-   hess[1].Set(1,12*MathPow(x[1]-3,2));
+   hess.Set(0,0,1200*MathPow(x[0]+3,2));
+   hess.Set(0,1,0);
+   hess.Set(1,0,0);
+   hess.Set(1,1,12*MathPow(x[1]-3,2));
+  }
+//+------------------------------------------------------------------+
+//| This callback calculates f(x0,x1)=100*(x0+3)^4 + (x1-3)^4        |
+//| its derivatives df/d0 and df/dx1                                 |
+//| and its Hessian.                                                 |
+//+------------------------------------------------------------------+
+void CNDimensional_Hess1::Hess(CRowDouble &x,double &func,CRowDouble &grad,
+                               CMatrixDouble &hess,CObject &obj)
+  {
+   func=100*MathPow(x[0]+3,4)+MathPow(x[1]-3,4);
+   grad.Set(0,400*MathPow(x[0]+3,3));
+   grad.Set(1,4*MathPow(x[1]-3,3));
+   hess.Set(0,0,1200*MathPow(x[0]+3,2));
+   hess.Set(0,1,0);
+   hess.Set(1,0,0);
+   hess.Set(1,1,12*MathPow(x[1]-3,2));
   }
 //+------------------------------------------------------------------+
 //| Derived class from CNDimensional_Hess                            |
@@ -331,25 +311,12 @@ class CNDimensional_Hess2 : public CNDimensional_Hess
   {
 public:
    //--- constructor, destructor
-                     CNDimensional_Hess2(void);
-                    ~CNDimensional_Hess2(void);
-   //--- method
+                     CNDimensional_Hess2(void) {}
+                    ~CNDimensional_Hess2(void) {}
+
    virtual void      Hess(double &x[],double &func,double &grad[],CMatrixDouble &hess,CObject &obj);
+   virtual void      Hess(CRowDouble &x,double &func,CRowDouble &grad,CMatrixDouble &hess,CObject &obj);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CNDimensional_Hess2::CNDimensional_Hess2(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CNDimensional_Hess2::~CNDimensional_Hess2(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| This callback calculates f(x0,x1)=(x0^2+1)^2 + (x1-1)^2          |
 //| its gradient and Hessian                                         |
@@ -360,10 +327,25 @@ void CNDimensional_Hess2::Hess(double &x[],double &func,double &grad[],
    func=MathPow(x[0]*x[0]+1,2)+MathPow(x[1]-1,2);
    grad[0]=4*(x[0]*x[0]+1)*x[0];
    grad[1]=2*(x[1]-1);
-   hess[0].Set(0,12*x[0]*x[0]+4);
-   hess[0].Set(1,0);
-   hess[1].Set(0,0);
-   hess[1].Set(1,2);
+   hess.Set(0,0,12*x[0]*x[0]+4);
+   hess.Set(0,1,0);
+   hess.Set(1,0,0);
+   hess.Set(1,1,2);
+  }
+//+------------------------------------------------------------------+
+//| This callback calculates f(x0,x1)=(x0^2+1)^2 + (x1-1)^2          |
+//| its gradient and Hessian                                         |
+//+------------------------------------------------------------------+
+void CNDimensional_Hess2::Hess(CRowDouble &x,double &func,CRowDouble &grad,
+                               CMatrixDouble &hess,CObject &obj)
+  {
+   func=MathPow(x[0]*x[0]+1,2)+MathPow(x[1]-1,2);
+   grad.Set(0,4*(x[0]*x[0]+1)*x[0]);
+   grad.Set(1,2*(x[1]-1));
+   hess.Set(0,0,12*x[0]*x[0]+4);
+   hess.Set(0,1,0);
+   hess.Set(1,0,0);
+   hess.Set(1,1,2);
   }
 //+------------------------------------------------------------------+
 //| Derived class from CNDimensional_Hess                            |
@@ -372,25 +354,12 @@ class CNDimensional_Bad_Hess : public CNDimensional_Hess
   {
 public:
    //--- constructor, destructor
-                     CNDimensional_Bad_Hess(void);
-                    ~CNDimensional_Bad_Hess(void);
-   //--- method
+                     CNDimensional_Bad_Hess(void) {}
+                    ~CNDimensional_Bad_Hess(void) {}
+
    virtual void      Hess(double &x[],double &func,double &grad[],CMatrixDouble &hess,CObject &obj);
+   virtual void      Hess(CRowDouble &x,double &func,CRowDouble &grad,CMatrixDouble &hess,CObject &obj);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CNDimensional_Bad_Hess::CNDimensional_Bad_Hess(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CNDimensional_Bad_Hess::~CNDimensional_Bad_Hess(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| This callback calculates 'bad' function, i.e. function with      |
 //| incorrectly calculated derivatives                               |
@@ -401,10 +370,25 @@ void CNDimensional_Bad_Hess::Hess(double &x[],double &func,double &grad[],
    func=100*MathPow(x[0]+3,4)+MathPow(x[1]-3,4);
    grad[0]=40*MathPow(x[0]+3,3);
    grad[1]=40*MathPow(x[1]-3,3);
-   hess[0].Set(0,120*MathPow(x[0]+3,2));
-   hess[0].Set(1,1);
-   hess[1].Set(0,1);
-   hess[1].Set(1,120*MathPow(x[1]-3,2));
+   hess.Set(0,0,120*MathPow(x[0]+3,2));
+   hess.Set(0,1,1);
+   hess.Set(1,0,1);
+   hess.Set(1,1,120*MathPow(x[1]-3,2));
+  }
+//+------------------------------------------------------------------+
+//| This callback calculates 'bad' function, i.e. function with      |
+//| incorrectly calculated derivatives                               |
+//+------------------------------------------------------------------+
+void CNDimensional_Bad_Hess::Hess(CRowDouble &x,double &func,CRowDouble &grad,
+                                  CMatrixDouble &hess,CObject &obj)
+  {
+   func=100*MathPow(x[0]+3,4)+MathPow(x[1]-3,4);
+   grad.Set(0,40*MathPow(x[0]+3,3));
+   grad.Set(1,40*MathPow(x[1]-3,3));
+   hess.Set(0,0,120*MathPow(x[0]+3,2));
+   hess.Set(0,1,1);
+   hess.Set(1,0,1);
+   hess.Set(1,1,120*MathPow(x[1]-3,2));
   }
 //+------------------------------------------------------------------+
 //| Derived class from CNDimensional_FVec                            |
@@ -413,25 +397,12 @@ class CNDimensional_FVec1 : public CNDimensional_FVec
   {
 public:
    //--- constructor, destructor
-                     CNDimensional_FVec1(void);
-                    ~CNDimensional_FVec1(void);
-   //--- method
+                     CNDimensional_FVec1(void) {}
+                    ~CNDimensional_FVec1(void) {}
+
    virtual void      FVec(double &x[],double &fi[],CObject &obj);
+   virtual void      FVec(CRowDouble &x,CRowDouble &fi,CObject &obj);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CNDimensional_FVec1::CNDimensional_FVec1(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CNDimensional_FVec1::~CNDimensional_FVec1(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| This callback calculates                                         |
 //| f0(x0,x1)=100*(x0+3)^4,                                          |
@@ -443,31 +414,28 @@ void CNDimensional_FVec1::FVec(double &x[],double &fi[],CObject &obj)
    fi[1]=MathPow(x[1]-3,2);
   }
 //+------------------------------------------------------------------+
+//| This callback calculates                                         |
+//| f0(x0,x1)=100*(x0+3)^4,                                          |
+//| f1(x0,x1)=(x1-3)^4                                               |
+//+------------------------------------------------------------------+
+void CNDimensional_FVec1::FVec(CRowDouble &x,CRowDouble &fi,CObject &obj)
+  {
+   fi.Set(0,10*MathPow(x[0]+3,2));
+   fi.Set(1,MathPow(x[1]-3,2));
+  }
+//+------------------------------------------------------------------+
 //| Derived class from CNDimensional_FVec                            |
 //+------------------------------------------------------------------+
 class CNDimensional_FVec2 : public CNDimensional_FVec
   {
 public:
    //--- constructor, destructor
-                     CNDimensional_FVec2(void);
-                    ~CNDimensional_FVec2(void);
-   //--- method
+                     CNDimensional_FVec2(void) {}
+                    ~CNDimensional_FVec2(void) {}
+
    virtual void      FVec(double &x[],double &fi[],CObject &obj);
+   virtual void      FVec(CRowDouble &x,CRowDouble &fi,CObject &obj);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CNDimensional_FVec2::CNDimensional_FVec2(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CNDimensional_FVec2::~CNDimensional_FVec2(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| This callback calculates                                         |
 //| f0(x0,x1)=100*(x0+3)^4,                                          |
@@ -479,31 +447,28 @@ void CNDimensional_FVec2::FVec(double &x[],double &fi[],CObject &obj)
    fi[1]=x[1]-1;
   }
 //+------------------------------------------------------------------+
+//| This callback calculates                                         |
+//| f0(x0,x1)=100*(x0+3)^4,                                          |
+//| f1(x0,x1)=(x1-3)^4                                               |
+//+------------------------------------------------------------------+
+void CNDimensional_FVec2::FVec(CRowDouble &x,CRowDouble &fi,CObject &obj)
+  {
+   fi.Set(0,x[0]*x[0]+1);
+   fi.Set(1,x[1]-1);
+  }
+//+------------------------------------------------------------------+
 //| Derived class from CNDimensional_FVec                            |
 //+------------------------------------------------------------------+
 class CNDimensional_Bad_FVec : public CNDimensional_FVec
   {
 public:
    //--- constructor, destructor
-                     CNDimensional_Bad_FVec(void);
-                    ~CNDimensional_Bad_FVec(void);
-   //--- method
+                     CNDimensional_Bad_FVec(void) {}
+                    ~CNDimensional_Bad_FVec(void) {}
+
    virtual void      FVec(double &x[],double &fi[],CObject &obj);
+   virtual void      FVec(CRowDouble &x,CRowDouble &fi,CObject &obj);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CNDimensional_Bad_FVec::CNDimensional_Bad_FVec(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CNDimensional_Bad_FVec::~CNDimensional_Bad_FVec(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| This callback calculates 'bad' function, i.e. function with      |
 //| incorrectly calculated derivatives                               |
@@ -514,31 +479,48 @@ void CNDimensional_Bad_FVec::FVec(double &x[],double &fi[],CObject &obj)
    fi[1]=MathPow(x[1]-3,2);
   }
 //+------------------------------------------------------------------+
+//| This callback calculates 'bad' function, i.e. function with      |
+//| incorrectly calculated derivatives                               |
+//+------------------------------------------------------------------+
+void CNDimensional_Bad_FVec::FVec(CRowDouble &x,CRowDouble &fi,CObject &obj)
+  {
+   fi.Set(0,10*MathPow(x[0]+3,2));
+   fi.Set(1,MathPow(x[1]-3,2));
+  }
+//+------------------------------------------------------------------+
+//| Derived class from CNDimensional_FVec                            |
+//+------------------------------------------------------------------+
+class CNDimensional_NSFunc1_FVec : public CNDimensional_FVec
+  {
+public:
+   //--- constructor, destructor
+                     CNDimensional_NSFunc1_FVec(void) {}
+                    ~CNDimensional_NSFunc1_FVec(void) {}
+
+   virtual void      FVec(CRowDouble &x,CRowDouble &fi,CObject &obj);
+  };
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void CNDimensional_NSFunc1_FVec::FVec(CRowDouble &x,CRowDouble &fi,CObject &obj)
+  {
+//--- this callback calculates
+//---     f0(x0,x1) = 2*|x0|+|x1|
+   fi.Set(0,2*MathAbs(x[0])+MathAbs(x[1]));
+  }
+//+------------------------------------------------------------------+
 //| Derived class from CNDimensional_Jac                             |
 //+------------------------------------------------------------------+
 class CNDimensional_Jac1 : public CNDimensional_Jac
   {
 public:
    //--- constructor, destructor
-                     CNDimensional_Jac1(void);
-                    ~CNDimensional_Jac1(void);
-   //--- method
+                     CNDimensional_Jac1(void) {}
+                    ~CNDimensional_Jac1(void) {}
+
    virtual void      Jac(double &x[],double &fi[],CMatrixDouble &jac,CObject &obj);
+   virtual void      Jac(CRowDouble &x,CRowDouble &fi,CMatrixDouble &jac,CObject &obj);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CNDimensional_Jac1::CNDimensional_Jac1(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CNDimensional_Jac1::~CNDimensional_Jac1(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| This callback calculates                                         |
 //| f0(x0,x1)=100*(x0+3)^4,                                          |
@@ -550,10 +532,23 @@ void CNDimensional_Jac1::Jac(double &x[],double &fi[],CMatrixDouble &jac,
   {
    fi[0]=10*MathPow(x[0]+3,2);
    fi[1]=MathPow(x[1]-3,2);
-   jac[0].Set(0,20*(x[0]+3));
-   jac[0].Set(1,0);
-   jac[1].Set(0,0);
-   jac[1].Set(1,2*(x[1]-3));
+   jac.Set(0,0,20*(x[0]+3));
+   jac.Set(0,1,0);
+   jac.Set(1,0,0);
+   jac.Set(1,1,2*(x[1]-3));
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void CNDimensional_Jac1::Jac(CRowDouble &x,CRowDouble &fi,CMatrixDouble &jac,
+                             CObject &obj)
+  {
+   fi.Set(0,10*MathPow(x[0]+3,2));
+   fi.Set(1,MathPow(x[1]-3,2));
+   jac.Set(0,0,20*(x[0]+3));
+   jac.Set(0,1,0);
+   jac.Set(1,0,0);
+   jac.Set(1,1,2*(x[1]-3));
   }
 //+------------------------------------------------------------------+
 //| Derived class from CNDimensional_Jac                             |
@@ -562,25 +557,12 @@ class CNDimensional_Jac2 : public CNDimensional_Jac
   {
 public:
    //--- constructor, destructor
-                     CNDimensional_Jac2(void);
-                    ~CNDimensional_Jac2(void);
-   //--- method
+                     CNDimensional_Jac2(void) {}
+                    ~CNDimensional_Jac2(void) {}
+
    virtual void      Jac(double &x[],double &fi[],CMatrixDouble &jac,CObject &obj);
+   virtual void      Jac(CRowDouble &x,CRowDouble &fi,CMatrixDouble &jac,CObject &obj);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CNDimensional_Jac2::CNDimensional_Jac2(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CNDimensional_Jac2::~CNDimensional_Jac2(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| This callback calculates                                         |
 //| f0(x0,x1)=x0^2+1                                                 |
@@ -592,10 +574,26 @@ void CNDimensional_Jac2::Jac(double &x[],double &fi[],CMatrixDouble &jac,
   {
    fi[0]=x[0]*x[0]+1;
    fi[1]=x[1]-1;
-   jac[0].Set(0,2*x[0]);
-   jac[0].Set(1,0);
-   jac[1].Set(0,0);
-   jac[1].Set(1,1);
+   jac.Set(0,0,2*x[0]);
+   jac.Set(0,1,0);
+   jac.Set(1,0,0);
+   jac.Set(1,1,1);
+  }
+//+------------------------------------------------------------------+
+//| This callback calculates                                         |
+//| f0(x0,x1)=x0^2+1                                                 |
+//| f1(x0,x1)=x1-1                                                   |
+//| and Jacobian matrix J=[dfi/dxj]                                  |
+//+------------------------------------------------------------------+
+void CNDimensional_Jac2::Jac(CRowDouble &x,CRowDouble &fi,CMatrixDouble &jac,
+                             CObject &obj)
+  {
+   fi.Set(0,x[0]*x[0]+1);
+   fi.Set(1,x[1]-1);
+   jac.Set(0,0,2*x[0]);
+   jac.Set(0,1,0);
+   jac.Set(1,0,0);
+   jac.Set(1,1,1);
   }
 //+------------------------------------------------------------------+
 //| Derived class from CNDimensional_Jac                             |
@@ -604,25 +602,12 @@ class CNDimensional_Bad_Jac : public CNDimensional_Jac
   {
 public:
    //--- constructor, destructor
-                     CNDimensional_Bad_Jac(void);
-                    ~CNDimensional_Bad_Jac(void);
-   //--- method
+                     CNDimensional_Bad_Jac(void) {}
+                    ~CNDimensional_Bad_Jac(void) {}
+
    virtual void      Jac(double &x[],double &fi[],CMatrixDouble &jac,CObject &obj);
+   virtual void      Jac(CRowDouble &x,CRowDouble &fi,CMatrixDouble &jac,CObject &obj);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CNDimensional_Bad_Jac::CNDimensional_Bad_Jac(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CNDimensional_Bad_Jac::~CNDimensional_Bad_Jac(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| This callback calculates 'bad' function,                         |
 //| i.e. function with incorrectly calculated derivatives            |
@@ -632,10 +617,162 @@ void CNDimensional_Bad_Jac::Jac(double &x[],double &fi[],CMatrixDouble &jac,
   {
    fi[0]=10*MathPow(x[0]+3,2);
    fi[1]=MathPow(x[1]-3,2);
-   jac[0].Set(0,20*(x[0]+3));
-   jac[0].Set(1,0);
-   jac[1].Set(0,1);
-   jac[1].Set(1,20*(x[1]-3));
+   jac.Set(0,0,20*(x[0]+3));
+   jac.Set(0,1,0);
+   jac.Set(1,0,1);
+   jac.Set(1,1,20*(x[1]-3));
+  }
+//+------------------------------------------------------------------+
+//| This callback calculates 'bad' function,                         |
+//| i.e. function with incorrectly calculated derivatives            |
+//+------------------------------------------------------------------+
+void CNDimensional_Bad_Jac::Jac(CRowDouble &x,CRowDouble &fi,CMatrixDouble &jac,
+                                CObject &obj)
+  {
+   fi.Set(0,10*MathPow(x[0]+3,2));
+   fi.Set(1,MathPow(x[1]-3,2));
+   jac.Set(0,0,20*(x[0]+3));
+   jac.Set(0,1,0);
+   jac.Set(1,0,1);
+   jac.Set(1,1,20*(x[1]-3));
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+class CNDimensional_NLCFunc1_Jac : public CNDimensional_Jac
+  {
+public:
+   //--- constructor, destructor
+                     CNDimensional_NLCFunc1_Jac(void) {}
+                    ~CNDimensional_NLCFunc1_Jac(void) {}
+
+   virtual void      Jac(double &x[],double &fi[],CMatrixDouble &jac,CObject &obj);
+   virtual void      Jac(CRowDouble &x,CRowDouble &fi,CMatrixDouble &jac,CObject &obj);
+  };
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void CNDimensional_NLCFunc1_Jac::Jac(CRowDouble &x,CRowDouble &fi,CMatrixDouble &jac,CObject &obj)
+  {
+//--- this callback calculates
+//---     f0(x0,x1) = -x0+x1
+//---     f1(x0,x1) = x0^2+x1^2-1
+//--- and Jacobian matrix J = [dfi/dxj]
+   fi.Set(0,-x[0]+x[1]);
+   fi.Set(1,x[0]*x[0]+x[1]*x[1]-1.0);
+   jac.Set(0,0,-1.0);
+   jac.Set(0,1,+1.0);
+   jac.Row(1,x*2+0);
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void CNDimensional_NLCFunc1_Jac::Jac(double &x[],double &fi[],CMatrixDouble &jac,CObject &obj)
+  {
+//--- this callback calculates
+//---     f0(x0,x1) = -x0+x1
+//---     f1(x0,x1) = x0^2+x1^2-1
+//--- and Jacobian matrix J = [dfi/dxj]
+   fi[0]=-x[0]+x[1];
+   fi[1]=x[0]*x[0]+x[1]*x[1]-1.0;
+   jac.Set(0,0,-1.0);
+   jac.Set(0,1,+1.0);
+   jac.Set(1,0,x[0]*2);
+   jac.Set(1,1,x[1]*2);
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+class CNDimensional_NLCFunc2_Jac : public CNDimensional_Jac
+  {
+public:
+   //--- constructor, destructor
+                     CNDimensional_NLCFunc2_Jac(void) {}
+                    ~CNDimensional_NLCFunc2_Jac(void) {}
+
+   virtual void      Jac(CRowDouble &x,CRowDouble &fi,CMatrixDouble &jac,CObject &obj);
+  };
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void CNDimensional_NLCFunc2_Jac::Jac(CRowDouble &x,CRowDouble &fi,CMatrixDouble &jac,CObject &obj)
+  {
+//--- this callback calculates
+//---     f0(x0,x1,x2) = x0+x1
+//---     f1(x0,x1,x2) = x2-exp(x0)
+//---     f2(x0,x1,x2) = x0^2+x1^2-1
+//--- and Jacobian matrix J = [dfi/dxj]
+   fi.Set(0,x[0]+x[1]);
+   fi.Set(1,x[2]-MathExp(x[0]));
+   fi.Set(2,x[0]*x[0]+x[1]*x[1]-1.0);
+   jac.Set(0,0,1.0);
+   jac.Set(0,1,1.0);
+   jac.Set(0,2,0.0);
+   jac.Set(1,0,-MathExp(x[0]));
+   jac.Set(1,1,0.0);
+   jac.Set(1,2,1.0);
+   jac.Set(2,0,2*x[0]);
+   jac.Set(2,1,2*x[1]);
+   jac.Set(2,2,0.0);
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+class CNDimensional_NSFunc1_Jac : public CNDimensional_Jac
+  {
+public:
+   //--- constructor, destructor
+                     CNDimensional_NSFunc1_Jac(void) {}
+                    ~CNDimensional_NSFunc1_Jac(void) {}
+
+   virtual void      Jac(CRowDouble &x,CRowDouble &fi,CMatrixDouble &jac,CObject &obj);
+  };
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void CNDimensional_NSFunc1_Jac::Jac(CRowDouble &x,CRowDouble &fi,CMatrixDouble &jac,CObject &obj)
+  {
+//--- this callback calculates
+//---     f0(x0,x1) = 2*|x0|+|x1|
+//--- and Jacobian matrix J = [ df0/dx0, df0/dx1 ]
+   fi.Set(0,2*MathAbs(x[0])+MathAbs(x[1]));
+   jac.Set(0,0,2*MathSign(x[0]));
+   jac.Set(0,1,MathSign(x[1]));
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+class CNDimensional_NSFunc2_Jac : public CNDimensional_Jac
+  {
+public:
+   //--- constructor, destructor
+                     CNDimensional_NSFunc2_Jac(void) {}
+                    ~CNDimensional_NSFunc2_Jac(void) {}
+
+   virtual void      Jac(CRowDouble &x,CRowDouble &fi,CMatrixDouble &jac,CObject &obj);
+  };
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void CNDimensional_NSFunc2_Jac::Jac(CRowDouble &x,CRowDouble &fi,CMatrixDouble &jac,CObject &obj)
+  {
+//--- this callback calculates function vector
+//---     f0(x0,x1) = 2*|x0|+x1
+//---     f1(x0,x1) = x0-1
+//---     f2(x0,x1) = -x1-1
+//--- and Jacobian matrix J
+//---         [ df0/dx0   df0/dx1 ]
+//---     J = [ df1/dx0   df1/dx1 ]
+//---         [ df2/dx0   df2/dx1 ]
+   fi.Set(0,2*MathAbs(x[0])+MathAbs(x[1]));
+   jac.Set(0,0,2*MathSign(x[0]));
+   jac.Set(0,1,MathSign(x[1]));
+   fi.Set(1,x[0]-1);
+   jac.Set(1,0,1);
+   jac.Set(1,1,0);
+   fi.Set(2,-x[1]-1);
+   jac.Set(2,0,0);
+   jac.Set(2,1,-1);
   }
 //+------------------------------------------------------------------+
 //| Derived class from CNDimensional_PFunc                           |
@@ -644,24 +781,20 @@ class CNDimensional_CX_1_Func : public CNDimensional_PFunc
   {
 public:
    //--- constructor, destructor
-                     CNDimensional_CX_1_Func(void);
-                    ~CNDimensional_CX_1_Func(void);
-   //--- method
+                     CNDimensional_CX_1_Func(void) {}
+                    ~CNDimensional_CX_1_Func(void) {}
+
    virtual void      PFunc(double &c[],double &x[],double &func,CObject &obj);
+   virtual void      PFunc(CRowDouble &c,CRowDouble &x,double &func,CObject &obj);
   };
 //+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
+//| This callback calculates f(c,x)=exp(-c0*sqr(x0)) where x is a    |
+//| position on X-axis and c is adjustable parameter                 |
 //+------------------------------------------------------------------+
-CNDimensional_CX_1_Func::CNDimensional_CX_1_Func(void)
+void CNDimensional_CX_1_Func::PFunc(CRowDouble &c,CRowDouble &x,double &func,
+                                    CObject &obj)
   {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CNDimensional_CX_1_Func::~CNDimensional_CX_1_Func(void)
-  {
-
+   func=MathExp(-c[0]*MathPow(x[0],2));
   }
 //+------------------------------------------------------------------+
 //| This callback calculates f(c,x)=exp(-c0*sqr(x0)) where x is a    |
@@ -670,7 +803,7 @@ CNDimensional_CX_1_Func::~CNDimensional_CX_1_Func(void)
 void CNDimensional_CX_1_Func::PFunc(double &c[],double &x[],double &func,
                                     CObject &obj)
   {
-   func=MathExp(-c[0]*x[0]*x[0]);
+   func=MathExp(-c[0]*MathPow(x[0],2));
   }
 //+------------------------------------------------------------------+
 //| Derived class from CNDimensional_PFunc                           |
@@ -679,30 +812,26 @@ class CNDimensional_Debt_Func : public CNDimensional_PFunc
   {
 public:
    //--- constructor, destructor
-                     CNDimensional_Debt_Func(void);
-                    ~CNDimensional_Debt_Func(void);
-   //--- method
+                     CNDimensional_Debt_Func(void) {}
+                    ~CNDimensional_Debt_Func(void) {}
+
    virtual void      PFunc(double &c[],double &x[],double &func,CObject &obj);
+   virtual void      PFunc(CRowDouble &c,CRowDouble &x,double &func,CObject &obj);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CNDimensional_Debt_Func::CNDimensional_Debt_Func(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CNDimensional_Debt_Func::~CNDimensional_Debt_Func(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| This callback calculates                                         |
 //| f(c,x)=c[0]*(1+c[1]*(pow(x[0]-1999,c[2])-1))                     |
 //+------------------------------------------------------------------+
 void CNDimensional_Debt_Func::PFunc(double &c[],double &x[],double &func,
+                                    CObject &obj)
+  {
+   func=c[0]*(1+c[1]*(MathPow(x[0]-1999,c[2])-1));
+  }
+//+------------------------------------------------------------------+
+//| This callback calculates                                         |
+//| f(c,x)=c[0]*(1+c[1]*(pow(x[0]-1999,c[2])-1))                     |
+//+------------------------------------------------------------------+
+void CNDimensional_Debt_Func::PFunc(CRowDouble &c,CRowDouble &x,double &func,
                                     CObject &obj)
   {
    func=c[0]*(1+c[1]*(MathPow(x[0]-1999,c[2])-1));
@@ -714,28 +843,15 @@ class CNDimensional_CX_1_Grad : public CNDimensional_PGrad
   {
 public:
    //--- constructor, destructor
-                     CNDimensional_CX_1_Grad(void);
-                    ~CNDimensional_CX_1_Grad(void);
-   //--- method
+                     CNDimensional_CX_1_Grad(void) {}
+                    ~CNDimensional_CX_1_Grad(void) {}
+
    virtual void      PGrad(double &c[],double &x[],double &func,double &grad[],CObject &obj);
+   virtual void      PGrad(CRowDouble &c,CRowDouble &x,double &func,CRowDouble &grad,CObject &obj);
   };
 //+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CNDimensional_CX_1_Grad::CNDimensional_CX_1_Grad(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CNDimensional_CX_1_Grad::~CNDimensional_CX_1_Grad(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
 //| This callback calculates f(c,x)=exp(-c0*sqr(x0)) and gradient    |
-//| G={df/dc[i]} where x is a position on X-axis and c is adjustable | 
+//| G={df/dc[i]} where x is a position on X-axis and c is adjustable |
 //| parameter.                                                       |
 //| IMPORTANT: gradient is calculated with respect to C, not to X    |
 //+------------------------------------------------------------------+
@@ -746,31 +862,30 @@ void CNDimensional_CX_1_Grad::PGrad(double &c[],double &x[],double &func,
    grad[0]=-MathPow(x[0],2)*func;
   }
 //+------------------------------------------------------------------+
+//| This callback calculates f(c,x)=exp(-c0*sqr(x0)) and gradient    |
+//| G={df/dc[i]} where x is a position on X-axis and c is adjustable |
+//| parameter.                                                       |
+//| IMPORTANT: gradient is calculated with respect to C, not to X    |
+//+------------------------------------------------------------------+
+void CNDimensional_CX_1_Grad::PGrad(CRowDouble &c,CRowDouble &x,double &func,
+                                    CRowDouble &grad,CObject &obj)
+  {
+   func=MathExp(-c[0]*MathPow(x[0],2));
+   grad.Set(0,-MathPow(x[0],2)*func);
+  }
+//+------------------------------------------------------------------+
 //| Derived class from CNDimensional_PHess                           |
 //+------------------------------------------------------------------+
 class CNDimensional_CX_1_Hess : public CNDimensional_PHess
   {
 public:
    //--- constructor, destructor
-                     CNDimensional_CX_1_Hess(void);
-                    ~CNDimensional_CX_1_Hess(void);
-   //--- method
+                     CNDimensional_CX_1_Hess(void) {}
+                    ~CNDimensional_CX_1_Hess(void) {}
+
    virtual void      PHess(double &c[],double &x[],double &func,double &grad[],CMatrixDouble &hess,CObject &obj);
+   virtual void      PHess(CRowDouble &c,CRowDouble &x,double &func,CRowDouble &grad,CMatrixDouble &hess,CObject &obj);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CNDimensional_CX_1_Hess::CNDimensional_CX_1_Hess(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CNDimensional_CX_1_Hess::~CNDimensional_CX_1_Hess(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| This callback calculates f(c,x)=exp(-c0*sqr(x0)), gradient       |
 //| G={df/dc[i]} and Hessian H={d2f/(dc[i]*dc[j])} where x is a      |
@@ -784,7 +899,22 @@ void CNDimensional_CX_1_Hess::PHess(double &c[],double &x[],double &func,
   {
    func=MathExp(-c[0]*MathPow(x[0],2));
    grad[0]=-MathPow(x[0],2)*func;
-   hess[0].Set(0,MathPow(x[0],4)*func);
+   hess.Set(0,0,MathPow(x[0],4)*func);
+  }
+//+------------------------------------------------------------------+
+//| This callback calculates f(c,x)=exp(-c0*sqr(x0)), gradient       |
+//| G={df/dc[i]} and Hessian H={d2f/(dc[i]*dc[j])} where x is a      |
+//| position on X-axis and c is adjustable parameter.                |
+//| IMPORTANT: gradient/Hessian are calculated with respect to C,    |
+//| not to X                                                         |
+//+------------------------------------------------------------------+
+void CNDimensional_CX_1_Hess::PHess(CRowDouble &c,CRowDouble &x,double &func,
+                                    CRowDouble &grad,CMatrixDouble &hess,
+                                    CObject &obj)
+  {
+   func=MathExp(-c[0]*MathPow(x[0],2));
+   grad.Set(0,-MathPow(x[0],2)*func);
+   hess.Set(0,0,MathPow(x[0],4)*func);
   }
 //+------------------------------------------------------------------+
 //| Derived class from CNDimensional_ODE_RP                          |
@@ -793,25 +923,12 @@ class CNDimensional_ODE_Function_1_Dif : public CNDimensional_ODE_RP
   {
 public:
    //--- constructor, destructor
-                     CNDimensional_ODE_Function_1_Dif(void);
-                    ~CNDimensional_ODE_Function_1_Dif(void);
-   //--- method
+                     CNDimensional_ODE_Function_1_Dif(void) {}
+                    ~CNDimensional_ODE_Function_1_Dif(void) {}
+
    virtual void      ODE_RP(double &y[],double x,double &dy[],CObject &obj);
+   virtual void      ODE_RP(CRowDouble &y,double x,CRowDouble &dy,CObject &obj);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CNDimensional_ODE_Function_1_Dif::CNDimensional_ODE_Function_1_Dif(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CNDimensional_ODE_Function_1_Dif::~CNDimensional_ODE_Function_1_Dif(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| This callback calculates f(y[],x)=-y[0]                          |
 //+------------------------------------------------------------------+
@@ -820,31 +937,24 @@ void CNDimensional_ODE_Function_1_Dif::ODE_RP(double &y[],double x,double &dy[],
    dy[0]=-y[0];
   }
 //+------------------------------------------------------------------+
+//| This callback calculates f(y[],x)=-y[0]                          |
+//+------------------------------------------------------------------+
+void CNDimensional_ODE_Function_1_Dif::ODE_RP(CRowDouble &y,double x,CRowDouble &dy,CObject &obj)
+  {
+   dy.Set(0,-y[0]);
+  }
+//+------------------------------------------------------------------+
 //| Derived class from CIntegrator1_Func                             |
 //+------------------------------------------------------------------+
 class CInt_Function_1_Func : public CIntegrator1_Func
   {
 public:
    //--- constructor, destructor
-                     CInt_Function_1_Func(void);
-                    ~CInt_Function_1_Func(void);
-   //--- method
+                     CInt_Function_1_Func(void) {}
+                    ~CInt_Function_1_Func(void) {}
+
    virtual void      Int_Func(double x,double xminusa,double bminusx,double &y,CObject &obj);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CInt_Function_1_Func::CInt_Function_1_Func(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CInt_Function_1_Func::~CInt_Function_1_Func(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| This callback calculates f(x)=exp(x)                             |
 //+------------------------------------------------------------------+
@@ -858,7 +968,13 @@ void CInt_Function_1_Func::Int_Func(double x,double xminusa,double bminusx,
 //+------------------------------------------------------------------+
 bool Doc_Test_Int(int val,int test_val)
   {
-//--- return result
+   return(val==test_val);
+  }
+//+------------------------------------------------------------------+
+//| A comparison of the two numbers                                  |
+//+------------------------------------------------------------------+
+bool Doc_Test_Bool(bool val,bool test_val)
+  {
    return(val==test_val);
   }
 //+------------------------------------------------------------------+
@@ -867,7 +983,7 @@ bool Doc_Test_Int(int val,int test_val)
 bool Doc_Test_Real(double val,double test_val,double _threshold)
   {
 //--- calculation
-   double s=_threshold>=0 ? 1.0 : MathAbs(test_val);
+   double s=_threshold>=0?1.0:MathAbs(test_val);
    double threshold=MathAbs(_threshold);
 //--- return result
    return(MathAbs(val-test_val)/s<=threshold);
@@ -875,10 +991,10 @@ bool Doc_Test_Real(double val,double test_val,double _threshold)
 //+------------------------------------------------------------------+
 //| A comparison of two numbers with an accuracy                     |
 //+------------------------------------------------------------------+
-bool Doc_Test_Complex(al_complex &val,al_complex &test_val,double _threshold)
+bool Doc_Test_Complex(complex &val,complex &test_val,double _threshold)
   {
 //--- calculation
-   double s=_threshold>=0 ? 1.0 : CMath::AbsComplex(test_val);
+   double s=_threshold>=0?1.0:CMath::AbsComplex(test_val);
    double threshold=MathAbs(_threshold);
 //--- return result
    return(CMath::AbsComplex(val-test_val)/s<=threshold);
@@ -888,13 +1004,41 @@ bool Doc_Test_Complex(al_complex &val,al_complex &test_val,double _threshold)
 //+------------------------------------------------------------------+
 bool Doc_Test_Int_Vector(int &val[],int &test_val[])
   {
-//--- create a variable
-   int i;
 //--- check
    if(CAp::Len(val)!=CAp::Len(test_val))
       return(false);
 //--- comparison
-   for(i=0;i<CAp::Len(val);i++)
+   for(int i=0; i<CAp::Len(val); i++)
+      if(val[i]!=test_val[i])
+         return(false);
+//--- return result
+   return(true);
+  }
+//+------------------------------------------------------------------+
+//| A comparison of two vectors                                      |
+//+------------------------------------------------------------------+
+bool Doc_Test_Int_Vector(CRowInt &val,CRowInt &test_val)
+  {
+//--- check
+   if(CAp::Len(val)!=CAp::Len(test_val))
+      return(false);
+//--- comparison
+   for(int i=0; i<CAp::Len(val); i++)
+      if(val[i]!=test_val[i])
+         return(false);
+//--- return result
+   return(true);
+  }
+//+------------------------------------------------------------------+
+//| A comparison of two vectors                                      |
+//+------------------------------------------------------------------+
+bool Doc_Test_Int_Vector(CRowInt &val,int &test_val[])
+  {
+//--- check
+   if(CAp::Len(val)!=CAp::Len(test_val))
+      return(false);
+//--- comparison
+   for(int i=0; i<CAp::Len(val); i++)
       if(val[i]!=test_val[i])
          return(false);
 //--- return result
@@ -905,8 +1049,6 @@ bool Doc_Test_Int_Vector(int &val[],int &test_val[])
 //+------------------------------------------------------------------+
 bool Doc_Test_Int_Matrix(CMatrixInt &val,CMatrixInt &test_val)
   {
-//--- create variables
-   int i,j;
 //--- check
    if(CAp::Rows(val)!=CAp::Rows(test_val))
       return(false);
@@ -914,9 +1056,9 @@ bool Doc_Test_Int_Matrix(CMatrixInt &val,CMatrixInt &test_val)
    if(CAp::Cols(val)!=CAp::Cols(test_val))
       return(false);
 //--- comparison
-   for(i=0;i<CAp::Rows(val);i++)
-      for(j=0;j<CAp::Cols(val);j++)
-         if(val[i][j]!=test_val[i][j])
+   for(int i=0; i<CAp::Rows(val); i++)
+      for(int j=0; j<CAp::Cols(val); j++)
+         if(val.Get(i,j)!=test_val.Get(i,j))
             return(false);
 //--- return result
    return(true);
@@ -926,15 +1068,73 @@ bool Doc_Test_Int_Matrix(CMatrixInt &val,CMatrixInt &test_val)
 //+------------------------------------------------------------------+
 bool Doc_Test_Real_Vector(double &val[],double &test_val[],double _threshold)
   {
-//--- create a variable
-   int i;
 //--- check
    if(CAp::Len(val)!=CAp::Len(test_val))
       return(false);
 //--- comparison
-   for(i=0;i<CAp::Len(val);i++)
+   for(int i=0; i<CAp::Len(val); i++)
      {
-      double s=_threshold>=0 ? 1.0 : MathAbs(test_val[i]);
+      double s=_threshold>=0?1.0:MathAbs(test_val[i]);
+      double threshold=MathAbs(_threshold);
+      //--- check
+      if(MathAbs(val[i]-test_val[i])/s>threshold)
+         return(false);
+     }
+//--- return result
+   return(true);
+  }
+//+------------------------------------------------------------------+
+//| A comparison of two vectors with an accuracy                     |
+//+------------------------------------------------------------------+
+bool Doc_Test_Real_Vector(CRowDouble &val,CRowDouble &test_val,double _threshold)
+  {
+//--- check
+   if(CAp::Len(val)!=CAp::Len(test_val))
+      return(false);
+//--- comparison
+   for(int i=0; i<CAp::Len(val); i++)
+     {
+      double s=_threshold>=0?1.0:MathAbs(test_val[i]);
+      double threshold=MathAbs(_threshold);
+      //--- check
+      if(MathAbs(val[i]-test_val[i])/s>threshold)
+         return(false);
+     }
+//--- return result
+   return(true);
+  }
+//+------------------------------------------------------------------+
+//| A comparison of two vectors with an accuracy                     |
+//+------------------------------------------------------------------+
+bool Doc_Test_Real_Vector(CRowDouble &val,double &test_val[],double _threshold)
+  {
+//--- check
+   if(CAp::Len(val)!=CAp::Len(test_val))
+      return(false);
+//--- comparison
+   for(int i=0; i<CAp::Len(val); i++)
+     {
+      double s=_threshold>=0?1.0:MathAbs(test_val[i]);
+      double threshold=MathAbs(_threshold);
+      //--- check
+      if(MathAbs(val[i]-test_val[i])/s>threshold)
+         return(false);
+     }
+//--- return result
+   return(true);
+  }
+//+------------------------------------------------------------------+
+//| A comparison of two vectors with an accuracy                     |
+//+------------------------------------------------------------------+
+bool Doc_Test_Real_Vector(CRowDouble &val,vector<double> &test_val,double _threshold)
+  {
+//--- check
+   if(CAp::Len(val)!=(int)test_val.Size())
+      return(false);
+//--- comparison
+   for(int i=0; i<CAp::Len(val); i++)
+     {
+      double s=_threshold>=0?1.0:MathAbs(test_val[i]);
       double threshold=MathAbs(_threshold);
       //--- check
       if(MathAbs(val[i]-test_val[i])/s>threshold)
@@ -948,8 +1148,6 @@ bool Doc_Test_Real_Vector(double &val[],double &test_val[],double _threshold)
 //+------------------------------------------------------------------+
 bool Doc_Test_Real_Matrix(CMatrixDouble &val,CMatrixDouble &test_val,double _threshold)
   {
-//--- create variables
-   int i,j;
 //--- check
    if(CAp::Rows(val)!=CAp::Rows(test_val))
       return(false);
@@ -957,13 +1155,13 @@ bool Doc_Test_Real_Matrix(CMatrixDouble &val,CMatrixDouble &test_val,double _thr
    if(CAp::Cols(val)!=CAp::Cols(test_val))
       return(false);
 //--- comparison
-   for(i=0;i<CAp::Rows(val);i++)
-      for(j=0;j<CAp::Cols(val);j++)
+   for(int i=0; i<CAp::Rows(val); i++)
+      for(int j=0; j<CAp::Cols(val); j++)
         {
-         double s=_threshold>=0 ? 1.0 : MathAbs(test_val[i][j]);
+         double s=_threshold>=0?1.0:MathAbs(test_val.Get(i,j));
          double threshold=MathAbs(_threshold);
          //--- check
-         if(MathAbs(val[i][j]-test_val[i][j])/s>threshold)
+         if(MathAbs(val.Get(i,j)-test_val.Get(i,j))/s>threshold)
             return(false);
         }
 //--- return result
@@ -972,17 +1170,39 @@ bool Doc_Test_Real_Matrix(CMatrixDouble &val,CMatrixDouble &test_val,double _thr
 //+------------------------------------------------------------------+
 //| A comparison of two vectors with an accuracy                     |
 //+------------------------------------------------------------------+
-bool Doc_Test_Complex_Vector(al_complex &val[],al_complex &test_val[],double _threshold)
+bool Doc_Test_Real_Matrix(CMatrixDouble &val,matrix<double> &test_val,double _threshold)
   {
-//--- create a variable
-   int i;
+//--- check
+   if(CAp::Rows(val)!=test_val.Rows())
+      return(false);
+//--- check
+   if(CAp::Cols(val)!=test_val.Cols())
+      return(false);
+//--- comparison
+   for(int i=0; i<CAp::Rows(val); i++)
+      for(int j=0; j<CAp::Cols(val); j++)
+        {
+         double s=_threshold>=0?1.0:MathAbs(test_val[i,j]);
+         double threshold=MathAbs(_threshold);
+         //--- check
+         if(MathAbs(val.Get(i,j)-test_val[i,j])/s>threshold)
+            return(false);
+        }
+//--- return result
+   return(true);
+  }
+//+------------------------------------------------------------------+
+//| A comparison of two vectors with an accuracy                     |
+//+------------------------------------------------------------------+
+bool Doc_Test_Complex_Vector(complex    &val[],complex    &test_val[],double _threshold)
+  {
 //--- check
    if(CAp::Len(val)!=CAp::Len(test_val))
       return(false);
 //--- comparison
-   for(i=0;i<CAp::Len(val);i++)
+   for(int i=0; i<CAp::Len(val); i++)
      {
-      double s=_threshold>=0 ? 1.0 : CMath::AbsComplex(test_val[i]);
+      double s=_threshold>=0?1.0:CMath::AbsComplex(test_val[i]);
       double threshold=MathAbs(_threshold);
       //--- check
       if(CMath::AbsComplex(val[i]-test_val[i])/s>threshold)
@@ -996,8 +1216,6 @@ bool Doc_Test_Complex_Vector(al_complex &val[],al_complex &test_val[],double _th
 //+------------------------------------------------------------------+
 bool Doc_Test_Complex_Matrix(CMatrixComplex &val,CMatrixComplex &test_val,double _threshold)
   {
-//--- create variables
-   int i,j;
 //--- check
    if(CAp::Rows(val)!=CAp::Rows(test_val))
       return(false);
@@ -1005,13 +1223,13 @@ bool Doc_Test_Complex_Matrix(CMatrixComplex &val,CMatrixComplex &test_val,double
    if(CAp::Cols(val)!=CAp::Cols(test_val))
       return(false);
 //--- comparison
-   for(i=0;i<CAp::Rows(val);i++)
-      for(j=0;j<CAp::Cols(val);j++)
+   for(int i=0; i<CAp::Rows(val); i++)
+      for(int j=0; j<CAp::Cols(val); j++)
         {
-         double s=_threshold>=0 ? 1.0 : CMath::AbsComplex(test_val[i][j]);
+         double s=_threshold>=0?1.0:CMath::AbsComplex(test_val.Get(i,j));
          double threshold=MathAbs(_threshold);
          //--- check
-         if(CMath::AbsComplex(val[i][j]-test_val[i][j])/s>threshold)
+         if(CMath::AbsComplex(val.Get(i,j)-test_val.Get(i,j))/s>threshold)
             return(false);
         }
 //--- return result
@@ -1044,15 +1262,27 @@ void Spoil_Vector_By_Adding_Element(double &x[])
 //+------------------------------------------------------------------+
 //| Add to the vector random element                                 |
 //+------------------------------------------------------------------+
-void Spoil_Vector_By_Adding_Element(al_complex &x[])
+void Spoil_Vector_By_Adding_Element(CRowDouble &x)
+  {
+//--- size calculation
+   int n=x.Size();
+//--- increasing the length of the vector
+   x.Resize(n+1);
+//--- set value
+   x.Set(n,CMath::RandomReal());
+  }
+//+------------------------------------------------------------------+
+//| Add to the vector random element                                 |
+//+------------------------------------------------------------------+
+void Spoil_Vector_By_Adding_Element(complex    &x[])
   {
 //--- size calculation
    int n=ArraySize(x);
 //--- increasing the length of the vector
    ArrayResize(x,n+1);
 //--- set value
-   x[n].re=CMath::RandomReal();
-   x[n].im=CMath::RandomReal();
+   x[n].real=CMath::RandomReal();
+   x[n].imag=CMath::RandomReal();
   }
 //+------------------------------------------------------------------+
 //| Removing the number of vector                                    |
@@ -1072,12 +1302,33 @@ void Spoil_Vector_By_Deleting_Element(double &x[])
 //--- size calculation
    int n=ArraySize(x);
 //--- reduction length of the vector
-   ArrayResize(x,n-1);
+   ResetLastError();
+   CAp::Assert(ArrayResize(x,n-1)==n-1,StringFormat("%s: error of resize array: %6d",__FUNCTION__,GetLastError()));
   }
 //+------------------------------------------------------------------+
 //| Removing the number of vector                                    |
 //+------------------------------------------------------------------+
-void Spoil_Vector_By_Deleting_Element(al_complex &x[])
+void Spoil_Vector_By_Deleting_Element(CRowDouble &x)
+  {
+//--- size calculation
+   int n=x.Size();
+//--- reduction length of the vector
+   x.Resize(n-1);
+  }
+//+------------------------------------------------------------------+
+//| Removing the number of vector                                    |
+//+------------------------------------------------------------------+
+void Spoil_Vector_By_Deleting_Element(CRowInt &x)
+  {
+//--- size calculation
+   int n=x.Size();
+//--- reduction length of the vector
+   x.Resize(n-1);
+  }
+//+------------------------------------------------------------------+
+//| Removing the number of vector                                    |
+//+------------------------------------------------------------------+
+void Spoil_Vector_By_Deleting_Element(complex    &x[])
   {
 //--- size calculation
    int n=ArraySize(x);
@@ -1095,8 +1346,8 @@ void Spoil_Matrix_By_Adding_Row(CMatrixInt &x)
 //--- increase the dimension
    x.Resize(n+1,m);
 //--- set values
-   for(int i=0;i<m;i++)
-      x[n].Set(i,MathRand());
+   for(int i=0; i<m; i++)
+      x.Set(n,i,MathRand());
   }
 //+------------------------------------------------------------------+
 //| Add a row in the matrix                                          |
@@ -1109,8 +1360,8 @@ void Spoil_Matrix_By_Adding_Row(CMatrixDouble &x)
 //--- increase the dimension
    x.Resize(n+1,m);
 //--- set values
-   for(int i=0;i<m;i++)
-      x[n].Set(i,CMath::RandomReal());
+   for(int i=0; i<m; i++)
+      x.Set(n,i,CMath::RandomReal());
   }
 //+------------------------------------------------------------------+
 //| Add a row in the matrix                                          |
@@ -1123,10 +1374,10 @@ void Spoil_Matrix_By_Adding_Row(CMatrixComplex &x)
 //--- increase the dimension
    x.Resize(n+1,m);
 //--- set values
-   for(int i=0;i<m;i++)
+   for(int i=0; i<m; i++)
      {
-      x[n].SetRe(i,CMath::RandomReal());
-      x[n].SetIm(i,CMath::RandomReal());
+      x.SetRe(n,i,CMath::RandomReal());
+      x.SetIm(n,i,CMath::RandomReal());
      }
   }
 //+------------------------------------------------------------------+
@@ -1173,8 +1424,8 @@ void Spoil_Matrix_By_Adding_Col(CMatrixInt &x)
 //--- increase the dimension
    x.Resize(n,m+1);
 //--- set values
-   for(int i=0;i<m;i++)
-      x[i].Set(m,MathRand());
+   for(int i=0; i<m; i++)
+      x.Set(i,m,MathRand());
   }
 //+------------------------------------------------------------------+
 //| Add a col in the matrix                                          |
@@ -1187,8 +1438,8 @@ void Spoil_Matrix_By_Adding_Col(CMatrixDouble &x)
 //--- increase the dimension
    x.Resize(n,m+1);
 //--- set values
-   for(int i=0;i<m;i++)
-      x[i].Set(m,CMath::RandomReal());
+   for(int i=0; i<m; i++)
+      x.Set(i,m,CMath::RandomReal());
   }
 //+------------------------------------------------------------------+
 //| Add a col in the matrix                                          |
@@ -1201,10 +1452,10 @@ void Spoil_Matrix_By_Adding_Col(CMatrixComplex &x)
 //--- increase the dimension
    x.Resize(n,m+1);
 //--- set values
-   for(int i=0;i<m;i++)
+   for(int i=0; i<m; i++)
      {
-      x[i].SetRe(m,CMath::RandomReal());
-      x[i].SetIm(m,CMath::RandomReal());
+      x.SetRe(i,m,CMath::RandomReal());
+      x.SetIm(i,m,CMath::RandomReal());
      }
   }
 //+------------------------------------------------------------------+
@@ -1265,7 +1516,18 @@ void Spoil_Vector_By_Value(double &x[],double val)
 //+------------------------------------------------------------------+
 //| Set number to a random position                                  |
 //+------------------------------------------------------------------+
-void Spoil_Vector_By_Value(al_complex &x[],al_complex &val)
+void Spoil_Vector_By_Value(CRowDouble &x,double val)
+  {
+//--- size calculation
+   int n=x.Size();
+//--- set value
+   if(n!=0)
+      x.Set(CMath::RandomInteger(n),val);
+  }
+//+------------------------------------------------------------------+
+//| Set number to a random position                                  |
+//+------------------------------------------------------------------+
+void Spoil_Vector_By_Value(complex    &x[],complex    &val)
   {
 //--- size calculation
    int n=ArraySize(x);
@@ -1283,7 +1545,7 @@ void Spoil_Matrix_By_Value(CMatrixInt &x,int val)
    int m=CAp::Cols(x);
 //--- set value
    if(n!=0 && m!=0)
-      x[CMath::RandomInteger(n)].Set(CMath::RandomInteger(m),val);
+      x.Set(CMath::RandomInteger(n),CMath::RandomInteger(m),val);
   }
 //+------------------------------------------------------------------+
 //| Set number to a random position                                  |
@@ -1295,19 +1557,19 @@ void Spoil_Matrix_By_Value(CMatrixDouble &x,double val)
    int m=CAp::Cols(x);
 //--- set value
    if(n!=0 && m!=0)
-      x[CMath::RandomInteger(n)].Set(CMath::RandomInteger(m),val);
+      x.Set(CMath::RandomInteger(n),CMath::RandomInteger(m),val);
   }
 //+------------------------------------------------------------------+
 //| Set number to a random position                                  |
 //+------------------------------------------------------------------+
-void Spoil_Matrix_By_Value(CMatrixComplex &x,al_complex &val)
+void Spoil_Matrix_By_Value(CMatrixComplex &x,complex    &val)
   {
 //--- get cols and rows
    int n=CAp::Rows(x);
    int m=CAp::Cols(x);
 //--- set value
    if(n!=0 && m!=0)
-      x[CMath::RandomInteger(n)].Set(CMath::RandomInteger(m),val);
+      x.Set(CMath::RandomInteger(n),CMath::RandomInteger(m),val);
   }
 //+------------------------------------------------------------------+
 //| Function test and exception handling                             |
@@ -1344,19 +1606,19 @@ void TEST_NNeighbor_D_1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResul
    int           k;
    CMatrixDouble tempmatrix;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<3;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<3; _spoil_scenario++)
      {
       //--- allocation
       a.Resize(4,2);
       //--- initialization
-      a[0].Set(0,0);
-      a[0].Set(1,0);
-      a[1].Set(0,0);
-      a[1].Set(1,1);
-      a[2].Set(0,1);
-      a[2].Set(1,0);
-      a[3].Set(0,1);
-      a[3].Set(1,1);
+      a.Set(0,0,0);
+      a.Set(0,1,0);
+      a.Set(1,0,0);
+      a.Set(1,1,1);
+      a.Set(2,0,1);
+      a.Set(2,1,0);
+      a.Set(3,0,1);
+      a.Set(3,1,1);
       //--- check
       if(_spoil_scenario==0)
          Spoil_Matrix_By_Value(a,CInfOrNaN::NaN());
@@ -1395,15 +1657,15 @@ void TEST_NNeighbor_D_1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResul
       //--- allocation
       tempmatrix.Resize(1,2);
       //--- initialization
-      tempmatrix[0].Set(0,0);
-      tempmatrix[0].Set(1,0);
+      tempmatrix.Set(0,0,0);
+      tempmatrix.Set(0,1,0);
       //--- check result
       _TestResult=_TestResult && Doc_Test_Real_Matrix(r,tempmatrix,0.05);
       _TestResult=_TestResult && (_spoil_scenario==-1);
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","nneighbor_d_1");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -1426,19 +1688,19 @@ void TEST_NNeighbor_T_2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResul
    int           k;
    CMatrixDouble tempmatrix;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<3;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<3; _spoil_scenario++)
      {
       //--- allocation
       a.Resize(4,2);
       //--- initialization
-      a[0].Set(0,0);
-      a[0].Set(1,0);
-      a[1].Set(0,0);
-      a[1].Set(1,1);
-      a[2].Set(0,1);
-      a[2].Set(1,0);
-      a[3].Set(0,1);
-      a[3].Set(1,1);
+      a.Set(0,0,0);
+      a.Set(0,1,0);
+      a.Set(1,0,0);
+      a.Set(1,1,1);
+      a.Set(2,0,1);
+      a.Set(2,1,0);
+      a.Set(3,0,1);
+      a.Set(3,1,1);
       //--- check
       if(_spoil_scenario==0)
          Spoil_Matrix_By_Value(a,CInfOrNaN::NaN());
@@ -1479,10 +1741,10 @@ void TEST_NNeighbor_T_2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResul
       //--- allocation
       tempmatrix.Resize(2,2);
       //--- initialization
-      tempmatrix[0].Set(0,1);
-      tempmatrix[0].Set(1,0);
-      tempmatrix[1].Set(0,1);
-      tempmatrix[1].Set(1,1);
+      tempmatrix.Set(0,0,1);
+      tempmatrix.Set(0,1,0);
+      tempmatrix.Set(1,0,1);
+      tempmatrix.Set(1,1,1);
       //--- check result
       _TestResult=_TestResult && Doc_Test_Real_Matrix(rx,tempmatrix,0.05);
       //--- allocation
@@ -1505,17 +1767,17 @@ void TEST_NNeighbor_T_2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResul
       //--- allocation
       tempmatrix.Resize(2,2);
       //--- initialization
-      tempmatrix[0].Set(0,0);
-      tempmatrix[0].Set(1,0);
-      tempmatrix[1].Set(0,1);
-      tempmatrix[1].Set(1,1);
+      tempmatrix.Set(0,0,0);
+      tempmatrix.Set(0,1,0);
+      tempmatrix.Set(1,0,1);
+      tempmatrix.Set(1,1,1);
       //--- check result
       _TestResult=_TestResult && Doc_Test_Real_Matrix(rx,tempmatrix,0.05);
       _TestResult=_TestResult && (_spoil_scenario==-1);
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","nneighbor_t_2");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -1538,19 +1800,19 @@ void TEST_NNeighbor_D_2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResul
    CMatrixDouble r1;
    CMatrixDouble tempmatrix;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<3;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<3; _spoil_scenario++)
      {
       //--- allocation
       a.Resize(4,2);
       //--- initialization
-      a[0].Set(0,0);
-      a[0].Set(1,0);
-      a[1].Set(0,0);
-      a[1].Set(1,1);
-      a[2].Set(0,1);
-      a[2].Set(1,0);
-      a[3].Set(0,1);
-      a[3].Set(1,1);
+      a.Set(0,0,0);
+      a.Set(0,1,0);
+      a.Set(1,0,0);
+      a.Set(1,1,1);
+      a.Set(2,0,1);
+      a.Set(2,1,0);
+      a.Set(3,0,1);
+      a.Set(3,1,1);
       //--- check
       if(_spoil_scenario==0)
          Spoil_Matrix_By_Value(a,CInfOrNaN::NaN());
@@ -1610,22 +1872,22 @@ void TEST_NNeighbor_D_2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResul
       //--- allocation
       tempmatrix.Resize(1,2);
       //--- initialization
-      tempmatrix[0].Set(0,0);
-      tempmatrix[0].Set(1,0);
+      tempmatrix.Set(0,0,0);
+      tempmatrix.Set(0,1,0);
       //--- check result
       _TestResult=_TestResult && Doc_Test_Real_Matrix(r0,tempmatrix,0.05);
       //--- allocation
       tempmatrix.Resize(1,2);
       //--- initialization
-      tempmatrix[0].Set(0,0);
-      tempmatrix[0].Set(1,0);
+      tempmatrix.Set(0,0,0);
+      tempmatrix.Set(0,1,0);
       //--- check result
       _TestResult=_TestResult && Doc_Test_Real_Matrix(r1,tempmatrix,0.05);
       _TestResult=_TestResult && (_spoil_scenario==-1);
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","nneighbor_d_2");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -1645,12 +1907,12 @@ void TEST_BaseStat_D_Base(int &_spoil_scenario,bool &_TestResult,bool &_TotalRes
    double p;
    double v;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<6;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<6; _spoil_scenario++)
      {
       //--- allocation
       ArrayResize(x,10);
       //--- initialization
-      for(int i=0;i<10;i++)
+      for(int i=0; i<10; i++)
          x[i]=i*i;
       //--- check
       if(_spoil_scenario==0)
@@ -1707,7 +1969,7 @@ void TEST_BaseStat_D_Base(int &_spoil_scenario,bool &_TestResult,bool &_TotalRes
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","basestat_d_base");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -1722,12 +1984,12 @@ void TEST_BaseStat_D_C2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResul
    double y[];
    double v;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<10;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<10; _spoil_scenario++)
      {
       //--- We have two samples - x and y,and want to measure dependency between them
       ArrayResize(x,10);
       //--- initialization
-      for(int i=0;i<10;i++)
+      for(int i=0; i<10; i++)
          x[i]=i*i;
       //--- check
       if(_spoil_scenario==0)
@@ -1747,7 +2009,7 @@ void TEST_BaseStat_D_C2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResul
       //--- allocation
       ArrayResize(y,10);
       //--- initialization
-      for(int i=0;i<10;i++)
+      for(int i=0; i<10; i++)
          y[i]=i;
       //--- check
       if(_spoil_scenario==5)
@@ -1792,7 +2054,7 @@ void TEST_BaseStat_D_C2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResul
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","basestat_d_c2");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -1807,28 +2069,28 @@ void TEST_BaseStat_D_CM(int &_spoil_scenario,bool &_TestResult,bool &_TotalResul
    CMatrixDouble c;
    CMatrixDouble tempmatrix;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<3;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<3; _spoil_scenario++)
      {
       //--- X is a sample matrix:
       //--- * I-th row corresponds to I-th observation
       //--- * J-th column corresponds to J-th variable
       x.Resize(5,3);
       //--- initialization
-      x[0].Set(0,1);
-      x[0].Set(1,0);
-      x[0].Set(2,1);
-      x[1].Set(0,1);
-      x[1].Set(1,1);
-      x[1].Set(2,0);
-      x[2].Set(0,-1);
-      x[2].Set(1,1);
-      x[2].Set(2,0);
-      x[3].Set(0,-2);
-      x[3].Set(1,-1);
-      x[3].Set(2,1);
-      x[4].Set(0,-1);
-      x[4].Set(1,0);
-      x[4].Set(2,9);
+      x.Set(0,0,1);
+      x.Set(0,1,0);
+      x.Set(0,2,1);
+      x.Set(1,0,1);
+      x.Set(1,1,1);
+      x.Set(1,2,0);
+      x.Set(2,0,-1);
+      x.Set(2,1,1);
+      x.Set(2,2,0);
+      x.Set(3,0,-2);
+      x.Set(3,1,-1);
+      x.Set(3,2,1);
+      x.Set(4,0,-1);
+      x.Set(4,1,0);
+      x.Set(4,2,9);
       //--- check
       if(_spoil_scenario==0)
          Spoil_Matrix_By_Value(x,CInfOrNaN::NaN());
@@ -1851,15 +2113,15 @@ void TEST_BaseStat_D_CM(int &_spoil_scenario,bool &_TestResult,bool &_TotalResul
       //--- allocation
       tempmatrix.Resize(3,3);
       //--- initialization
-      tempmatrix[0].Set(0,1.8);
-      tempmatrix[0].Set(1,0.6);
-      tempmatrix[0].Set(2,-1.4);
-      tempmatrix[1].Set(0,0.6);
-      tempmatrix[1].Set(1,0.7);
-      tempmatrix[1].Set(2,-0.8);
-      tempmatrix[2].Set(0,-1.4);
-      tempmatrix[2].Set(1,-0.8);
-      tempmatrix[2].Set(2,14.7);
+      tempmatrix.Set(0,0,1.8);
+      tempmatrix.Set(0,1,0.6);
+      tempmatrix.Set(0,2,-1.4);
+      tempmatrix.Set(1,0,0.6);
+      tempmatrix.Set(1,1,0.7);
+      tempmatrix.Set(1,2,-0.8);
+      tempmatrix.Set(2,0,-1.4);
+      tempmatrix.Set(2,1,-0.8);
+      tempmatrix.Set(2,2,14.7);
       //--- check result
       _TestResult=_TestResult && Doc_Test_Real_Matrix(c,tempmatrix,0.01);
       //--- function call
@@ -1870,15 +2132,15 @@ void TEST_BaseStat_D_CM(int &_spoil_scenario,bool &_TestResult,bool &_TotalResul
       //--- allocation
       tempmatrix.Resize(3,3);
       //--- initialization
-      tempmatrix[0].Set(0,1);
-      tempmatrix[0].Set(1,0.535);
-      tempmatrix[0].Set(2,-0.272);
-      tempmatrix[1].Set(0,0.535);
-      tempmatrix[1].Set(1,1);
-      tempmatrix[1].Set(2,-0.249);
-      tempmatrix[2].Set(0,-0.272);
-      tempmatrix[2].Set(1,-0.249);
-      tempmatrix[2].Set(2,1);
+      tempmatrix.Set(0,0,1);
+      tempmatrix.Set(0,1,0.535);
+      tempmatrix.Set(0,2,-0.272);
+      tempmatrix.Set(1,0,0.535);
+      tempmatrix.Set(1,1,1);
+      tempmatrix.Set(1,2,-0.249);
+      tempmatrix.Set(2,0,-0.272);
+      tempmatrix.Set(2,1,-0.249);
+      tempmatrix.Set(2,2,1);
       //--- check result
       _TestResult=_TestResult && Doc_Test_Real_Matrix(c,tempmatrix,0.01);
       //--- function call
@@ -1889,22 +2151,22 @@ void TEST_BaseStat_D_CM(int &_spoil_scenario,bool &_TestResult,bool &_TotalResul
       //--- allocation
       tempmatrix.Resize(3,3);
       //--- initialization
-      tempmatrix[0].Set(0,1);
-      tempmatrix[0].Set(1,0.556);
-      tempmatrix[0].Set(2,-0.306);
-      tempmatrix[1].Set(0,0.556);
-      tempmatrix[1].Set(1,1);
-      tempmatrix[1].Set(2,-0.75);
-      tempmatrix[2].Set(0,-0.306);
-      tempmatrix[2].Set(1,-0.75);
-      tempmatrix[2].Set(2,1);
+      tempmatrix.Set(0,0,1);
+      tempmatrix.Set(0,1,0.556);
+      tempmatrix.Set(0,2,-0.306);
+      tempmatrix.Set(1,0,0.556);
+      tempmatrix.Set(1,1,1);
+      tempmatrix.Set(1,2,-0.75);
+      tempmatrix.Set(2,0,-0.306);
+      tempmatrix.Set(2,1,-0.75);
+      tempmatrix.Set(2,2,1);
       //--- check result
       _TestResult=_TestResult && Doc_Test_Real_Matrix(c,tempmatrix,0.01);
       _TestResult=_TestResult && (_spoil_scenario==-1);
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","basestat_d_cm");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -1919,28 +2181,28 @@ void TEST_BaseStat_D_CM2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResu
    CMatrixDouble y;
    CMatrixDouble tempmatrix;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<6;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<6; _spoil_scenario++)
      {
       //--- X and Y are sample matrices:
       //--- * I-th row corresponds to I-th observation
       //--- * J-th column corresponds to J-th variable
       x.Resize(5,3);
       //--- initialization
-      x[0].Set(0,1);
-      x[0].Set(1,0);
-      x[0].Set(2,1);
-      x[1].Set(0,1);
-      x[1].Set(1,1);
-      x[1].Set(2,0);
-      x[2].Set(0,-1);
-      x[2].Set(1,1);
-      x[2].Set(2,0);
-      x[3].Set(0,-2);
-      x[3].Set(1,-1);
-      x[3].Set(2,1);
-      x[4].Set(0,-1);
-      x[4].Set(1,0);
-      x[4].Set(2,9);
+      x.Set(0,0,1);
+      x.Set(0,1,0);
+      x.Set(0,2,1);
+      x.Set(1,0,1);
+      x.Set(1,1,1);
+      x.Set(1,2,0);
+      x.Set(2,0,-1);
+      x.Set(2,1,1);
+      x.Set(2,2,0);
+      x.Set(3,0,-2);
+      x.Set(3,1,-1);
+      x.Set(3,2,1);
+      x.Set(4,0,-1);
+      x.Set(4,1,0);
+      x.Set(4,2,9);
       //--- check
       if(_spoil_scenario==0)
          Spoil_Matrix_By_Value(x,CInfOrNaN::NaN());
@@ -1953,16 +2215,16 @@ void TEST_BaseStat_D_CM2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResu
       //--- allocation
       y.Resize(5,2);
       //--- initialization
-      y[0].Set(0,2);
-      y[0].Set(1,3);
-      y[1].Set(0,2);
-      y[1].Set(1,1);
-      y[2].Set(0,-1);
-      y[2].Set(1,6);
-      y[3].Set(0,-9);
-      y[3].Set(1,9);
-      y[4].Set(0,7);
-      y[4].Set(1,1);
+      y.Set(0,0,2);
+      y.Set(0,1,3);
+      y.Set(1,0,2);
+      y.Set(1,1,1);
+      y.Set(2,0,-1);
+      y.Set(2,1,6);
+      y.Set(3,0,-9);
+      y.Set(3,1,9);
+      y.Set(4,0,7);
+      y.Set(4,1,1);
       //--- check
       if(_spoil_scenario==3)
          Spoil_Matrix_By_Value(y,CInfOrNaN::NaN());
@@ -1986,12 +2248,12 @@ void TEST_BaseStat_D_CM2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResu
       //--- allocation
       tempmatrix.Resize(3,2);
       //--- initialization
-      tempmatrix[0].Set(0,4.1);
-      tempmatrix[0].Set(1,-3.25);
-      tempmatrix[1].Set(0,2.45);
-      tempmatrix[1].Set(1,-1.5);
-      tempmatrix[2].Set(0,13.45);
-      tempmatrix[2].Set(1,-5.75);
+      tempmatrix.Set(0,0,4.1);
+      tempmatrix.Set(0,1,-3.25);
+      tempmatrix.Set(1,0,2.45);
+      tempmatrix.Set(1,1,-1.5);
+      tempmatrix.Set(2,0,13.45);
+      tempmatrix.Set(2,1,-5.75);
       //--- check result
       _TestResult=_TestResult && Doc_Test_Real_Matrix(c,tempmatrix,0.01);
       //--- function call
@@ -2002,12 +2264,12 @@ void TEST_BaseStat_D_CM2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResu
       //--- allocation
       tempmatrix.Resize(3,2);
       //--- initialization
-      tempmatrix[0].Set(0,0.519);
-      tempmatrix[0].Set(1,-0.699);
-      tempmatrix[1].Set(0,0.497);
-      tempmatrix[1].Set(1,-0.518);
-      tempmatrix[2].Set(0,0.596);
-      tempmatrix[2].Set(1,-0.433);
+      tempmatrix.Set(0,0,0.519);
+      tempmatrix.Set(0,1,-0.699);
+      tempmatrix.Set(1,0,0.497);
+      tempmatrix.Set(1,1,-0.518);
+      tempmatrix.Set(2,0,0.596);
+      tempmatrix.Set(2,1,-0.433);
       //--- check result
       _TestResult=_TestResult && Doc_Test_Real_Matrix(c,tempmatrix,0.01);
       //--- function call
@@ -2018,19 +2280,19 @@ void TEST_BaseStat_D_CM2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResu
       //--- allocation
       tempmatrix.Resize(3,2);
       //--- initialization
-      tempmatrix[0].Set(0,0.541);
-      tempmatrix[0].Set(1,-0.649);
-      tempmatrix[1].Set(0,0.216);
-      tempmatrix[1].Set(1,-0.433);
-      tempmatrix[2].Set(0,0.433);
-      tempmatrix[2].Set(1,-0.135);
+      tempmatrix.Set(0,0,0.541);
+      tempmatrix.Set(0,1,-0.649);
+      tempmatrix.Set(1,0,0.216);
+      tempmatrix.Set(1,1,-0.433);
+      tempmatrix.Set(2,0,0.433);
+      tempmatrix.Set(2,1,-0.135);
       //--- check result
       _TestResult=_TestResult && Doc_Test_Real_Matrix(c,tempmatrix,0.01);
       _TestResult=_TestResult && (_spoil_scenario==-1);
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","basestat_d_cm2");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -2057,12 +2319,12 @@ void TEST_BaseStat_T_Base(int &_spoil_scenario,bool &_TestResult,bool &_TotalRes
    double x7[];
    double x8[];
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<34;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<34; _spoil_scenario++)
      {
       //--- first,we test short form of functions
       ArrayResize(x1,10);
       //--- initialization
-      for(int i=0;i<10;i++)
+      for(int i=0; i<10; i++)
          x1[i]=i*i;
       //--- check
       if(_spoil_scenario==0)
@@ -2081,7 +2343,7 @@ void TEST_BaseStat_T_Base(int &_spoil_scenario,bool &_TestResult,bool &_TotalRes
       //--- allocation
       ArrayResize(x2,10);
       //--- initialization
-      for(int i=0;i<10;i++)
+      for(int i=0; i<10; i++)
          x2[i]=i*i;
       //--- check
       if(_spoil_scenario==3)
@@ -2100,7 +2362,7 @@ void TEST_BaseStat_T_Base(int &_spoil_scenario,bool &_TestResult,bool &_TotalRes
       //--- allocation
       ArrayResize(x3,10);
       //--- initialization
-      for(int i=0;i<10;i++)
+      for(int i=0; i<10; i++)
          x3[i]=i*i;
       //--- check
       if(_spoil_scenario==6)
@@ -2119,7 +2381,7 @@ void TEST_BaseStat_T_Base(int &_spoil_scenario,bool &_TestResult,bool &_TotalRes
       //--- allocation
       ArrayResize(x4,10);
       //--- initialization
-      for(int i=0;i<10;i++)
+      for(int i=0; i<10; i++)
          x4[i]=i*i;
       //--- check
       if(_spoil_scenario==9)
@@ -2149,7 +2411,7 @@ void TEST_BaseStat_T_Base(int &_spoil_scenario,bool &_TestResult,bool &_TotalRes
       //--- and then we test full form
       ArrayResize(x5,10);
       //--- initialization
-      for(int i=0;i<10;i++)
+      for(int i=0; i<10; i++)
          x5[i]=i*i;
       //--- check
       if(_spoil_scenario==15)
@@ -2171,7 +2433,7 @@ void TEST_BaseStat_T_Base(int &_spoil_scenario,bool &_TestResult,bool &_TotalRes
       //--- allocation
       ArrayResize(x6,10);
       //--- initialization
-      for(int i=0;i<10;i++)
+      for(int i=0; i<10; i++)
          x6[i]=i*i;
       //--- check
       if(_spoil_scenario==19)
@@ -2193,7 +2455,7 @@ void TEST_BaseStat_T_Base(int &_spoil_scenario,bool &_TestResult,bool &_TotalRes
       //--- allocation
       ArrayResize(x7,10);
       //--- initialization
-      for(int i=0;i<10;i++)
+      for(int i=0; i<10; i++)
          x7[i]=i*i;
       //--- check
       if(_spoil_scenario==23)
@@ -2215,7 +2477,7 @@ void TEST_BaseStat_T_Base(int &_spoil_scenario,bool &_TestResult,bool &_TotalRes
       //--- allocation
       ArrayResize(x8,10);
       //--- initialization
-      for(int i=0;i<10;i++)
+      for(int i=0; i<10; i++)
          x8[i]=i*i;
       //--- check
       if(_spoil_scenario==27)
@@ -2250,7 +2512,7 @@ void TEST_BaseStat_T_Base(int &_spoil_scenario,bool &_TestResult,bool &_TotalRes
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","basestat_t_base");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -2261,7 +2523,7 @@ void TEST_BaseStat_T_CovCorr(int &_spoil_scenario,bool &_TestResult,bool &_Total
   {
    _TestResult=true;
 //--- create variables
-   double v;
+   double        v;
    CMatrixDouble c;
    double        x1[];
    double        x2[];
@@ -2294,12 +2556,12 @@ void TEST_BaseStat_T_CovCorr(int &_spoil_scenario,bool &_TestResult,bool &_Total
    CMatrixDouble y14;
    CMatrixDouble y15;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<126;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<126; _spoil_scenario++)
      {
       //--- 2-sample short-form cov/corr are tested
       ArrayResize(x1,10);
       //--- initialization
-      for(int i=0;i<10;i++)
+      for(int i=0; i<10; i++)
          x1[i]=i*i;
       //--- check
       if(_spoil_scenario==0)
@@ -2319,7 +2581,7 @@ void TEST_BaseStat_T_CovCorr(int &_spoil_scenario,bool &_TestResult,bool &_Total
       //--- allocation
       ArrayResize(y1,10);
       //--- initialization
-      for(int i=0;i<10;i++)
+      for(int i=0; i<10; i++)
          y1[i]=i;
       //--- check
       if(_spoil_scenario==5)
@@ -2344,7 +2606,7 @@ void TEST_BaseStat_T_CovCorr(int &_spoil_scenario,bool &_TestResult,bool &_Total
       //--- allocation
       ArrayResize(x2,10);
       //--- initialization
-      for(int i=0;i<10;i++)
+      for(int i=0; i<10; i++)
          x2[i]=i*i;
       //--- check
       if(_spoil_scenario==10)
@@ -2364,7 +2626,7 @@ void TEST_BaseStat_T_CovCorr(int &_spoil_scenario,bool &_TestResult,bool &_Total
       //--- allocation
       ArrayResize(y2,10);
       //--- initialization
-      for(int i=0;i<10;i++)
+      for(int i=0; i<10; i++)
          y2[i]=i;
       //--- check
       if(_spoil_scenario==15)
@@ -2389,7 +2651,7 @@ void TEST_BaseStat_T_CovCorr(int &_spoil_scenario,bool &_TestResult,bool &_Total
       //--- allocation
       ArrayResize(x3,10);
       //--- initialization
-      for(int i=0;i<10;i++)
+      for(int i=0; i<10; i++)
          x3[i]=i*i;
       //--- check
       if(_spoil_scenario==20)
@@ -2409,7 +2671,7 @@ void TEST_BaseStat_T_CovCorr(int &_spoil_scenario,bool &_TestResult,bool &_Total
       //--- allocation
       ArrayResize(y3,10);
       //--- initialization
-      for(int i=0;i<10;i++)
+      for(int i=0; i<10; i++)
          y3[i]=i;
       //--- check
       if(_spoil_scenario==25)
@@ -2434,7 +2696,7 @@ void TEST_BaseStat_T_CovCorr(int &_spoil_scenario,bool &_TestResult,bool &_Total
       //--- 2-sample full-form cov/corr are tested
       ArrayResize(x1a,10);
       //--- initialization
-      for(int i=0;i<10;i++)
+      for(int i=0; i<10; i++)
          x1a[i]=i*i;
       //--- check
       if(_spoil_scenario==30)
@@ -2451,7 +2713,7 @@ void TEST_BaseStat_T_CovCorr(int &_spoil_scenario,bool &_TestResult,bool &_Total
       //--- allocation
       ArrayResize(y1a,10);
       //--- initialization
-      for(int i=0;i<10;i++)
+      for(int i=0; i<10; i++)
          y1a[i]=i;
       //--- check
       if(_spoil_scenario==34)
@@ -2473,7 +2735,7 @@ void TEST_BaseStat_T_CovCorr(int &_spoil_scenario,bool &_TestResult,bool &_Total
       //--- allocation
       ArrayResize(x2a,10);
       //--- initialization
-      for(int i=0;i<10;i++)
+      for(int i=0; i<10; i++)
          x2a[i]=i*i;
       //--- check
       if(_spoil_scenario==38)
@@ -2490,7 +2752,7 @@ void TEST_BaseStat_T_CovCorr(int &_spoil_scenario,bool &_TestResult,bool &_Total
       //--- allocation
       ArrayResize(y2a,10);
       //--- initialization
-      for(int i=0;i<10;i++)
+      for(int i=0; i<10; i++)
          y2a[i]=i;
       //--- check
       if(_spoil_scenario==42)
@@ -2512,7 +2774,7 @@ void TEST_BaseStat_T_CovCorr(int &_spoil_scenario,bool &_TestResult,bool &_Total
       //--- allocation
       ArrayResize(x3a,10);
       //--- initialization
-      for(int i=0;i<10;i++)
+      for(int i=0; i<10; i++)
          x3a[i]=i*i;
       //--- check
       if(_spoil_scenario==46)
@@ -2529,7 +2791,7 @@ void TEST_BaseStat_T_CovCorr(int &_spoil_scenario,bool &_TestResult,bool &_Total
       //--- allocation
       ArrayResize(y3a,10);
       //--- initialization
-      for(int i=0;i<10;i++)
+      for(int i=0; i<10; i++)
          y3a[i]=i;
       //--- check
       if(_spoil_scenario==50)
@@ -2551,21 +2813,21 @@ void TEST_BaseStat_T_CovCorr(int &_spoil_scenario,bool &_TestResult,bool &_Total
       //--- vector short-form cov/corr are tested.
       x4.Resize(5,3);
       //--- initialization
-      x4[0].Set(0,1);
-      x4[0].Set(1,0);
-      x4[0].Set(2,1);
-      x4[1].Set(0,1);
-      x4[1].Set(1,1);
-      x4[1].Set(2,0);
-      x4[2].Set(0,-1);
-      x4[2].Set(1,1);
-      x4[2].Set(2,0);
-      x4[3].Set(0,-2);
-      x4[3].Set(1,-1);
-      x4[3].Set(2,1);
-      x4[4].Set(0,-1);
-      x4[4].Set(1,0);
-      x4[4].Set(2,9);
+      x4.Set(0,0,1);
+      x4.Set(0,1,0);
+      x4.Set(0,2,1);
+      x4.Set(1,0,1);
+      x4.Set(1,1,1);
+      x4.Set(1,2,0);
+      x4.Set(2,0,-1);
+      x4.Set(2,1,1);
+      x4.Set(2,2,0);
+      x4.Set(3,0,-2);
+      x4.Set(3,1,-1);
+      x4.Set(3,2,1);
+      x4.Set(4,0,-1);
+      x4.Set(4,1,0);
+      x4.Set(4,2,9);
       //--- check
       if(_spoil_scenario==54)
          Spoil_Matrix_By_Value(x4,CInfOrNaN::NaN());
@@ -2583,21 +2845,21 @@ void TEST_BaseStat_T_CovCorr(int &_spoil_scenario,bool &_TestResult,bool &_Total
       //--- allocation
       x5.Resize(5,3);
       //--- initialization
-      x5[0].Set(0,1);
-      x5[0].Set(1,0);
-      x5[0].Set(2,1);
-      x5[1].Set(0,1);
-      x5[1].Set(1,1);
-      x5[1].Set(2,0);
-      x5[2].Set(0,-1);
-      x5[2].Set(1,1);
-      x5[2].Set(2,0);
-      x5[3].Set(0,-2);
-      x5[3].Set(1,-1);
-      x5[3].Set(2,1);
-      x5[4].Set(0,-1);
-      x5[4].Set(1,0);
-      x5[4].Set(2,9);
+      x5.Set(0,0,1);
+      x5.Set(0,1,0);
+      x5.Set(0,2,1);
+      x5.Set(1,0,1);
+      x5.Set(1,1,1);
+      x5.Set(1,2,0);
+      x5.Set(2,0,-1);
+      x5.Set(2,1,1);
+      x5.Set(2,2,0);
+      x5.Set(3,0,-2);
+      x5.Set(3,1,-1);
+      x5.Set(3,2,1);
+      x5.Set(4,0,-1);
+      x5.Set(4,1,0);
+      x5.Set(4,2,9);
       //--- check
       if(_spoil_scenario==57)
          Spoil_Matrix_By_Value(x5,CInfOrNaN::NaN());
@@ -2615,21 +2877,21 @@ void TEST_BaseStat_T_CovCorr(int &_spoil_scenario,bool &_TestResult,bool &_Total
       //--- allocation
       x6.Resize(5,3);
       //--- initialization
-      x6[0].Set(0,1);
-      x6[0].Set(1,0);
-      x6[0].Set(2,1);
-      x6[1].Set(0,1);
-      x6[1].Set(1,1);
-      x6[1].Set(2,0);
-      x6[2].Set(0,-1);
-      x6[2].Set(1,1);
-      x6[2].Set(2,0);
-      x6[3].Set(0,-2);
-      x6[3].Set(1,-1);
-      x6[3].Set(2,1);
-      x6[4].Set(0,-1);
-      x6[4].Set(1,0);
-      x6[4].Set(2,9);
+      x6.Set(0,0,1);
+      x6.Set(0,1,0);
+      x6.Set(0,2,1);
+      x6.Set(1,0,1);
+      x6.Set(1,1,1);
+      x6.Set(1,2,0);
+      x6.Set(2,0,-1);
+      x6.Set(2,1,1);
+      x6.Set(2,2,0);
+      x6.Set(3,0,-2);
+      x6.Set(3,1,-1);
+      x6.Set(3,2,1);
+      x6.Set(4,0,-1);
+      x6.Set(4,1,0);
+      x6.Set(4,2,9);
       //--- check
       if(_spoil_scenario==60)
          Spoil_Matrix_By_Value(x6,CInfOrNaN::NaN());
@@ -2647,21 +2909,21 @@ void TEST_BaseStat_T_CovCorr(int &_spoil_scenario,bool &_TestResult,bool &_Total
       //--- vector full-form cov/corr are tested.
       x7.Resize(5,3);
       //--- initialization
-      x7[0].Set(0,1);
-      x7[0].Set(1,0);
-      x7[0].Set(2,1);
-      x7[1].Set(0,1);
-      x7[1].Set(1,1);
-      x7[1].Set(2,0);
-      x7[2].Set(0,-1);
-      x7[2].Set(1,1);
-      x7[2].Set(2,0);
-      x7[3].Set(0,-2);
-      x7[3].Set(1,-1);
-      x7[3].Set(2,1);
-      x7[4].Set(0,-1);
-      x7[4].Set(1,0);
-      x7[4].Set(2,9);
+      x7.Set(0,0,1);
+      x7.Set(0,1,0);
+      x7.Set(0,2,1);
+      x7.Set(1,0,1);
+      x7.Set(1,1,1);
+      x7.Set(1,2,0);
+      x7.Set(2,0,-1);
+      x7.Set(2,1,1);
+      x7.Set(2,2,0);
+      x7.Set(3,0,-2);
+      x7.Set(3,1,-1);
+      x7.Set(3,2,1);
+      x7.Set(4,0,-1);
+      x7.Set(4,1,0);
+      x7.Set(4,2,9);
       //--- check
       if(_spoil_scenario==63)
          Spoil_Matrix_By_Value(x7,CInfOrNaN::NaN());
@@ -2685,21 +2947,21 @@ void TEST_BaseStat_T_CovCorr(int &_spoil_scenario,bool &_TestResult,bool &_Total
       //--- allocation
       x8.Resize(5,3);
       //--- initialization
-      x8[0].Set(0,1);
-      x8[0].Set(1,0);
-      x8[0].Set(2,1);
-      x8[1].Set(0,1);
-      x8[1].Set(1,1);
-      x8[1].Set(2,0);
-      x8[2].Set(0,-1);
-      x8[2].Set(1,1);
-      x8[2].Set(2,0);
-      x8[3].Set(0,-2);
-      x8[3].Set(1,-1);
-      x8[3].Set(2,1);
-      x8[4].Set(0,-1);
-      x8[4].Set(1,0);
-      x8[4].Set(2,9);
+      x8.Set(0,0,1);
+      x8.Set(0,1,0);
+      x8.Set(0,2,1);
+      x8.Set(1,0,1);
+      x8.Set(1,1,1);
+      x8.Set(1,2,0);
+      x8.Set(2,0,-1);
+      x8.Set(2,1,1);
+      x8.Set(2,2,0);
+      x8.Set(3,0,-2);
+      x8.Set(3,1,-1);
+      x8.Set(3,2,1);
+      x8.Set(4,0,-1);
+      x8.Set(4,1,0);
+      x8.Set(4,2,9);
       //--- check
       if(_spoil_scenario==68)
          Spoil_Matrix_By_Value(x8,CInfOrNaN::NaN());
@@ -2723,21 +2985,21 @@ void TEST_BaseStat_T_CovCorr(int &_spoil_scenario,bool &_TestResult,bool &_Total
       //--- allocation
       x9.Resize(5,3);
       //--- initialization
-      x9[0].Set(0,1);
-      x9[0].Set(1,0);
-      x9[0].Set(2,1);
-      x9[1].Set(0,1);
-      x9[1].Set(1,1);
-      x9[1].Set(2,0);
-      x9[2].Set(0,-1);
-      x9[2].Set(1,1);
-      x9[2].Set(2,0);
-      x9[3].Set(0,-2);
-      x9[3].Set(1,-1);
-      x9[3].Set(2,1);
-      x9[4].Set(0,-1);
-      x9[4].Set(1,0);
-      x9[4].Set(2,9);
+      x9.Set(0,0,1);
+      x9.Set(0,1,0);
+      x9.Set(0,2,1);
+      x9.Set(1,0,1);
+      x9.Set(1,1,1);
+      x9.Set(1,2,0);
+      x9.Set(2,0,-1);
+      x9.Set(2,1,1);
+      x9.Set(2,2,0);
+      x9.Set(3,0,-2);
+      x9.Set(3,1,-1);
+      x9.Set(3,2,1);
+      x9.Set(4,0,-1);
+      x9.Set(4,1,0);
+      x9.Set(4,2,9);
       //--- check
       if(_spoil_scenario==73)
          Spoil_Matrix_By_Value(x9,CInfOrNaN::NaN());
@@ -2761,21 +3023,21 @@ void TEST_BaseStat_T_CovCorr(int &_spoil_scenario,bool &_TestResult,bool &_Total
       //--- cross-vector short-form cov/corr are tested.
       x10.Resize(5,3);
       //--- initialization
-      x10[0].Set(0,1);
-      x10[0].Set(1,0);
-      x10[0].Set(2,1);
-      x10[1].Set(0,1);
-      x10[1].Set(1,1);
-      x10[1].Set(2,0);
-      x10[2].Set(0,-1);
-      x10[2].Set(1,1);
-      x10[2].Set(2,0);
-      x10[3].Set(0,-2);
-      x10[3].Set(1,-1);
-      x10[3].Set(2,1);
-      x10[4].Set(0,-1);
-      x10[4].Set(1,0);
-      x10[4].Set(2,9);
+      x10.Set(0,0,1);
+      x10.Set(0,1,0);
+      x10.Set(0,2,1);
+      x10.Set(1,0,1);
+      x10.Set(1,1,1);
+      x10.Set(1,2,0);
+      x10.Set(2,0,-1);
+      x10.Set(2,1,1);
+      x10.Set(2,2,0);
+      x10.Set(3,0,-2);
+      x10.Set(3,1,-1);
+      x10.Set(3,2,1);
+      x10.Set(4,0,-1);
+      x10.Set(4,1,0);
+      x10.Set(4,2,9);
       //--- check
       if(_spoil_scenario==78)
          Spoil_Matrix_By_Value(x10,CInfOrNaN::NaN());
@@ -2788,16 +3050,16 @@ void TEST_BaseStat_T_CovCorr(int &_spoil_scenario,bool &_TestResult,bool &_Total
       //--- allocation
       y10.Resize(5,2);
       //--- initialization
-      y10[0].Set(0,2);
-      y10[0].Set(1,3);
-      y10[1].Set(0,2);
-      y10[1].Set(1,1);
-      y10[2].Set(0,-1);
-      y10[2].Set(1,6);
-      y10[3].Set(0,-9);
-      y10[3].Set(1,9);
-      y10[4].Set(0,7);
-      y10[4].Set(1,1);
+      y10.Set(0,0,2);
+      y10.Set(0,1,3);
+      y10.Set(1,0,2);
+      y10.Set(1,1,1);
+      y10.Set(2,0,-1);
+      y10.Set(2,1,6);
+      y10.Set(3,0,-9);
+      y10.Set(3,1,9);
+      y10.Set(4,0,7);
+      y10.Set(4,1,1);
       //--- check
       if(_spoil_scenario==81)
          Spoil_Matrix_By_Value(y10,CInfOrNaN::NaN());
@@ -2815,21 +3077,21 @@ void TEST_BaseStat_T_CovCorr(int &_spoil_scenario,bool &_TestResult,bool &_Total
       //--- allocation
       x11.Resize(5,3);
       //--- initialization
-      x11[0].Set(0,1);
-      x11[0].Set(1,0);
-      x11[0].Set(2,1);
-      x11[1].Set(0,1);
-      x11[1].Set(1,1);
-      x11[1].Set(2,0);
-      x11[2].Set(0,-1);
-      x11[2].Set(1,1);
-      x11[2].Set(2,0);
-      x11[3].Set(0,-2);
-      x11[3].Set(1,-1);
-      x11[3].Set(2,1);
-      x11[4].Set(0,-1);
-      x11[4].Set(1,0);
-      x11[4].Set(2,9);
+      x11.Set(0,0,1);
+      x11.Set(0,1,0);
+      x11.Set(0,2,1);
+      x11.Set(1,0,1);
+      x11.Set(1,1,1);
+      x11.Set(1,2,0);
+      x11.Set(2,0,-1);
+      x11.Set(2,1,1);
+      x11.Set(2,2,0);
+      x11.Set(3,0,-2);
+      x11.Set(3,1,-1);
+      x11.Set(3,2,1);
+      x11.Set(4,0,-1);
+      x11.Set(4,1,0);
+      x11.Set(4,2,9);
       //--- check
       if(_spoil_scenario==84)
          Spoil_Matrix_By_Value(x11,CInfOrNaN::NaN());
@@ -2842,16 +3104,16 @@ void TEST_BaseStat_T_CovCorr(int &_spoil_scenario,bool &_TestResult,bool &_Total
       //--- allocation
       y11.Resize(5,2);
       //--- initialization
-      y11[0].Set(0,2);
-      y11[0].Set(1,3);
-      y11[1].Set(0,2);
-      y11[1].Set(1,1);
-      y11[2].Set(0,-1);
-      y11[2].Set(1,6);
-      y11[3].Set(0,-9);
-      y11[3].Set(1,9);
-      y11[4].Set(0,7);
-      y11[4].Set(1,1);
+      y11.Set(0,0,2);
+      y11.Set(0,1,3);
+      y11.Set(1,0,2);
+      y11.Set(1,1,1);
+      y11.Set(2,0,-1);
+      y11.Set(2,1,6);
+      y11.Set(3,0,-9);
+      y11.Set(3,1,9);
+      y11.Set(4,0,7);
+      y11.Set(4,1,1);
       //--- check
       if(_spoil_scenario==87)
          Spoil_Matrix_By_Value(y11,CInfOrNaN::NaN());
@@ -2869,21 +3131,21 @@ void TEST_BaseStat_T_CovCorr(int &_spoil_scenario,bool &_TestResult,bool &_Total
       //--- allocation
       x12.Resize(5,3);
       //--- initialization
-      x12[0].Set(0,1);
-      x12[0].Set(1,0);
-      x12[0].Set(2,1);
-      x12[1].Set(0,1);
-      x12[1].Set(1,1);
-      x12[1].Set(2,0);
-      x12[2].Set(0,-1);
-      x12[2].Set(1,1);
-      x12[2].Set(2,0);
-      x12[3].Set(0,-2);
-      x12[3].Set(1,-1);
-      x12[3].Set(2,1);
-      x12[4].Set(0,-1);
-      x12[4].Set(1,0);
-      x12[4].Set(2,9);
+      x12.Set(0,0,1);
+      x12.Set(0,1,0);
+      x12.Set(0,2,1);
+      x12.Set(1,0,1);
+      x12.Set(1,1,1);
+      x12.Set(1,2,0);
+      x12.Set(2,0,-1);
+      x12.Set(2,1,1);
+      x12.Set(2,2,0);
+      x12.Set(3,0,-2);
+      x12.Set(3,1,-1);
+      x12.Set(3,2,1);
+      x12.Set(4,0,-1);
+      x12.Set(4,1,0);
+      x12.Set(4,2,9);
       //--- check
       if(_spoil_scenario==90)
          Spoil_Matrix_By_Value(x12,CInfOrNaN::NaN());
@@ -2896,16 +3158,16 @@ void TEST_BaseStat_T_CovCorr(int &_spoil_scenario,bool &_TestResult,bool &_Total
       //--- allocation
       y12.Resize(5,2);
       //--- initialization
-      y12[0].Set(0,2);
-      y12[0].Set(1,3);
-      y12[1].Set(0,2);
-      y12[1].Set(1,1);
-      y12[2].Set(0,-1);
-      y12[2].Set(1,6);
-      y12[3].Set(0,-9);
-      y12[3].Set(1,9);
-      y12[4].Set(0,7);
-      y12[4].Set(1,1);
+      y12.Set(0,0,2);
+      y12.Set(0,1,3);
+      y12.Set(1,0,2);
+      y12.Set(1,1,1);
+      y12.Set(2,0,-1);
+      y12.Set(2,1,6);
+      y12.Set(3,0,-9);
+      y12.Set(3,1,9);
+      y12.Set(4,0,7);
+      y12.Set(4,1,1);
       //--- check
       if(_spoil_scenario==93)
          Spoil_Matrix_By_Value(y12,CInfOrNaN::NaN());
@@ -2923,21 +3185,21 @@ void TEST_BaseStat_T_CovCorr(int &_spoil_scenario,bool &_TestResult,bool &_Total
       //--- cross-vector full-form cov/corr are tested.
       x13.Resize(5,3);
       //--- initialization
-      x13[0].Set(0,1);
-      x13[0].Set(1,0);
-      x13[0].Set(2,1);
-      x13[1].Set(0,1);
-      x13[1].Set(1,1);
-      x13[1].Set(2,0);
-      x13[2].Set(0,-1);
-      x13[2].Set(1,1);
-      x13[2].Set(2,0);
-      x13[3].Set(0,-2);
-      x13[3].Set(1,-1);
-      x13[3].Set(2,1);
-      x13[4].Set(0,-1);
-      x13[4].Set(1,0);
-      x13[4].Set(2,9);
+      x13.Set(0,0,1);
+      x13.Set(0,1,0);
+      x13.Set(0,2,1);
+      x13.Set(1,0,1);
+      x13.Set(1,1,1);
+      x13.Set(1,2,0);
+      x13.Set(2,0,-1);
+      x13.Set(2,1,1);
+      x13.Set(2,2,0);
+      x13.Set(3,0,-2);
+      x13.Set(3,1,-1);
+      x13.Set(3,2,1);
+      x13.Set(4,0,-1);
+      x13.Set(4,1,0);
+      x13.Set(4,2,9);
       //--- check
       if(_spoil_scenario==96)
          Spoil_Matrix_By_Value(x13,CInfOrNaN::NaN());
@@ -2956,16 +3218,16 @@ void TEST_BaseStat_T_CovCorr(int &_spoil_scenario,bool &_TestResult,bool &_Total
       //--- allocation
       y13.Resize(5,2);
       //--- initialization
-      y13[0].Set(0,2);
-      y13[0].Set(1,3);
-      y13[1].Set(0,2);
-      y13[1].Set(1,1);
-      y13[2].Set(0,-1);
-      y13[2].Set(1,6);
-      y13[3].Set(0,-9);
-      y13[3].Set(1,9);
-      y13[4].Set(0,7);
-      y13[4].Set(1,1);
+      y13.Set(0,0,2);
+      y13.Set(0,1,3);
+      y13.Set(1,0,2);
+      y13.Set(1,1,1);
+      y13.Set(2,0,-1);
+      y13.Set(2,1,6);
+      y13.Set(3,0,-9);
+      y13.Set(3,1,9);
+      y13.Set(4,0,7);
+      y13.Set(4,1,1);
       //--- check
       if(_spoil_scenario==101)
          Spoil_Matrix_By_Value(y13,CInfOrNaN::NaN());
@@ -2989,21 +3251,21 @@ void TEST_BaseStat_T_CovCorr(int &_spoil_scenario,bool &_TestResult,bool &_Total
       //--- allocation
       x14.Resize(5,3);
       //--- initialization
-      x14[0].Set(0,1);
-      x14[0].Set(1,0);
-      x14[0].Set(2,1);
-      x14[1].Set(0,1);
-      x14[1].Set(1,1);
-      x14[1].Set(2,0);
-      x14[2].Set(0,-1);
-      x14[2].Set(1,1);
-      x14[2].Set(2,0);
-      x14[3].Set(0,-2);
-      x14[3].Set(1,-1);
-      x14[3].Set(2,1);
-      x14[4].Set(0,-1);
-      x14[4].Set(1,0);
-      x14[4].Set(2,9);
+      x14.Set(0,0,1);
+      x14.Set(0,1,0);
+      x14.Set(0,2,1);
+      x14.Set(1,0,1);
+      x14.Set(1,1,1);
+      x14.Set(1,2,0);
+      x14.Set(2,0,-1);
+      x14.Set(2,1,1);
+      x14.Set(2,2,0);
+      x14.Set(3,0,-2);
+      x14.Set(3,1,-1);
+      x14.Set(3,2,1);
+      x14.Set(4,0,-1);
+      x14.Set(4,1,0);
+      x14.Set(4,2,9);
       //--- check
       if(_spoil_scenario==106)
          Spoil_Matrix_By_Value(x14,CInfOrNaN::NaN());
@@ -3022,16 +3284,16 @@ void TEST_BaseStat_T_CovCorr(int &_spoil_scenario,bool &_TestResult,bool &_Total
       //--- allocation
       y14.Resize(5,2);
       //--- initialization
-      y14[0].Set(0,2);
-      y14[0].Set(1,3);
-      y14[1].Set(0,2);
-      y14[1].Set(1,1);
-      y14[2].Set(0,-1);
-      y14[2].Set(1,6);
-      y14[3].Set(0,-9);
-      y14[3].Set(1,9);
-      y14[4].Set(0,7);
-      y14[4].Set(1,1);
+      y14.Set(0,0,2);
+      y14.Set(0,1,3);
+      y14.Set(1,0,2);
+      y14.Set(1,1,1);
+      y14.Set(2,0,-1);
+      y14.Set(2,1,6);
+      y14.Set(3,0,-9);
+      y14.Set(3,1,9);
+      y14.Set(4,0,7);
+      y14.Set(4,1,1);
       //--- check
       if(_spoil_scenario==111)
          Spoil_Matrix_By_Value(y14,CInfOrNaN::NaN());
@@ -3055,21 +3317,21 @@ void TEST_BaseStat_T_CovCorr(int &_spoil_scenario,bool &_TestResult,bool &_Total
       //--- allocation
       x15.Resize(5,3);
       //--- initialization
-      x15[0].Set(0,1);
-      x15[0].Set(1,0);
-      x15[0].Set(2,1);
-      x15[1].Set(0,1);
-      x15[1].Set(1,1);
-      x15[1].Set(2,0);
-      x15[2].Set(0,-1);
-      x15[2].Set(1,1);
-      x15[2].Set(2,0);
-      x15[3].Set(0,-2);
-      x15[3].Set(1,-1);
-      x15[3].Set(2,1);
-      x15[4].Set(0,-1);
-      x15[4].Set(1,0);
-      x15[4].Set(2,9);
+      x15.Set(0,0,1);
+      x15.Set(0,1,0);
+      x15.Set(0,2,1);
+      x15.Set(1,0,1);
+      x15.Set(1,1,1);
+      x15.Set(1,2,0);
+      x15.Set(2,0,-1);
+      x15.Set(2,1,1);
+      x15.Set(2,2,0);
+      x15.Set(3,0,-2);
+      x15.Set(3,1,-1);
+      x15.Set(3,2,1);
+      x15.Set(4,0,-1);
+      x15.Set(4,1,0);
+      x15.Set(4,2,9);
       //--- check
       if(_spoil_scenario==116)
          Spoil_Matrix_By_Value(x15,CInfOrNaN::NaN());
@@ -3088,16 +3350,16 @@ void TEST_BaseStat_T_CovCorr(int &_spoil_scenario,bool &_TestResult,bool &_Total
       //--- allocation
       y15.Resize(5,2);
       //--- initialization
-      y15[0].Set(0,2);
-      y15[0].Set(1,3);
-      y15[1].Set(0,2);
-      y15[1].Set(1,1);
-      y15[2].Set(0,-1);
-      y15[2].Set(1,6);
-      y15[3].Set(0,-9);
-      y15[3].Set(1,9);
-      y15[4].Set(0,7);
-      y15[4].Set(1,1);
+      y15.Set(0,0,2);
+      y15.Set(0,1,3);
+      y15.Set(1,0,2);
+      y15.Set(1,1,1);
+      y15.Set(2,0,-1);
+      y15.Set(2,1,6);
+      y15.Set(3,0,-9);
+      y15.Set(3,1,9);
+      y15.Set(4,0,7);
+      y15.Set(4,1,1);
       //--- check
       if(_spoil_scenario==121)
          Spoil_Matrix_By_Value(y15,CInfOrNaN::NaN());
@@ -3123,7 +3385,7 @@ void TEST_BaseStat_T_CovCorr(int &_spoil_scenario,bool &_TestResult,bool &_Total
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","basestat_t_covcorr");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -3137,15 +3399,15 @@ void TEST_MatInv_D_R1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
    CMatrixDouble a;
    CMatrixDouble tempmatrix;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<7;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<7; _spoil_scenario++)
      {
       //--- allocation
       a.Resize(2,2);
       //--- initialization
-      a[0].Set(0,1);
-      a[0].Set(1,-1);
-      a[1].Set(0,1);
-      a[1].Set(1,1);
+      a.Set(0,0,1);
+      a.Set(0,1,-1);
+      a.Set(1,0,1);
+      a.Set(1,1,1);
       //--- check
       if(_spoil_scenario==0)
          Spoil_Matrix_By_Value(a,CInfOrNaN::NaN());
@@ -3178,10 +3440,10 @@ void TEST_MatInv_D_R1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
       //--- allocation
       tempmatrix.Resize(2,2);
       //--- initialization
-      tempmatrix[0].Set(0,0.5);
-      tempmatrix[0].Set(1,0.5);
-      tempmatrix[1].Set(0,-0.5);
-      tempmatrix[1].Set(1,0.5);
+      tempmatrix.Set(0,0,0.5);
+      tempmatrix.Set(0,1,0.5);
+      tempmatrix.Set(1,0,-0.5);
+      tempmatrix.Set(1,1,0.5);
       //--- check result
       _TestResult=_TestResult && Doc_Test_Int(info,1);
       _TestResult=_TestResult && Doc_Test_Real_Matrix(a,tempmatrix,0.00005);
@@ -3191,7 +3453,7 @@ void TEST_MatInv_D_R1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","matinv_d_r1");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -3204,33 +3466,33 @@ void TEST_MatInv_D_C1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
 //--- create variables
    CMatrixComplex a;
    CMatrixComplex tempmatrix;
-   al_complex     tempcomplex1;
-   al_complex     tempcomplex2;
-   al_complex     cnan;
-   al_complex     cpositiveinfinity;
-   al_complex     cnegativeinfinity;
+   complex        tempcomplex1;
+   complex        tempcomplex2;
+   complex        cnan;
+   complex        cpositiveinfinity;
+   complex        cnegativeinfinity;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<7;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<7; _spoil_scenario++)
      {
       //--- initialization
-      cnan.re=CInfOrNaN::NaN();
-      cnan.im=CInfOrNaN::NaN();
-      cpositiveinfinity.re=CInfOrNaN::PositiveInfinity();
-      cpositiveinfinity.im=CInfOrNaN::PositiveInfinity();
-      cnegativeinfinity.re=CInfOrNaN::NegativeInfinity();
-      cnegativeinfinity.im=CInfOrNaN::NegativeInfinity();
+      cnan.real=CInfOrNaN::NaN();
+      cnan.imag=CInfOrNaN::NaN();
+      cpositiveinfinity.real=CInfOrNaN::PositiveInfinity();
+      cpositiveinfinity.imag=CInfOrNaN::PositiveInfinity();
+      cnegativeinfinity.real=CInfOrNaN::NegativeInfinity();
+      cnegativeinfinity.imag=CInfOrNaN::NegativeInfinity();
       //--- initialization
-      tempcomplex1.re=0;
-      tempcomplex1.im=1;
-      tempcomplex2.re=0;
-      tempcomplex2.im=-0.5;
+      tempcomplex1.real=0;
+      tempcomplex1.imag=1;
+      tempcomplex2.real=0;
+      tempcomplex2.imag=-0.5;
       //--- allocation
       a.Resize(2,2);
       //--- initialization
-      a[0].Set(0,tempcomplex1);
-      a[0].Set(1,-1);
-      a[1].Set(0,tempcomplex1);
-      a[1].Set(1,1);
+      a.Set(0,0,tempcomplex1);
+      a.Set(0,1,-1);
+      a.Set(1,0,tempcomplex1);
+      a.Set(1,1,1);
       //--- check
       if(_spoil_scenario==0)
          Spoil_Matrix_By_Value(a,cnan);
@@ -3263,10 +3525,10 @@ void TEST_MatInv_D_C1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
       //--- allocation
       tempmatrix.Resize(2,2);
       //--- initialization
-      tempmatrix[0].Set(0,tempcomplex2);
-      tempmatrix[0].Set(1,tempcomplex2);
-      tempmatrix[1].Set(0,-0.5);
-      tempmatrix[1].Set(1,0.5);
+      tempmatrix.Set(0,0,tempcomplex2);
+      tempmatrix.Set(0,1,tempcomplex2);
+      tempmatrix.Set(1,0,-0.5);
+      tempmatrix.Set(1,1,0.5);
       //--- check result
       _TestResult=_TestResult && Doc_Test_Int(info,1);
       _TestResult=_TestResult && Doc_Test_Complex_Matrix(a,tempmatrix,0.00005);
@@ -3276,7 +3538,7 @@ void TEST_MatInv_D_C1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","matinv_d_c1");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -3290,24 +3552,28 @@ void TEST_MatInv_D_SPD1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResul
    CMatrixDouble a;
    CMatrixDouble tempmatrix;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<7;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<7; _spoil_scenario++)
      {
       //--- allocation
       a.Resize(2,2);
       //--- initialization
-      a[0].Set(0,2);
-      a[0].Set(1,1);
-      a[1].Set(0,1);
-      a[1].Set(1,2);
+      a.Set(0,0,2);
+      a.Set(0,1,1);
+      a.Set(1,0,1);
+      a.Set(1,1,2);
       //--- check
-      if(_spoil_scenario==0)
-         Spoil_Matrix_By_Value(a,CInfOrNaN::NaN());
-      //--- check
-      if(_spoil_scenario==1)
-         Spoil_Matrix_By_Value(a,CInfOrNaN::PositiveInfinity());
-      //--- check
-      if(_spoil_scenario==2)
-         Spoil_Matrix_By_Value(a,CInfOrNaN::NegativeInfinity());
+      do
+        {
+         if(_spoil_scenario==0)
+            Spoil_Matrix_By_Value(a,CInfOrNaN::NaN());
+         //--- check
+         if(_spoil_scenario==1)
+            Spoil_Matrix_By_Value(a,CInfOrNaN::PositiveInfinity());
+         //--- check
+         if(_spoil_scenario==2)
+            Spoil_Matrix_By_Value(a,CInfOrNaN::NegativeInfinity());
+        }
+      while(_spoil_scenario>=0 && _spoil_scenario<=2 && CApServ::IsFiniteRTrMatrix(a,2,false));
       //--- check
       if(_spoil_scenario==3)
          Spoil_Matrix_By_Adding_Row(a);
@@ -3331,10 +3597,10 @@ void TEST_MatInv_D_SPD1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResul
       //--- allocation
       tempmatrix.Resize(2,2);
       //--- initialization
-      tempmatrix[0].Set(0,0.666666);
-      tempmatrix[0].Set(1,-0.333333);
-      tempmatrix[1].Set(0,-0.333333);
-      tempmatrix[1].Set(1,0.666666);
+      tempmatrix.Set(0,0,0.666666);
+      tempmatrix.Set(0,1,-0.333333);
+      tempmatrix.Set(1,0,-0.333333);
+      tempmatrix.Set(1,1,0.666666);
       //--- check result
       _TestResult=_TestResult && Doc_Test_Int(info,1);
       _TestResult=_TestResult && Doc_Test_Real_Matrix(a,tempmatrix,0.00005);
@@ -3342,7 +3608,7 @@ void TEST_MatInv_D_SPD1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResul
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","matinv_d_spd1");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -3355,26 +3621,26 @@ void TEST_MatInv_D_HPD1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResul
 //--- create variables
    CMatrixComplex a;
    CMatrixComplex tempmatrix;
-   al_complex cnan;
-   al_complex cpositiveinfinity;
-   al_complex cnegativeinfinity;
+   complex    cnan;
+   complex    cpositiveinfinity;
+   complex    cnegativeinfinity;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<7;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<7; _spoil_scenario++)
      {
       //--- allocation
       a.Resize(2,2);
       //--- initialization
-      a[0].Set(0,2);
-      a[0].Set(1,1);
-      a[1].Set(0,1);
-      a[1].Set(1,2);
+      a.Set(0,0,2);
+      a.Set(0,1,1);
+      a.Set(1,0,1);
+      a.Set(1,1,2);
       //--- initialization
-      cnan.re=CInfOrNaN::NaN();
-      cnan.im=CInfOrNaN::NaN();
-      cpositiveinfinity.re=CInfOrNaN::PositiveInfinity();
-      cpositiveinfinity.im=CInfOrNaN::PositiveInfinity();
-      cnegativeinfinity.re=CInfOrNaN::NegativeInfinity();
-      cnegativeinfinity.im=CInfOrNaN::NegativeInfinity();
+      cnan.real=CInfOrNaN::NaN();
+      cnan.imag=CInfOrNaN::NaN();
+      cpositiveinfinity.real=CInfOrNaN::PositiveInfinity();
+      cpositiveinfinity.imag=CInfOrNaN::PositiveInfinity();
+      cnegativeinfinity.real=CInfOrNaN::NegativeInfinity();
+      cnegativeinfinity.imag=CInfOrNaN::NegativeInfinity();
       //--- check
       if(_spoil_scenario==0)
          Spoil_Matrix_By_Value(a,cnan);
@@ -3407,10 +3673,10 @@ void TEST_MatInv_D_HPD1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResul
       //--- allocation
       tempmatrix.Resize(2,2);
       //--- initialization
-      tempmatrix[0].Set(0,0.666666);
-      tempmatrix[0].Set(1,-0.333333);
-      tempmatrix[1].Set(0,-0.333333);
-      tempmatrix[1].Set(1,0.666666);
+      tempmatrix.Set(0,0,0.666666);
+      tempmatrix.Set(0,1,-0.333333);
+      tempmatrix.Set(1,0,-0.333333);
+      tempmatrix.Set(1,1,0.666666);
       //--- check result
       _TestResult=_TestResult && Doc_Test_Int(info,1);
       _TestResult=_TestResult && Doc_Test_Complex_Matrix(a,tempmatrix,0.00005);
@@ -3418,7 +3684,7 @@ void TEST_MatInv_D_HPD1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResul
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","matinv_d_hpd1");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -3433,10 +3699,10 @@ void TEST_MatInv_T_R1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
 //--- allocation
    a.Resize(2,2);
 //--- initialization
-   a[0].Set(0,1);
-   a[0].Set(1,-1);
-   a[1].Set(0,-2);
-   a[1].Set(1,2);
+   a.Set(0,0,1);
+   a.Set(0,1,-1);
+   a.Set(1,0,-2);
+   a.Set(1,1,2);
 //--- create variables
    int info;
    CMatInvReportShell rep;
@@ -3450,7 +3716,7 @@ void TEST_MatInv_T_R1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
    _TestResult=_TestResult && Doc_Test_Real(rep.GetRInf(),0.0,0.00005);
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","matinv_t_r1");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -3459,22 +3725,23 @@ void TEST_MatInv_T_R1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
 //+------------------------------------------------------------------+
 void TEST_MatInv_T_C1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
   {
-   CMatrixComplex a;
-   al_complex tempcomplex1;
-   al_complex tempcomplex2;
    _TestResult=true;
 //--- create variables
-   tempcomplex1.re=0;
-   tempcomplex1.im=1;
-   tempcomplex2.re=0;
-   tempcomplex2.im=-1;
+   CMatrixComplex a;
+   complex        tempcomplex1;
+   complex        tempcomplex2;
+
+   tempcomplex1.real=0;
+   tempcomplex1.imag=1;
+   tempcomplex2.real=0;
+   tempcomplex2.imag=-1;
 //--- allocation
    a.Resize(2,2);
 //--- initialization
-   a[0].Set(0,tempcomplex1);
-   a[0].Set(1,tempcomplex2);
-   a[1].Set(0,-2);
-   a[1].Set(1,2);
+   a.Set(0,0,tempcomplex1);
+   a.Set(0,1,tempcomplex2);
+   a.Set(1,0,-2);
+   a.Set(1,1,2);
 //--- create variables
    int info;
    CMatInvReportShell rep;
@@ -3488,7 +3755,7 @@ void TEST_MatInv_T_C1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
    _TestResult=_TestResult && Doc_Test_Real(rep.GetRInf(),0.0,0.00005);
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","matinv_t_c1");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -3503,10 +3770,10 @@ void TEST_MatInv_E_SPD1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResul
 //--- allocation
    a.Resize(2,2);
 //--- initialization
-   a[0].Set(0,1);
-   a[0].Set(1,0);
-   a[1].Set(0,1);
-   a[1].Set(1,1);
+   a.Set(0,0,1);
+   a.Set(0,1,0);
+   a.Set(1,0,1);
+   a.Set(1,1,1);
 //--- create variables
    int info;
    CMatInvReportShell rep;
@@ -3517,7 +3784,7 @@ void TEST_MatInv_E_SPD1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResul
       _TestResult=false;
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","matinv_e_spd1");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -3532,10 +3799,10 @@ void TEST_MatInv_E_HPD1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResul
 //--- allocation
    a.Resize(2,2);
 //--- initialization
-   a[0].Set(0,1);
-   a[0].Set(1,0);
-   a[1].Set(0,1);
-   a[1].Set(1,1);
+   a.Set(0,0,1);
+   a.Set(0,1,0);
+   a.Set(1,0,1);
+   a.Set(1,1,1);
 //--- create variables
    int info;
    CMatInvReportShell rep;
@@ -3546,7 +3813,7 @@ void TEST_MatInv_E_HPD1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResul
       _TestResult=false;
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","matinv_e_hpd1");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -3563,7 +3830,7 @@ void TEST_MinCG_D_1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
    CNDimensional_Grad1 fgrad;
    CNDimensional_Rep   frep;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<12;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<12; _spoil_scenario++)
      {
       //--- This example demonstrates minimization of f(x,y)=100*(x+3)^4+(y-3)^4
       //--- with nonlinear conjugate gradient method.
@@ -3649,7 +3916,7 @@ void TEST_MinCG_D_1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","mincg_d_1");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -3666,7 +3933,7 @@ void TEST_MinCG_D_2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
    CNDimensional_Grad1 fgrad;
    CNDimensional_Rep   frep;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<18;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<18; _spoil_scenario++)
      {
       //--- This example demonstrates minimization of f(x,y)=100*(x+3)^4+(y-3)^4
       //--- with nonlinear conjugate gradient method.
@@ -3803,7 +4070,7 @@ void TEST_MinCG_D_2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","mincg_d_2");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -3820,7 +4087,7 @@ void TEST_MinCG_NumDiff(int &_spoil_scenario,bool &_TestResult,bool &_TotalResul
    CNDimensional_Func1 ffunc;
    CNDimensional_Rep   frep;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<15;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<15; _spoil_scenario++)
      {
       //--- This example demonstrates minimization of f(x,y)=100*(x+3)^4+(y-3)^4
       //--- using numerical differentiation to calculate gradient.
@@ -3913,7 +4180,7 @@ void TEST_MinCG_NumDiff(int &_spoil_scenario,bool &_TestResult,bool &_TotalResul
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","mincg_numdiff");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -3930,7 +4197,7 @@ void TEST_MinCG_FTRIM(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
    CNDimensional_S1_Grad fs1grad;
    CNDimensional_Rep     frep;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<12;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<12; _spoil_scenario++)
      {
       //--- This example demonstrates minimization of f(x)=(1+x)^(-0.2) + (1-x)^(-0.3) + 1000*x.
       //--- This function has singularities at the boundary of the [-1,+1],but technique called
@@ -4010,7 +4277,7 @@ void TEST_MinCG_FTRIM(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","mincg_ftrim");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -4029,7 +4296,7 @@ void TEST_MinBLEIC_D_1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
    CNDimensional_Grad1 fgrad;
    CNDimensional_Rep   frep;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<22;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<22; _spoil_scenario++)
      {
       //--- This example demonstrates minimization of f(x,y)=100*(x+3)^4+(y-3)^4
       //--- subject to bound constraints -1<=x<=+1,-1<=y<=+1,using BLEIC optimizer.
@@ -4175,7 +4442,7 @@ void TEST_MinBLEIC_D_1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","minbleic_d_1");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -4194,7 +4461,7 @@ void TEST_MinBLEIC_D_2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
    CNDimensional_Grad1 fgrad;
    CNDimensional_Rep   frep;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<24;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<24; _spoil_scenario++)
      {
       //--- This example demonstrates minimization of f(x,y)=100*(x+3)^4+(y-3)^4
       //--- subject to inequality constraints:
@@ -4217,12 +4484,12 @@ void TEST_MinBLEIC_D_2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
       //--- allocation
       c.Resize(2,3);
       //--- initialization
-      c[0].Set(0,1);
-      c[0].Set(1,0);
-      c[0].Set(2,2);
-      c[1].Set(0,1);
-      c[1].Set(1,1);
-      c[1].Set(2,6);
+      c.Set(0,0,1);
+      c.Set(0,1,0);
+      c.Set(0,2,2);
+      c.Set(1,0,1);
+      c.Set(1,1,1);
+      c.Set(1,2,6);
       //--- check
       if(_spoil_scenario==3)
          Spoil_Matrix_By_Value(c,CInfOrNaN::NaN());
@@ -4354,7 +4621,7 @@ void TEST_MinBLEIC_D_2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","minbleic_d_2");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -4374,7 +4641,7 @@ void TEST_MinBLEIC_NumDiff(int &_spoil_scenario,bool &_TestResult,bool &_TotalRe
    CNDimensional_Func1 ffunc;
    CNDimensional_Rep   frep;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<25;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<25; _spoil_scenario++)
      {
       //--- This example demonstrates minimization of f(x,y)=100*(x+3)^4+(y-3)^4
       //--- subject to bound constraints -1<=x<=+1,-1<=y<=+1,using BLEIC optimizer.
@@ -4531,7 +4798,7 @@ void TEST_MinBLEIC_NumDiff(int &_spoil_scenario,bool &_TestResult,bool &_TotalRe
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","minbleic_numdiff");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -4548,11 +4815,11 @@ void TEST_MinBLEIC_FTRIM(int &_spoil_scenario,bool &_TestResult,bool &_TotalResu
    CNDimensional_S1_Grad fs1grad;
    CNDimensional_Rep     frep;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<18;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<18; _spoil_scenario++)
      {
       //--- This example demonstrates minimization of f(x)=(1+x)^(-0.2) + (1-x)^(-0.3) + 1000*x.
       //--- This function is undefined outside of (-1,+1) and has singularities at x=-1 and x=+1.
-      //--- Special technique called "function trimming" allows us to solve this optimization problem 
+      //--- Special technique called "function trimming" allows us to solve this optimization problem
       //--- - withusing boundary constraints!
       //--- See http://www.CAlglib::net/optimization/tipsandtricks.php#ftrimming for more information
       //--- on this subject.
@@ -4656,7 +4923,7 @@ void TEST_MinBLEIC_FTRIM(int &_spoil_scenario,bool &_TestResult,bool &_TotalResu
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","minbleic_ftrim");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -4672,15 +4939,15 @@ void TEST_MCPD_Simple1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
    CMatrixDouble tempmatrix;
    CMatrixDouble p;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<6;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<6; _spoil_scenario++)
      {
       //--- The very simple MCPD example
       //--- We have a loan portfolio. Our loans can be in one of two states:
-      //--- * normal loans ("good" ones)
-      //--- * past due loans ("bad" ones)
+      //---*normal loans ("good" ones)
+      //---*past due loans ("bad" ones)
       //--- We assume that:
-      //--- * loans can transition from any state to any other state. In 
-      //---   particular,past due loan can become "good" one at any moment 
+      //--- * loans can transition from any state to any other state. In
+      //---   particular,past due loan can become "good" one at any moment
       //---   with same (fixed) probability. Not realistic,but it is toy example :)
       //--- * portfolio size does not change over time
       //
@@ -4694,11 +4961,11 @@ void TEST_MCPD_Simple1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
       //--- approach (Markov Chains for Proportional/Population Data),i.e.
       //--- to restore hidden transition matrix P using actual portfolio data.
       //--- We have:
-      //--- * poportional data,i.e. proportion of loans in the normal and past 
-      //---   due states (not portfolio size measured in some currency,although 
+      //--- * poportional data,i.e. proportion of loans in the normal and past
+      //---   due states (not portfolio size measured in some currency,although
       //---   it is possible to work with population data too)
       //--- * two tracks,i.e. two sequences which describe portfolio
-      //---   evolution from two different starting states: [1,0] (all loans 
+      //---   evolution from two different starting states: [1,0] (all loans
       //---   are "good") and [0.8,0.2] (only 80% of portfolio is in the "good"
       //---   state)
       CMCPDStateShell s;
@@ -4706,16 +4973,16 @@ void TEST_MCPD_Simple1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
       //--- allocation
       track0.Resize(5,2);
       //--- initialization
-      track0[0].Set(0,1);
-      track0[0].Set(1,0);
-      track0[1].Set(0,0.95);
-      track0[1].Set(1,0.05);
-      track0[2].Set(0,0.9275);
-      track0[2].Set(1,0.0725);
-      track0[3].Set(0,0.91738);
-      track0[3].Set(1,0.08263);
-      track0[4].Set(0,0.91282);
-      track0[4].Set(1,0.08718);
+      track0.Set(0,0,1);
+      track0.Set(0,1,0);
+      track0.Set(1,0,0.95);
+      track0.Set(1,1,0.05);
+      track0.Set(2,0,0.9275);
+      track0.Set(2,1,0.0725);
+      track0.Set(3,0,0.91738);
+      track0.Set(3,1,0.08263);
+      track0.Set(4,0,0.91282);
+      track0.Set(4,1,0.08718);
       //--- check
       if(_spoil_scenario==0)
          Spoil_Matrix_By_Value(track0,CInfOrNaN::NaN());
@@ -4728,14 +4995,14 @@ void TEST_MCPD_Simple1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
       //--- allocation
       track1.Resize(4,2);
       //--- initialization
-      track1[0].Set(0,0.8);
-      track1[0].Set(1,0.2);
-      track1[1].Set(0,0.86);
-      track1[1].Set(1,0.14);
-      track1[2].Set(0,0.887);
-      track1[2].Set(1,0.113);
-      track1[3].Set(0,0.89915);
-      track1[3].Set(1,0.10085);
+      track1.Set(0,0,0.8);
+      track1.Set(0,1,0.2);
+      track1.Set(1,0,0.86);
+      track1.Set(1,1,0.14);
+      track1.Set(2,0,0.887);
+      track1.Set(2,1,0.113);
+      track1.Set(3,0,0.89915);
+      track1.Set(3,1,0.10085);
       //--- check
       if(_spoil_scenario==3)
          Spoil_Matrix_By_Value(track1,CInfOrNaN::NaN());
@@ -4778,17 +5045,17 @@ void TEST_MCPD_Simple1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
       //--- while "bad" loans will return to good state with 50% probability.
       tempmatrix.Resize(2,2);
       //--- initialization
-      tempmatrix[0].Set(0,0.95);
-      tempmatrix[0].Set(1,0.5);
-      tempmatrix[1].Set(0,0.05);
-      tempmatrix[1].Set(1,0.5);
+      tempmatrix.Set(0,0,0.95);
+      tempmatrix.Set(0,1,0.5);
+      tempmatrix.Set(1,0,0.05);
+      tempmatrix.Set(1,1,0.5);
       //--- check result
       _TestResult=_TestResult && Doc_Test_Real_Matrix(p,tempmatrix,0.005);
       _TestResult=_TestResult && (_spoil_scenario==-1);
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","mcpd_simple1");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -4805,7 +5072,7 @@ void TEST_MCPD_Simple2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
    CMatrixDouble tempmatrix;
    CMatrixDouble p;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<6;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<6; _spoil_scenario++)
      {
       //--- Simple MCPD example
       //--- We have a loan portfolio. Our loans can be in one of three states:
@@ -4825,17 +5092,17 @@ void TEST_MCPD_Simple2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
       //---     P = ( p10  p11    )
       //---         (      p21  1 )
       //--- i.e. four elements of P are known a priori.
-      //--- Although it is possible (given enough data) to In order to enforce 
+      //--- Although it is possible (given enough data) to In order to enforce
       //--- this property we set equality constraints on these elements.
       //--- We want to model transitions between these two states using MCPD
       //--- approach (Markov Chains for Proportional/Population Data),i.e.
       //--- to restore hidden transition matrix P using actual portfolio data.
       //--- We have:
-      //--- * poportional data,i.e. proportion of loans in the current and past 
-      //---   due states (not portfolio size measured in some currency,although 
+      //--- * poportional data,i.e. proportion of loans in the current and past
+      //---   due states (not portfolio size measured in some currency,although
       //---   it is possible to work with population data too)
       //--- * two tracks,i.e. two sequences which describe portfolio
-      //---   evolution from two different starting states: [1,0,0] (all loans 
+      //---   evolution from two different starting states: [1,0,0] (all loans
       //---   are "good") and [0.8,0.2,0.0] (only 80% of portfolio is in the "good"
       //---   state)
       CMCPDStateShell s;
@@ -4843,21 +5110,21 @@ void TEST_MCPD_Simple2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
       //--- allocation
       track0.Resize(5,3);
       //--- initialization
-      track0[0].Set(0,1);
-      track0[0].Set(1,0);
-      track0[0].Set(2,0);
-      track0[1].Set(0,0.95);
-      track0[1].Set(1,0.05);
-      track0[1].Set(2,0);
-      track0[2].Set(0,0.9275);
-      track0[2].Set(1,0.06);
-      track0[2].Set(2,0.0125);
-      track0[3].Set(0,0.911125);
-      track0[3].Set(1,0.061375);
-      track0[3].Set(2,0.0275);
-      track0[4].Set(0,0.896256);
-      track0[4].Set(1,0.0609);
-      track0[4].Set(2,0.042844);
+      track0.Set(0,0,1);
+      track0.Set(0,1,0);
+      track0.Set(0,2,0);
+      track0.Set(1,0,0.95);
+      track0.Set(1,1,0.05);
+      track0.Set(1,2,0);
+      track0.Set(2,0,0.9275);
+      track0.Set(2,1,0.06);
+      track0.Set(2,2,0.0125);
+      track0.Set(3,0,0.911125);
+      track0.Set(3,1,0.061375);
+      track0.Set(3,2,0.0275);
+      track0.Set(4,0,0.896256);
+      track0.Set(4,1,0.0609);
+      track0.Set(4,2,0.042844);
       //--- check
       if(_spoil_scenario==0)
          Spoil_Matrix_By_Value(track0,CInfOrNaN::NaN());
@@ -4870,21 +5137,21 @@ void TEST_MCPD_Simple2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
       //--- allocation
       track1.Resize(5,3);
       //--- initialization
-      track1[0].Set(0,0.8);
-      track1[0].Set(1,0.2);
-      track1[0].Set(2,0);
-      track1[1].Set(0,0.86);
-      track1[1].Set(1,0.09);
-      track1[1].Set(2,0.05);
-      track1[2].Set(0,0.862);
-      track1[2].Set(1,0.0655);
-      track1[2].Set(2,0.0725);
-      track1[3].Set(0,0.85165);
-      track1[3].Set(1,0.059475);
-      track1[3].Set(2,0.088875);
-      track1[4].Set(0,0.838805);
-      track1[4].Set(1,0.057451);
-      track1[4].Set(2,0.103744);
+      track1.Set(0,0,0.8);
+      track1.Set(0,1,0.2);
+      track1.Set(0,2,0);
+      track1.Set(1,0,0.86);
+      track1.Set(1,1,0.09);
+      track1.Set(1,2,0.05);
+      track1.Set(2,0,0.862);
+      track1.Set(2,1,0.0655);
+      track1.Set(2,2,0.0725);
+      track1.Set(3,0,0.85165);
+      track1.Set(3,1,0.059475);
+      track1.Set(3,2,0.088875);
+      track1.Set(4,0,0.838805);
+      track1.Set(4,1,0.057451);
+      track1.Set(4,2,0.103744);
       //--- check
       if(_spoil_scenario==3)
          Spoil_Matrix_By_Value(track1,CInfOrNaN::NaN());
@@ -4942,28 +5209,28 @@ void TEST_MCPD_Simple2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
       //--- Hidden matrix P is equal to
       //---         ( 0.95 0.50      )
       //---         ( 0.05 0.25      )
-      //---         (      0.25 1.00 ) 
+      //---         (      0.25 1.00 )
       //--- which means that "good" loans can become past due with 5% probability,
       //--- while past due loans will become charged off with 25% probability or
       //--- return back to normal state with 50% probability.
       tempmatrix.Resize(3,3);
       //--- initialization
-      tempmatrix[0].Set(0,0.95);
-      tempmatrix[0].Set(1,0.5);
-      tempmatrix[0].Set(2,0);
-      tempmatrix[1].Set(0,0.05);
-      tempmatrix[1].Set(1,0.25);
-      tempmatrix[1].Set(2,0);
-      tempmatrix[2].Set(0,0);
-      tempmatrix[2].Set(1,0.25);
-      tempmatrix[2].Set(2,1);
+      tempmatrix.Set(0,0,0.95);
+      tempmatrix.Set(0,1,0.5);
+      tempmatrix.Set(0,2,0);
+      tempmatrix.Set(1,0,0.05);
+      tempmatrix.Set(1,1,0.25);
+      tempmatrix.Set(1,2,0);
+      tempmatrix.Set(2,0,0);
+      tempmatrix.Set(2,1,0.25);
+      tempmatrix.Set(2,2,1);
       //--- check result
       _TestResult=_TestResult && Doc_Test_Real_Matrix(p,tempmatrix,0.005);
       _TestResult=_TestResult && (_spoil_scenario==-1);
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","mcpd_simple2");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -4980,7 +5247,7 @@ void TEST_MinLBFGS_D_1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
    CNDimensional_Grad1 fgrad;
    CNDimensional_Rep   frep;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<12;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<12; _spoil_scenario++)
      {
       //--- This example demonstrates minimization of f(x,y)=100*(x+3)^4+(y-3)^4
       //--- using LBFGS method.
@@ -5063,7 +5330,7 @@ void TEST_MinLBFGS_D_1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","minlbfgs_d_1");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -5080,7 +5347,7 @@ void TEST_MinLBFGS_D_2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
    CNDimensional_Grad1 fgrad;
    CNDimensional_Rep   frep;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<18;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<18; _spoil_scenario++)
      {
       //--- This example demonstrates minimization of f(x,y)=100*(x+3)^4+(y-3)^4
       //--- using LBFGS method.
@@ -5217,7 +5484,7 @@ void TEST_MinLBFGS_D_2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","minlbfgs_d_2");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -5234,7 +5501,7 @@ void TEST_MinLBFGS_NumDiff(int &_spoil_scenario,bool &_TestResult,bool &_TotalRe
    CNDimensional_Func1 ffunc;
    CNDimensional_Rep   frep;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<15;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<15; _spoil_scenario++)
      {
       //--- This example demonstrates minimization of f(x,y)=100*(x+3)^4+(y-3)^4
       //--- using numerical differentiation to calculate gradient.
@@ -5326,7 +5593,7 @@ void TEST_MinLBFGS_NumDiff(int &_spoil_scenario,bool &_TestResult,bool &_TotalRe
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","minlbfgs_numdiff");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -5343,7 +5610,7 @@ void TEST_MinLBFGS_FTRIM(int &_spoil_scenario,bool &_TestResult,bool &_TotalResu
    CNDimensional_S1_Grad fs1grad;
    CNDimensional_Rep     frep;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<12;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<12; _spoil_scenario++)
      {
       //--- This example demonstrates minimization of f(x)=(1+x)^(-0.2) + (1-x)^(-0.3) + 1000*x.
       //--- This function has singularities at the boundary of the [-1,+1],but technique called
@@ -5426,7 +5693,7 @@ void TEST_MinLBFGS_FTRIM(int &_spoil_scenario,bool &_TestResult,bool &_TotalResu
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","minlbfgs_ftrim");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -5437,17 +5704,17 @@ void TEST_ODESolver_D1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
   {
    _TestResult=true;
 //--- create variables
-   double                           y[];
-   double                           x[];
-   int                              m;
-   double                           xtbl[];
-   double                           temparray[];
-   CMatrixDouble                    ytbl;
-   CMatrixDouble                    tempmatrix;
-   CObject                          obj;
+   double        y[];
+   double        x[];
+   int           m;
+   double        xtbl[];
+   double        temparray[];
+   CMatrixDouble ytbl;
+   CMatrixDouble tempmatrix;
+   CObject       obj;
    CNDimensional_ODE_Function_1_Dif fode;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<13;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<13; _spoil_scenario++)
      {
       //--- allocation
       ArrayResize(y,1);
@@ -5529,10 +5796,10 @@ void TEST_ODESolver_D1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
       //--- allocation
       tempmatrix.Resize(4,1);
       //--- initialization
-      tempmatrix[0].Set(0,1);
-      tempmatrix[1].Set(0,0.367);
-      tempmatrix[2].Set(0,0.135);
-      tempmatrix[3].Set(0,0.05);
+      tempmatrix.Set(0,0,1);
+      tempmatrix.Set(1,0,0.367);
+      tempmatrix.Set(2,0,0.135);
+      tempmatrix.Set(3,0,0.05);
       //--- check result
       _TestResult=_TestResult && Doc_Test_Int(m,4);
       _TestResult=_TestResult && Doc_Test_Real_Vector(xtbl,temparray,0.005);
@@ -5541,7 +5808,7 @@ void TEST_ODESolver_D1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","odesolver_d1");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -5552,22 +5819,22 @@ void TEST_FFT_Complex_D1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResu
   {
    _TestResult=true;
 //--- create variables
-   al_complex z[];
-   al_complex temparray[];
-   al_complex tempcomplex1;
-   al_complex tempcomplex2;
-   al_complex cnan;
-   al_complex cpositiveinfinity;
-   al_complex cnegativeinfinity;
+   complex z[];
+   complex temparray[];
+   complex tempcomplex1;
+   complex tempcomplex2;
+   complex cnan;
+   complex cpositiveinfinity;
+   complex cnegativeinfinity;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<3;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<3; _spoil_scenario++)
      {
       //--- first we demonstrate forward FFT:
       //--- [1i,1i,1i,1i] is converted to [4i,0,0,0]
-      tempcomplex1.re=0;
-      tempcomplex1.im=1;
-      tempcomplex2.re=0;
-      tempcomplex2.im=4;
+      tempcomplex1.real=0;
+      tempcomplex1.imag=1;
+      tempcomplex2.real=0;
+      tempcomplex2.imag=4;
       //--- allocation
       ArrayResize(z,4);
       //--- initialization
@@ -5576,12 +5843,12 @@ void TEST_FFT_Complex_D1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResu
       z[2]=tempcomplex1;
       z[3]=tempcomplex1;
       //--- initialization
-      cnan.re=CInfOrNaN::NaN();
-      cnan.im=CInfOrNaN::NaN();
-      cpositiveinfinity.re=CInfOrNaN::PositiveInfinity();
-      cpositiveinfinity.im=CInfOrNaN::PositiveInfinity();
-      cnegativeinfinity.re=CInfOrNaN::NegativeInfinity();
-      cnegativeinfinity.im=CInfOrNaN::NegativeInfinity();
+      cnan.real=CInfOrNaN::NaN();
+      cnan.imag=CInfOrNaN::NaN();
+      cpositiveinfinity.real=CInfOrNaN::PositiveInfinity();
+      cpositiveinfinity.imag=CInfOrNaN::PositiveInfinity();
+      cnegativeinfinity.real=CInfOrNaN::NegativeInfinity();
+      cnegativeinfinity.imag=CInfOrNaN::NegativeInfinity();
       //--- check
       if(_spoil_scenario==0)
          Spoil_Vector_By_Value(z,cnan);
@@ -5624,7 +5891,7 @@ void TEST_FFT_Complex_D1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResu
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","fft_complex_d1");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -5635,21 +5902,21 @@ void TEST_FFT_Complex_D2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResu
   {
    _TestResult=true;
 //--- create variables
-   al_complex z[];
-   al_complex temparray[];
-   al_complex tempcomplex1;
-   al_complex tempcomplex2;
-   al_complex tempcomplex3;
-   al_complex cnan;
-   al_complex cpositiveinfinity;
-   al_complex cnegativeinfinity;
+   complex z[];
+   complex temparray[];
+   complex tempcomplex1;
+   complex tempcomplex2;
+   complex tempcomplex3;
+   complex cnan;
+   complex cpositiveinfinity;
+   complex cnegativeinfinity;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<3;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<3; _spoil_scenario++)
      {
       //--- first we demonstrate forward FFT:
       //--- [0,1,0,1i] is converted to [1+1i,-1-1i,-1-1i,1+1i]
-      tempcomplex1.re=0;
-      tempcomplex1.im=1;
+      tempcomplex1.real=0;
+      tempcomplex1.imag=1;
       //--- allocation
       ArrayResize(z,4);
       //--- initialization
@@ -5658,12 +5925,12 @@ void TEST_FFT_Complex_D2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResu
       z[2]=0;
       z[3]=tempcomplex1;
       //--- initialization
-      cnan.re=CInfOrNaN::NaN();
-      cnan.im=CInfOrNaN::NaN();
-      cpositiveinfinity.re=CInfOrNaN::PositiveInfinity();
-      cpositiveinfinity.im=CInfOrNaN::PositiveInfinity();
-      cnegativeinfinity.re=CInfOrNaN::NegativeInfinity();
-      cnegativeinfinity.im=CInfOrNaN::NegativeInfinity();
+      cnan.real=CInfOrNaN::NaN();
+      cnan.imag=CInfOrNaN::NaN();
+      cpositiveinfinity.real=CInfOrNaN::PositiveInfinity();
+      cpositiveinfinity.imag=CInfOrNaN::PositiveInfinity();
+      cnegativeinfinity.real=CInfOrNaN::NegativeInfinity();
+      cnegativeinfinity.imag=CInfOrNaN::NegativeInfinity();
       //--- check
       if(_spoil_scenario==0)
          Spoil_Vector_By_Value(z,cnan);
@@ -5679,10 +5946,10 @@ void TEST_FFT_Complex_D2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResu
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
       //--- initialization
-      tempcomplex2.re=1;
-      tempcomplex2.im=1;
-      tempcomplex3.re=-1;
-      tempcomplex3.im=-1;
+      tempcomplex2.real=1;
+      tempcomplex2.imag=1;
+      tempcomplex3.real=-1;
+      tempcomplex3.imag=-1;
       //--- allocation
       ArrayResize(temparray,4);
       //--- initialization
@@ -5710,7 +5977,7 @@ void TEST_FFT_Complex_D2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResu
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","fft_complex_d2");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -5721,13 +5988,13 @@ void TEST_FFT_Real_D1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
   {
    _TestResult=true;
 //--- create variables
-   double     x[];
-   al_complex tempcarray[];
-   double     temparray[];
-   al_complex f[];
-   double     x2[];
+   double  x[];
+   complex tempcarray[];
+   double  temparray[];
+   complex f[];
+   double  x2[];
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<3;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<3; _spoil_scenario++)
      {
       //--- first we demonstrate forward FFT:
       //--- [1,1,1,1] is converted to [4,0,0,0]
@@ -5779,7 +6046,7 @@ void TEST_FFT_Real_D1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","fft_real_d1");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -5790,15 +6057,15 @@ void TEST_FFT_Real_D2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
   {
    _TestResult=true;
 //--- create variables
-   double     x[];
-   double     temparray[];
-   al_complex tempcarray[];
-   al_complex f[];
-   double     x2[];
-   al_complex tempcomplex1;
-   al_complex tempcomplex2;
+   double  x[];
+   double  temparray[];
+   complex tempcarray[];
+   complex f[];
+   double  x2[];
+   complex tempcomplex1;
+   complex tempcomplex2;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<3;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<3; _spoil_scenario++)
      {
       //--- first we demonstrate forward FFT:
       //--- [1,2,3,4] is converted to [10,-2+2i,-2,-2-2i]
@@ -5827,10 +6094,10 @@ void TEST_FFT_Real_D2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
       //--- initialization
-      tempcomplex1.re=-2;
-      tempcomplex1.im=2;
-      tempcomplex2.re=-2;
-      tempcomplex2.im=-2;
+      tempcomplex1.real=-2;
+      tempcomplex1.imag=2;
+      tempcomplex2.real=-2;
+      tempcomplex2.imag=-2;
       //--- allocation
       ArrayResize(tempcarray,4);
       //--- initialization
@@ -5883,7 +6150,7 @@ void TEST_FFT_Real_D2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","fft_real_d2");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -5894,15 +6161,15 @@ void TEST_FFT_Complex_E1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResu
   {
    _TestResult=true;
 //--- create variables
-   al_complex tempcomplex1;
-   al_complex tempcomplex2;
-   al_complex z[];
-   al_complex temparray[];
-   al_complex cnan;
-   al_complex cpositiveinfinity;
-   al_complex cnegativeinfinity;
+   complex tempcomplex1;
+   complex tempcomplex2;
+   complex z[];
+   complex temparray[];
+   complex cnan;
+   complex cpositiveinfinity;
+   complex cnegativeinfinity;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<3;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<3; _spoil_scenario++)
      {
       //--- allocation
       ArrayResize(z,4);
@@ -5912,12 +6179,12 @@ void TEST_FFT_Complex_E1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResu
       z[2]=0;
       z[3]=-2;
       //--- initialization
-      cnan.re=CInfOrNaN::NaN();
-      cnan.im=CInfOrNaN::NaN();
-      cpositiveinfinity.re=CInfOrNaN::PositiveInfinity();
-      cpositiveinfinity.im=CInfOrNaN::PositiveInfinity();
-      cnegativeinfinity.re=CInfOrNaN::NegativeInfinity();
-      cnegativeinfinity.im=CInfOrNaN::NegativeInfinity();
+      cnan.real=CInfOrNaN::NaN();
+      cnan.imag=CInfOrNaN::NaN();
+      cpositiveinfinity.real=CInfOrNaN::PositiveInfinity();
+      cpositiveinfinity.imag=CInfOrNaN::PositiveInfinity();
+      cnegativeinfinity.real=CInfOrNaN::NegativeInfinity();
+      cnegativeinfinity.imag=CInfOrNaN::NegativeInfinity();
       //--- check
       if(_spoil_scenario==0)
          Spoil_Vector_By_Value(z,cnan);
@@ -5933,10 +6200,10 @@ void TEST_FFT_Complex_E1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResu
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
       //--- initialization
-      tempcomplex1.re=0;
-      tempcomplex1.im=1;
-      tempcomplex2.re=0;
-      tempcomplex2.im=-1;
+      tempcomplex1.real=0;
+      tempcomplex1.imag=1;
+      tempcomplex2.real=0;
+      tempcomplex2.imag=-1;
       //--- allocation
       ArrayResize(temparray,4);
       //--- initialization
@@ -5950,7 +6217,7 @@ void TEST_FFT_Complex_E1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResu
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","fft_complex_e1");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -5964,7 +6231,7 @@ void TEST_AutoGK_D1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
    CObject              obj;
    CInt_Function_1_Func fint;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<6;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<6; _spoil_scenario++)
      {
       //--- This example demonstrates integration of f=exp(x) on [0,1]:
       //--- * first,autogkstate is initialized
@@ -6015,7 +6282,7 @@ void TEST_AutoGK_D1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","autogk_d1");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -6030,7 +6297,7 @@ void TEST_PolInt_D_CalcDiff(int &_spoil_scenario,bool &_TestResult,bool &_TotalR
    double x[];
    double y[];
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<12;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<12; _spoil_scenario++)
      {
       //--- Here we demonstrate polynomial interpolation and differentiation
       //--- of y=x^2-x sampled at [0,1,2]. Barycentric representation of polynomial is used.
@@ -6128,7 +6395,7 @@ void TEST_PolInt_D_CalcDiff(int &_spoil_scenario,bool &_TestResult,bool &_TotalR
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","polint_d_calcdiff");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -6144,7 +6411,7 @@ void TEST_PolInt_D_Conv(int &_spoil_scenario,bool &_TestResult,bool &_TotalResul
    double a2[];
    double v;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<5;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<5; _spoil_scenario++)
      {
       //--- Here we demonstrate conversion of y=x^2-x
       //--- between power basis and barycentric representation.
@@ -6202,7 +6469,7 @@ void TEST_PolInt_D_Conv(int &_spoil_scenario,bool &_TestResult,bool &_TotalResul
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","polint_d_conv");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -6222,7 +6489,7 @@ void TEST_PolInt_D_Spec(int &_spoil_scenario,bool &_TestResult,bool &_TotalResul
    double a_cheb2[];
    double temparray[];
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<11;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<11; _spoil_scenario++)
      {
       //--- Temporaries:
       //--- * values of y=x^2-x sampled at three special grids:
@@ -6336,7 +6603,7 @@ void TEST_PolInt_D_Spec(int &_spoil_scenario,bool &_TestResult,bool &_TotalResul
       temparray[2]=1;
       //--- check result
       _TestResult=_TestResult && Doc_Test_Real_Vector(a_cheb2,temparray,0.00005);
-      //--- Now we demonstrate polynomial interpolation withconstruction 
+      //--- Now we demonstrate polynomial interpolation withconstruction
       //--- of the barycentricinterpolant structure.
       //--- We calculate interpolant value at x=-2.
       //--- In all three cases we should get same f=6
@@ -6373,7 +6640,7 @@ void TEST_PolInt_D_Spec(int &_spoil_scenario,bool &_TestResult,bool &_TotalResul
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","polint_d_spec");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -6387,7 +6654,7 @@ void TEST_PolInt_T_1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
    double x[];
    double y[];
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<10;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<10; _spoil_scenario++)
      {
       //--- allocation
       ArrayResize(x,3);
@@ -6451,7 +6718,7 @@ void TEST_PolInt_T_1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","polint_t_1");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -6466,7 +6733,7 @@ void TEST_PolInt_T_2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
    double t;
    double v;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<6;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<6; _spoil_scenario++)
      {
       //--- allocation
       ArrayResize(y,3);
@@ -6510,7 +6777,7 @@ void TEST_PolInt_T_2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","polint_t_2");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -6524,7 +6791,7 @@ void TEST_PolInt_T_3(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
    double y[];
    double t;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<6;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<6; _spoil_scenario++)
      {
       //--- allocation
       ArrayResize(y,3);
@@ -6570,7 +6837,7 @@ void TEST_PolInt_T_3(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","polint_t_3");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -6587,7 +6854,7 @@ void TEST_PolInt_T_4(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
    double b;
    double v;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<12;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<12; _spoil_scenario++)
      {
       //--- allocation
       ArrayResize(y,3);
@@ -6652,7 +6919,7 @@ void TEST_PolInt_T_4(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","polint_t_4");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -6667,7 +6934,7 @@ void TEST_PolInt_T_5(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
    double t;
    double v;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<6;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<6; _spoil_scenario++)
      {
       //--- allocation
       ArrayResize(y,3);
@@ -6705,7 +6972,7 @@ void TEST_PolInt_T_5(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","polint_t_5");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -6722,7 +6989,7 @@ void TEST_PolInt_T_6(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
    double b;
    double v;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<12;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<12; _spoil_scenario++)
      {
       //--- allocation
       ArrayResize(y,3);
@@ -6780,7 +7047,7 @@ void TEST_PolInt_T_6(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","polint_t_6");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -6797,7 +7064,7 @@ void TEST_PolInt_T_7(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
    double b;
    double v;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<12;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<12; _spoil_scenario++)
      {
       //--- allocation
       ArrayResize(y,3);
@@ -6855,7 +7122,7 @@ void TEST_PolInt_T_7(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","polint_t_7");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -6871,7 +7138,7 @@ void TEST_PolInt_T_8(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
    double t;
    double v;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<5;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<5; _spoil_scenario++)
      {
       //--- allocation
       ArrayResize(y,3);
@@ -6912,7 +7179,7 @@ void TEST_PolInt_T_8(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","polint_t_8");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -6930,7 +7197,7 @@ void TEST_PolInt_T_9(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
    double b;
    double v;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<11;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<11; _spoil_scenario++)
      {
       //--- allocation
       ArrayResize(y,3);
@@ -6992,7 +7259,7 @@ void TEST_PolInt_T_9(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","polint_t_9");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -7010,7 +7277,7 @@ void TEST_PolInt_T_10(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
    double b;
    double v;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<11;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<11; _spoil_scenario++)
      {
       //--- allocation
       ArrayResize(y,3);
@@ -7072,7 +7339,7 @@ void TEST_PolInt_T_10(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","polint_t_10");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -7087,7 +7354,7 @@ void TEST_PolInt_T_11(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
    double t;
    double v;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<5;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<5; _spoil_scenario++)
      {
       //--- allocation
       ArrayResize(y,3);
@@ -7122,7 +7389,7 @@ void TEST_PolInt_T_11(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","polint_t_11");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -7139,7 +7406,7 @@ void TEST_PolInt_T_12(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
    double b;
    double v;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<11;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<11; _spoil_scenario++)
      {
       //--- allocation
       ArrayResize(y,3);
@@ -7194,7 +7461,7 @@ void TEST_PolInt_T_12(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","polint_t_12");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -7207,7 +7474,7 @@ void TEST_PolInt_T_13(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
 //--- create variables
    double y[];
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<11;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<11; _spoil_scenario++)
      {
       //--- allocation
       ArrayResize(y,3);
@@ -7263,7 +7530,7 @@ void TEST_PolInt_T_13(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","polint_t_13");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -7279,9 +7546,9 @@ void TEST_Spline1D_D_Linear(int &_spoil_scenario,bool &_TestResult,bool &_TotalR
    double t;
    double v;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<12;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<12; _spoil_scenario++)
      {
-      //--- We use piecewise linear spline to interpolate f(x)=x^2 sampled 
+      //--- We use piecewise linear spline to interpolate f(x)=x^2 sampled
       //--- at 5 equidistant nodes on [-1,+1].
       ArrayResize(x,5);
       //--- initialization
@@ -7356,7 +7623,7 @@ void TEST_Spline1D_D_Linear(int &_spoil_scenario,bool &_TestResult,bool &_TotalR
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","spline1d_d_linear");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -7370,12 +7637,12 @@ void TEST_Spline1D_D_Cubic(int &_spoil_scenario,bool &_TestResult,bool &_TotalRe
    double x[];
    double y[];
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<10;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<10; _spoil_scenario++)
      {
-      //--- We use cubic spline to interpolate f(x)=x^2 sampled 
+      //--- We use cubic spline to interpolate f(x)=x^2 sampled
       //--- at 5 equidistant nodes on [-1,+1].
       //--- First,we use default boundary conditions ("parabolically terminated
-      //--- spline") because cubic spline built with such boundary conditions 
+      //--- spline") because cubic spline built with such boundary conditions
       //--- will exactly reproduce any quadratic f(x).
       //--- Then we try to use natural boundary conditions
       //---     d2S(-1)/dx^2=0.0
@@ -7461,7 +7728,7 @@ void TEST_Spline1D_D_Cubic(int &_spoil_scenario,bool &_TestResult,bool &_TotalRe
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","spline1d_d_cubic");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -7479,7 +7746,7 @@ void TEST_Spline1D_D_GridDiff(int &_spoil_scenario,bool &_TestResult,bool &_Tota
    double temparray1[];
    double temparray2[];
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<10;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<10; _spoil_scenario++)
      {
       //--- We use cubic spline to do grid differentiation,i.e. having
       //--- values of f(x)=x^2 sampled at 5 equidistant nodes on [-1,+1]
@@ -7488,10 +7755,10 @@ void TEST_Spline1D_D_GridDiff(int &_spoil_scenario,bool &_TestResult,bool &_Tota
       //--- There are efficient functions spline1dgriddiffcubic() and
       //--- spline1dgriddiff2cubic() for such calculations.
       //--- We use default boundary conditions ("parabolically terminated
-      //--- spline") because cubic spline built with such boundary conditions 
+      //--- spline") because cubic spline built with such boundary conditions
       //--- will exactly reproduce any quadratic f(x).
-      //--- Actually,we could use natural conditions,but we feel that 
-      //--- spline which exactly reproduces f() will show us more 
+      //--- Actually,we could use natural conditions,but we feel that
+      //--- spline which exactly reproduces f() will show us more
       //--- understandable results.
       ArrayResize(x,5);
       //--- initialization
@@ -7574,7 +7841,7 @@ void TEST_Spline1D_D_GridDiff(int &_spoil_scenario,bool &_TestResult,bool &_Tota
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","spline1d_d_griddiff");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -7595,21 +7862,21 @@ void TEST_Spline1D_D_ConvDiff(int &_spoil_scenario,bool &_TestResult,bool &_Tota
    double temparray2[];
    double temparray3[];
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<11;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<11; _spoil_scenario++)
      {
       //--- We use cubic spline to do resampling,i.e. having
       //--- values of f(x)=x^2 sampled at 5 equidistant nodes on [-1,+1]
-      //--- we calculate values/derivatives of cubic spline on 
+      //--- we calculate values/derivatives of cubic spline on
       //--- another grid (equidistant with 9 nodes on [-1,+1])
       //--- WITHOUT CONSTRUCTION OF SPLINE OBJECT.
       //--- There are efficient functions spline1dconvcubic(),
-      //--- spline1dconvdiffcubic() and spline1dconvdiff2cubic() 
+      //--- spline1dconvdiffcubic() and spline1dconvdiff2cubic()
       //--- for such calculations.
       //--- We use default boundary conditions ("parabolically terminated
-      //--- spline") because cubic spline built with such boundary conditions 
+      //--- spline") because cubic spline built with such boundary conditions
       //--- will exactly reproduce any quadratic f(x).
-      //--- Actually,we could use natural conditions,but we feel that 
-      //--- spline which exactly reproduces f() will show us more 
+      //--- Actually,we could use natural conditions,but we feel that
+      //--- spline which exactly reproduces f() will show us more
       //--- understandable results.
       ArrayResize(x_old,5);
       //--- initialization
@@ -7735,7 +8002,7 @@ void TEST_Spline1D_D_ConvDiff(int &_spoil_scenario,bool &_TestResult,bool &_Tota
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","spline1d_d_convdiff");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -7752,7 +8019,7 @@ void TEST_MinQP_D_U1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
    double x[];
    double temparray[];
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<13;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<13; _spoil_scenario++)
      {
       //--- This example demonstrates minimization of F(x0,x1)=x0^2 + x1^2 -6*x0 - 4*x1
       //--- Exact solution is [x0,x1]=[3,2]
@@ -7763,24 +8030,29 @@ void TEST_MinQP_D_U1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
       //--- Note that quadratic term has 0.5 before it. So if you want to minimize
       //--- quadratic function,you should rewrite it in such way that quadratic term
       //--- is multiplied by 0.5 too.
-      //--- For example,our function is f(x)=x0^2+x1^2+...,but we rewrite it as 
+      //--- For example,our function is f(x)=x0^2+x1^2+...,but we rewrite it as
       //---     f(x)=0.5*(2*x0^2+2*x1^2) + ....
       //--- and pass diag(2,2) as quadratic term - NOT diag(1,1)!
       a.Resize(2,2);
       //--- initialization
-      a[0].Set(0,2);
-      a[0].Set(1,0);
-      a[1].Set(0,0);
-      a[1].Set(1,2);
+      a.Set(0,0,2);
+      a.Set(0,1,0);
+      a.Set(1,0,0);
+      a.Set(1,1,2);
       //--- check
-      if(_spoil_scenario==0)
-         Spoil_Matrix_By_Value(a,CInfOrNaN::NaN());
-      //--- check
-      if(_spoil_scenario==1)
-         Spoil_Matrix_By_Value(a,CInfOrNaN::PositiveInfinity());
-      //--- check
-      if(_spoil_scenario==2)
-         Spoil_Matrix_By_Value(a,CInfOrNaN::NegativeInfinity());
+      if(_spoil_scenario>=0 && _spoil_scenario<=2)
+         do
+           {
+            if(_spoil_scenario==0)
+               Spoil_Matrix_By_Value(a,CInfOrNaN::NaN());
+            //--- check
+            if(_spoil_scenario==1)
+               Spoil_Matrix_By_Value(a,CInfOrNaN::PositiveInfinity());
+            //--- check
+            if(_spoil_scenario==2)
+               Spoil_Matrix_By_Value(a,CInfOrNaN::NegativeInfinity());
+           }
+         while(CApServ::IsFiniteRTrMatrix(a,2,false));
       //--- check
       if(_spoil_scenario==3)
          Spoil_Matrix_By_Deleting_Row(a);
@@ -7866,7 +8138,7 @@ void TEST_MinQP_D_U1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","minqp_d_u1");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -7884,7 +8156,7 @@ void TEST_MinQP_D_BC1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
    double bndu[];
    double temparray[];
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<17;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<17; _spoil_scenario++)
      {
       //--- This example demonstrates minimization of F(x0,x1)=x0^2 + x1^2 -6*x0 - 4*x1
       //--- subject to bound constraints 0<=x0<=2.5,0<=x1<=2.5
@@ -7897,24 +8169,30 @@ void TEST_MinQP_D_BC1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
       //--- Note that quadratic term has 0.5 before it. So if you want to minimize
       //--- quadratic function,you should rewrite it in such way that quadratic term
       //--- is multiplied by 0.5 too.
-      //--- For example,our function is f(x)=x0^2+x1^2+...,but we rewrite it as 
+      //--- For example,our function is f(x)=x0^2+x1^2+...,but we rewrite it as
       //---     f(x)=0.5*(2*x0^2+2*x1^2) + ....
       //--- and pass diag(2,2) as quadratic term - NOT diag(1,1)!
       a.Resize(2,2);
       //--- initialization
-      a[0].Set(0,2);
-      a[0].Set(1,0);
-      a[1].Set(0,0);
-      a[1].Set(1,2);
+      a.Set(0,0,2);
+      a.Set(0,1,0);
+      a.Set(1,0,0);
+      a.Set(1,1,2);
       //--- check
-      if(_spoil_scenario==0)
-         Spoil_Matrix_By_Value(a,CInfOrNaN::NaN());
       //--- check
-      if(_spoil_scenario==1)
-         Spoil_Matrix_By_Value(a,CInfOrNaN::PositiveInfinity());
-      //--- check
-      if(_spoil_scenario==2)
-         Spoil_Matrix_By_Value(a,CInfOrNaN::NegativeInfinity());
+      if(_spoil_scenario>=0 && _spoil_scenario<=2)
+         do
+           {
+            if(_spoil_scenario==0)
+               Spoil_Matrix_By_Value(a,CInfOrNaN::NaN());
+            //--- check
+            if(_spoil_scenario==1)
+               Spoil_Matrix_By_Value(a,CInfOrNaN::PositiveInfinity());
+            //--- check
+            if(_spoil_scenario==2)
+               Spoil_Matrix_By_Value(a,CInfOrNaN::NegativeInfinity());
+           }
+         while(CApServ::IsFiniteRTrMatrix(a,2,false));
       //--- check
       if(_spoil_scenario==3)
          Spoil_Matrix_By_Deleting_Row(a);
@@ -8027,7 +8305,7 @@ void TEST_MinQP_D_BC1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","minqp_d_bc1");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -8039,14 +8317,15 @@ void TEST_MinLM_D_V(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
    _TestResult=true;
 //--- create variables
    double              x[];
+   double              s[];
    double              temparray[];
    CObject             obj;
    CNDimensional_FVec1 ffvec;
    CNDimensional_Rep   frep;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<12;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<9; _spoil_scenario++)
      {
-      //--- This example demonstrates minimization of F(x0,x1)=f0^2+f1^2,where 
+      //--- This example demonstrates minimization of F(x0,x1)=f0^2+f1^2,where
       //---     f0(x0,x1)=10*(x0+3)^2
       //---     f1(x0,x1)=(x1-3)^2
       //--- using "V" mode of the Levenberg-Marquardt optimizer.
@@ -8066,35 +8345,25 @@ void TEST_MinLM_D_V(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
       //--- check
       if(_spoil_scenario==2)
          Spoil_Vector_By_Value(x,CInfOrNaN::NegativeInfinity());
-      double epsg=0.0000000001;
-      //--- check
+      ArrayResize(s,2);
+      ArrayInitialize(s,1);
       if(_spoil_scenario==3)
-         epsg=CInfOrNaN::NaN();
+         Spoil_Vector_By_Value(s,CInfOrNaN::NaN());
       //--- check
       if(_spoil_scenario==4)
-         epsg=CInfOrNaN::PositiveInfinity();
+         Spoil_Vector_By_Value(s,CInfOrNaN::PositiveInfinity());
       //--- check
       if(_spoil_scenario==5)
-         epsg=CInfOrNaN::NegativeInfinity();
-      double epsf=0;
+         Spoil_Vector_By_Value(s,CInfOrNaN::NegativeInfinity());
+      double epsx=0.0000000001;
       //--- check
       if(_spoil_scenario==6)
-         epsf=CInfOrNaN::NaN();
-      //--- check
-      if(_spoil_scenario==7)
-         epsf=CInfOrNaN::PositiveInfinity();
-      //--- check
-      if(_spoil_scenario==8)
-         epsf=CInfOrNaN::NegativeInfinity();
-      double epsx=0;
-      //--- check
-      if(_spoil_scenario==9)
          epsx=CInfOrNaN::NaN();
       //--- check
-      if(_spoil_scenario==10)
+      if(_spoil_scenario==7)
          epsx=CInfOrNaN::PositiveInfinity();
       //--- check
-      if(_spoil_scenario==11)
+      if(_spoil_scenario==8)
          epsx=CInfOrNaN::NegativeInfinity();
       int maxits=0;
       //--- objects of classes
@@ -8106,7 +8375,12 @@ void TEST_MinLM_D_V(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
       //--- function call
-      CAlglib::MinLMSetCond(state,epsg,epsf,epsx,maxits);
+      CAlglib::MinLMSetCond(state,epsx,maxits);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- function call
+      CAlglib::MinLMSetScale(state,s);
       //--- handling exceptions
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
@@ -8126,13 +8400,12 @@ void TEST_MinLM_D_V(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
       temparray[0]=-3;
       temparray[1]=3;
       //--- check result
-      _TestResult=_TestResult && Doc_Test_Int(rep.GetTerminationType(),4);
       _TestResult=_TestResult && Doc_Test_Real_Vector(x,temparray,0.005);
       _TestResult=_TestResult && (_spoil_scenario==-1);
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","minlm_d_v");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -8147,15 +8420,16 @@ void TEST_MinLM_D_VJ(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
    _TestResult=true;
 //--- create variables
    double              x[];
+   double              s[];
    double              temparray[];
    CObject             obj;
    CNDimensional_FVec1 ffvec;
    CNDimensional_Jac1  fjac;
    CNDimensional_Rep   frep;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<12;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<9; _spoil_scenario++)
      {
-      //--- This example demonstrates minimization of F(x0,x1)=f0^2+f1^2,where 
+      //--- This example demonstrates minimization of F(x0,x1)=f0^2+f1^2,where
       //---     f0(x0,x1)=10*(x0+3)^2
       //---     f1(x0,x1)=(x1-3)^2
       //--- using "VJ" mode of the Levenberg-Marquardt optimizer.
@@ -8175,35 +8449,25 @@ void TEST_MinLM_D_VJ(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
       //--- check
       if(_spoil_scenario==2)
          Spoil_Vector_By_Value(x,CInfOrNaN::NegativeInfinity());
-      double epsg=0.0000000001;
-      //--- check
+      ArrayResize(s,2);
+      ArrayInitialize(s,1);
       if(_spoil_scenario==3)
-         epsg=CInfOrNaN::NaN();
+         Spoil_Vector_By_Value(s,CInfOrNaN::NaN());
       //--- check
       if(_spoil_scenario==4)
-         epsg=CInfOrNaN::PositiveInfinity();
+         Spoil_Vector_By_Value(s,CInfOrNaN::PositiveInfinity());
       //--- check
       if(_spoil_scenario==5)
-         epsg=CInfOrNaN::NegativeInfinity();
-      double epsf=0;
+         Spoil_Vector_By_Value(s,CInfOrNaN::NegativeInfinity());
+      double epsx=0.0000000001;
       //--- check
       if(_spoil_scenario==6)
-         epsf=CInfOrNaN::NaN();
-      //--- check
-      if(_spoil_scenario==7)
-         epsf=CInfOrNaN::PositiveInfinity();
-      //--- check
-      if(_spoil_scenario==8)
-         epsf=CInfOrNaN::NegativeInfinity();
-      double epsx=0;
-      //--- check
-      if(_spoil_scenario==9)
          epsx=CInfOrNaN::NaN();
       //--- check
-      if(_spoil_scenario==10)
+      if(_spoil_scenario==7)
          epsx=CInfOrNaN::PositiveInfinity();
       //--- check
-      if(_spoil_scenario==11)
+      if(_spoil_scenario==8)
          epsx=CInfOrNaN::NegativeInfinity();
       //--- create variables
       int maxits=0;
@@ -8215,7 +8479,12 @@ void TEST_MinLM_D_VJ(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
       //--- function call
-      CAlglib::MinLMSetCond(state,epsg,epsf,epsx,maxits);
+      CAlglib::MinLMSetCond(state,epsx,maxits);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- function call
+      CAlglib::MinLMSetScale(state,s);
       //--- handling exceptions
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
@@ -8235,13 +8504,13 @@ void TEST_MinLM_D_VJ(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
       temparray[0]=-3;
       temparray[1]=3;
       //--- check result
-      _TestResult=_TestResult && Doc_Test_Int(rep.GetTerminationType(),4);
+      //_TestResult = _TestResult  &&  Doc_Test_Int(rep.GetTerminationType(), 4);
       _TestResult=_TestResult && Doc_Test_Real_Vector(x,temparray,0.005);
       _TestResult=_TestResult && (_spoil_scenario==-1);
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","minlm_d_vj");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -8253,6 +8522,7 @@ void TEST_MinLM_D_FGH(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
    _TestResult=true;
 //--- create variables
    double              x[];
+   double              s[];
    double              temparray[];
    CObject             obj;
    CNDimensional_Func1 ffunc;
@@ -8260,7 +8530,7 @@ void TEST_MinLM_D_FGH(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
    CNDimensional_Hess1 fhess;
    CNDimensional_Rep   frep;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<12;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<9; _spoil_scenario++)
      {
       //--- This example demonstrates minimization of F(x0,x1)=100*(x0+3)^4+(x1-3)^4
       //--- using "FGH" mode of the Levenberg-Marquardt optimizer.
@@ -8283,35 +8553,25 @@ void TEST_MinLM_D_FGH(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
       //--- check
       if(_spoil_scenario==2)
          Spoil_Vector_By_Value(x,CInfOrNaN::NegativeInfinity());
-      double epsg=0.0000000001;
-      //--- check
+      ArrayResize(s,2);
+      ArrayInitialize(s,1);
       if(_spoil_scenario==3)
-         epsg=CInfOrNaN::NaN();
+         Spoil_Vector_By_Value(s,CInfOrNaN::NaN());
       //--- check
       if(_spoil_scenario==4)
-         epsg=CInfOrNaN::PositiveInfinity();
+         Spoil_Vector_By_Value(s,CInfOrNaN::PositiveInfinity());
       //--- check
       if(_spoil_scenario==5)
-         epsg=CInfOrNaN::NegativeInfinity();
-      double epsf=0;
+         Spoil_Vector_By_Value(s,CInfOrNaN::NegativeInfinity());
+      double epsx=0.0000000001;
       //--- check
       if(_spoil_scenario==6)
-         epsf=CInfOrNaN::NaN();
-      //--- check
-      if(_spoil_scenario==7)
-         epsf=CInfOrNaN::PositiveInfinity();
-      //--- check
-      if(_spoil_scenario==8)
-         epsf=CInfOrNaN::NegativeInfinity();
-      double epsx=0;
-      //--- check
-      if(_spoil_scenario==9)
          epsx=CInfOrNaN::NaN();
       //--- check
-      if(_spoil_scenario==10)
+      if(_spoil_scenario==7)
          epsx=CInfOrNaN::PositiveInfinity();
       //--- check
-      if(_spoil_scenario==11)
+      if(_spoil_scenario==8)
          epsx=CInfOrNaN::NegativeInfinity();
       //--- create variables
       int maxits=0;
@@ -8323,7 +8583,12 @@ void TEST_MinLM_D_FGH(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
       //--- function call
-      CAlglib::MinLMSetCond(state,epsg,epsf,epsx,maxits);
+      CAlglib::MinLMSetCond(state,epsx,maxits);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- function call
+      CAlglib::MinLMSetScale(state,s);
       //--- handling exceptions
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
@@ -8343,13 +8608,13 @@ void TEST_MinLM_D_FGH(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
       temparray[0]=-3;
       temparray[1]=3;
       //--- check result
-      _TestResult=_TestResult && Doc_Test_Int(rep.GetTerminationType(),4);
+      //_TestResult = _TestResult  &&  Doc_Test_Int(rep.GetTerminationType(), 4);
       _TestResult=_TestResult && Doc_Test_Real_Vector(x,temparray,0.005);
       _TestResult=_TestResult && (_spoil_scenario==-1);
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","minlm_d_fgh");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -8361,6 +8626,7 @@ void TEST_MinLM_D_VB(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
    _TestResult=true;
 //--- create variables
    double              x[];
+   double              s[];
    double              bndl[];
    double              bndu[];
    double              temparray[];
@@ -8368,9 +8634,9 @@ void TEST_MinLM_D_VB(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
    CNDimensional_FVec1 ffvec;
    CNDimensional_Rep   frep;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<16;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<13; _spoil_scenario++)
      {
-      //--- This example demonstrates minimization of F(x0,x1)=f0^2+f1^2,where 
+      //--- This example demonstrates minimization of F(x0,x1)=f0^2+f1^2,where
       //---     f0(x0,x1)=10*(x0+3)^2
       //---     f1(x0,x1)=(x1-3)^2
       //--- with boundary constraints
@@ -8415,35 +8681,25 @@ void TEST_MinLM_D_VB(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
       //--- check
       if(_spoil_scenario==6)
          Spoil_Vector_By_Deleting_Element(bndu);
-      double epsg=0.0000000001;
-      //--- check
+      ArrayResize(s,2);
+      ArrayInitialize(s,1);
       if(_spoil_scenario==7)
-         epsg=CInfOrNaN::NaN();
+         Spoil_Vector_By_Value(s,CInfOrNaN::NaN());
       //--- check
       if(_spoil_scenario==8)
-         epsg=CInfOrNaN::PositiveInfinity();
+         Spoil_Vector_By_Value(s,CInfOrNaN::PositiveInfinity());
       //--- check
       if(_spoil_scenario==9)
-         epsg=CInfOrNaN::NegativeInfinity();
-      double epsf=0;
+         Spoil_Vector_By_Value(s,CInfOrNaN::NegativeInfinity());
+      double epsx=0.0000000001;
       //--- check
       if(_spoil_scenario==10)
-         epsf=CInfOrNaN::NaN();
-      //--- check
-      if(_spoil_scenario==11)
-         epsf=CInfOrNaN::PositiveInfinity();
-      //--- check
-      if(_spoil_scenario==12)
-         epsf=CInfOrNaN::NegativeInfinity();
-      double epsx=0;
-      //--- check
-      if(_spoil_scenario==13)
          epsx=CInfOrNaN::NaN();
       //--- check
-      if(_spoil_scenario==14)
+      if(_spoil_scenario==11)
          epsx=CInfOrNaN::PositiveInfinity();
       //--- check
-      if(_spoil_scenario==15)
+      if(_spoil_scenario==12)
          epsx=CInfOrNaN::NegativeInfinity();
       //--- create variables
       int maxits=0;
@@ -8460,7 +8716,12 @@ void TEST_MinLM_D_VB(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
       //--- function call
-      CAlglib::MinLMSetCond(state,epsg,epsf,epsx,maxits);
+      CAlglib::MinLMSetCond(state,epsx,maxits);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- function call
+      CAlglib::MinLMSetScale(state,s);
       //--- handling exceptions
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
@@ -8480,13 +8741,13 @@ void TEST_MinLM_D_VB(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
       temparray[0]=-1;
       temparray[1]=1;
       //--- check result
-      _TestResult=_TestResult && Doc_Test_Int(rep.GetTerminationType(),4);
+      //_TestResult = _TestResult  &&  Doc_Test_Int(rep.GetTerminationType(), 4);
       _TestResult=_TestResult && Doc_Test_Real_Vector(x,temparray,0.005);
       _TestResult=_TestResult && (_spoil_scenario==-1);
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","minlm_d_vb");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -8498,47 +8759,38 @@ void TEST_MinLM_D_Restarts(int &_spoil_scenario,bool &_TestResult,bool &_TotalRe
    _TestResult=true;
 //--- create variables
    double              x[];
+   double              s[];
    double              temparray[];
    CObject             obj;
    CNDimensional_FVec1 ffvec1;
    CNDimensional_FVec2 ffvec2;
    CNDimensional_Rep   frep;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<15;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<9; _spoil_scenario++)
      {
-      //--- This example demonstrates minimization of F(x0,x1)=f0^2+f1^2,where 
+      //--- This example demonstrates minimization of F(x0,x1)=f0^2+f1^2,where
       //---     f0(x0,x1)=10*(x0+3)^2
       //---     f1(x0,x1)=(x1-3)^2
       //--- using several starting points and efficient restarts.
-      double epsg=0.0000000001;
-      //--- check
+      ArrayResize(s,2);
+      ArrayInitialize(s,1);
       if(_spoil_scenario==0)
-         epsg=CInfOrNaN::NaN();
+         Spoil_Vector_By_Value(s,CInfOrNaN::NaN());
       //--- check
       if(_spoil_scenario==1)
-         epsg=CInfOrNaN::PositiveInfinity();
+         Spoil_Vector_By_Value(s,CInfOrNaN::PositiveInfinity());
       //--- check
       if(_spoil_scenario==2)
-         epsg=CInfOrNaN::NegativeInfinity();
-      double epsf=0;
+         Spoil_Vector_By_Value(s,CInfOrNaN::NegativeInfinity());
+      double epsx=0.0000000001;
       //--- check
       if(_spoil_scenario==3)
-         epsf=CInfOrNaN::NaN();
-      //--- check
-      if(_spoil_scenario==4)
-         epsf=CInfOrNaN::PositiveInfinity();
-      //--- check
-      if(_spoil_scenario==5)
-         epsf=CInfOrNaN::NegativeInfinity();
-      double epsx=0;
-      //--- check
-      if(_spoil_scenario==6)
          epsx=CInfOrNaN::NaN();
       //--- check
-      if(_spoil_scenario==7)
+      if(_spoil_scenario==4)
          epsx=CInfOrNaN::PositiveInfinity();
       //--- check
-      if(_spoil_scenario==8)
+      if(_spoil_scenario==5)
          epsx=CInfOrNaN::NegativeInfinity();
       //--- create variables
       int maxits=0;
@@ -8550,13 +8802,13 @@ void TEST_MinLM_D_Restarts(int &_spoil_scenario,bool &_TestResult,bool &_TotalRe
       x[0]=10;
       x[1]=10;
       //--- check
-      if(_spoil_scenario==9)
+      if(_spoil_scenario==6)
          Spoil_Vector_By_Value(x,CInfOrNaN::NaN());
       //--- check
-      if(_spoil_scenario==10)
+      if(_spoil_scenario==7)
          Spoil_Vector_By_Value(x,CInfOrNaN::PositiveInfinity());
       //--- check
-      if(_spoil_scenario==11)
+      if(_spoil_scenario==8)
          Spoil_Vector_By_Value(x,CInfOrNaN::NegativeInfinity());
       //--- function call
       CAlglib::MinLMCreateV(2,x,0.0001,state);
@@ -8564,7 +8816,12 @@ void TEST_MinLM_D_Restarts(int &_spoil_scenario,bool &_TestResult,bool &_TotalRe
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
       //--- function call
-      CAlglib::MinLMSetCond(state,epsg,epsf,epsx,maxits);
+      CAlglib::MinLMSetCond(state,epsx,maxits);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- function call
+      CAlglib::MinLMSetScale(state,s);
       //--- handling exceptions
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
@@ -8628,7 +8885,7 @@ void TEST_MinLM_D_Restarts(int &_spoil_scenario,bool &_TestResult,bool &_TotalRe
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","minlm_d_restarts");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -8641,13 +8898,14 @@ void TEST_MinLM_T_1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
    _TestResult=true;
 //--- create variables
    double              x[];
+   double              s[];
    double              temparray[];
    CObject             obj;
    CNDimensional_Func1 ffunc;
    CNDimensional_Jac1  fjac;
    CNDimensional_Rep   frep;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<12;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<9; _spoil_scenario++)
      {
       //--- allocation
       ArrayResize(x,2);
@@ -8664,34 +8922,25 @@ void TEST_MinLM_T_1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
       if(_spoil_scenario==2)
          Spoil_Vector_By_Value(x,CInfOrNaN::NegativeInfinity());
       double epsg=0.0000000001;
-      //--- check
+      ArrayResize(s,2);
+      ArrayInitialize(s,1);
       if(_spoil_scenario==3)
-         epsg=CInfOrNaN::NaN();
+         Spoil_Vector_By_Value(s,CInfOrNaN::NaN());
       //--- check
       if(_spoil_scenario==4)
-         epsg=CInfOrNaN::PositiveInfinity();
+         Spoil_Vector_By_Value(s,CInfOrNaN::PositiveInfinity());
       //--- check
       if(_spoil_scenario==5)
-         epsg=CInfOrNaN::NegativeInfinity();
-      double epsf=0;
+         Spoil_Vector_By_Value(s,CInfOrNaN::NegativeInfinity());
+      double epsx=0.0000000001;
       //--- check
       if(_spoil_scenario==6)
-         epsf=CInfOrNaN::NaN();
-      //--- check
-      if(_spoil_scenario==7)
-         epsf=CInfOrNaN::PositiveInfinity();
-      //--- check
-      if(_spoil_scenario==8)
-         epsf=CInfOrNaN::NegativeInfinity();
-      double epsx=0;
-      //--- check
-      if(_spoil_scenario==9)
          epsx=CInfOrNaN::NaN();
       //--- check
-      if(_spoil_scenario==10)
+      if(_spoil_scenario==7)
          epsx=CInfOrNaN::PositiveInfinity();
       //--- check
-      if(_spoil_scenario==11)
+      if(_spoil_scenario==8)
          epsx=CInfOrNaN::NegativeInfinity();
       int maxits=0;
       CMinLMStateShell state;
@@ -8702,7 +8951,12 @@ void TEST_MinLM_T_1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
       //--- function call
-      CAlglib::MinLMSetCond(state,epsg,epsf,epsx,maxits);
+      CAlglib::MinLMSetCond(state,epsx,maxits);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- function call
+      CAlglib::MinLMSetScale(state,s);
       //--- handling exceptions
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
@@ -8722,13 +8976,12 @@ void TEST_MinLM_T_1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
       temparray[0]=-3;
       temparray[1]=3;
       //--- check result
-      _TestResult=_TestResult && Doc_Test_Int(rep.GetTerminationType(),4);
       _TestResult=_TestResult && Doc_Test_Real_Vector(x,temparray,0.005);
       _TestResult=_TestResult && (_spoil_scenario==-1);
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","minlm_t_1");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -8741,6 +8994,7 @@ void TEST_MinLM_T_2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
    _TestResult=true;
 //--- create variables
    double  x[];
+   double  s[];
    double  temparray[];
    CObject obj;
    CNDimensional_Func1 ffunc;
@@ -8748,7 +9002,7 @@ void TEST_MinLM_T_2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
    CNDimensional_Jac1  fjac;
    CNDimensional_Rep   frep;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<12;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<9; _spoil_scenario++)
      {
       //--- allocation
       ArrayResize(x,2);
@@ -8764,35 +9018,25 @@ void TEST_MinLM_T_2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
       //--- check
       if(_spoil_scenario==2)
          Spoil_Vector_By_Value(x,CInfOrNaN::NegativeInfinity());
-      double epsg=0.0000000001;
-      //--- check
+      ArrayResize(s,2);
+      ArrayInitialize(s,1);
       if(_spoil_scenario==3)
-         epsg=CInfOrNaN::NaN();
+         Spoil_Vector_By_Value(s,CInfOrNaN::NaN());
       //--- check
       if(_spoil_scenario==4)
-         epsg=CInfOrNaN::PositiveInfinity();
+         Spoil_Vector_By_Value(s,CInfOrNaN::PositiveInfinity());
       //--- check
       if(_spoil_scenario==5)
-         epsg=CInfOrNaN::NegativeInfinity();
-      double epsf=0;
+         Spoil_Vector_By_Value(s,CInfOrNaN::NegativeInfinity());
+      double epsx=0.0000000001;
       //--- check
       if(_spoil_scenario==6)
-         epsf=CInfOrNaN::NaN();
-      //--- check
-      if(_spoil_scenario==7)
-         epsf=CInfOrNaN::PositiveInfinity();
-      //--- check
-      if(_spoil_scenario==8)
-         epsf=CInfOrNaN::NegativeInfinity();
-      double epsx=0;
-      //--- check
-      if(_spoil_scenario==9)
          epsx=CInfOrNaN::NaN();
       //--- check
-      if(_spoil_scenario==10)
+      if(_spoil_scenario==7)
          epsx=CInfOrNaN::PositiveInfinity();
       //--- check
-      if(_spoil_scenario==11)
+      if(_spoil_scenario==8)
          epsx=CInfOrNaN::NegativeInfinity();
       //--- create variables
       int maxits=0;
@@ -8804,7 +9048,12 @@ void TEST_MinLM_T_2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
       //--- function call
-      CAlglib::MinLMSetCond(state,epsg,epsf,epsx,maxits);
+      CAlglib::MinLMSetCond(state,epsx,maxits);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- function call
+      CAlglib::MinLMSetScale(state,s);
       //--- handling exceptions
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
@@ -8824,13 +9073,12 @@ void TEST_MinLM_T_2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
       temparray[0]=-3;
       temparray[1]=3;
       //--- check result
-      _TestResult=_TestResult && Doc_Test_Int(rep.GetTerminationType(),4);
       _TestResult=_TestResult && Doc_Test_Real_Vector(x,temparray,0.005);
       _TestResult=_TestResult && (_spoil_scenario==-1);
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","minlm_t_2");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -8850,27 +9098,27 @@ void TEST_LSFit_D_NLF(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
    CNDimensional_CX_1_Func fcx1func;
    CNDimensional_Rep       frep;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<27;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<19; _spoil_scenario++)
      {
       //--- In this example we demonstrate exponential fitting
       //--- by f(x)=exp(-c*x^2)
       //--- using function value only.
       //--- Gradient is estimated using combination of numerical differences
-      //--- and secant updates. diffstep variable stores differentiation step 
+      //--- and secant updates. diffstep variable stores differentiation step
       //--- (we have to tell algorithm what step to use).
       x.Resize(11,1);
       //--- initialization
-      x[0].Set(0,-1);
-      x[1].Set(0,-0.8);
-      x[2].Set(0,-0.6);
-      x[3].Set(0,-0.4);
-      x[4].Set(0,-0.2);
-      x[5].Set(0,0);
-      x[6].Set(0,0.2);
-      x[7].Set(0,0.4);
-      x[8].Set(0,0.6);
-      x[9].Set(0,0.8);
-      x[10].Set(0,1);
+      x.Set(0,0,-1);
+      x.Set(1,0,-0.8);
+      x.Set(2,0,-0.6);
+      x.Set(3,0,-0.4);
+      x.Set(4,0,-0.2);
+      x.Set(5,0,0);
+      x.Set(6,0,0.2);
+      x.Set(7,0,0.4);
+      x.Set(8,0,0.6);
+      x.Set(9,0,0.8);
+      x.Set(10,0,1);
       //--- check
       if(_spoil_scenario==0)
          Spoil_Matrix_By_Value(x,CInfOrNaN::NaN());
@@ -8928,25 +9176,15 @@ void TEST_LSFit_D_NLF(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
       //--- check
       if(_spoil_scenario==12)
          Spoil_Vector_By_Value(c,CInfOrNaN::NegativeInfinity());
-      double epsf=0;
-      //--- check
-      if(_spoil_scenario==13)
-         epsf=CInfOrNaN::NaN();
-      //--- check
-      if(_spoil_scenario==14)
-         epsf=CInfOrNaN::PositiveInfinity();
-      //--- check
-      if(_spoil_scenario==15)
-         epsf=CInfOrNaN::NegativeInfinity();
       double epsx=0.000001;
       //--- check
-      if(_spoil_scenario==16)
+      if(_spoil_scenario==13)
          epsx=CInfOrNaN::NaN();
       //--- check
-      if(_spoil_scenario==17)
+      if(_spoil_scenario==14)
          epsx=CInfOrNaN::PositiveInfinity();
       //--- check
-      if(_spoil_scenario==18)
+      if(_spoil_scenario==15)
          epsx=CInfOrNaN::NegativeInfinity();
       //--- create variables
       int maxits=0;
@@ -8955,13 +9193,13 @@ void TEST_LSFit_D_NLF(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
       CLSFitReportShell rep;
       double diffstep=0.0001;
       //--- check
-      if(_spoil_scenario==19)
+      if(_spoil_scenario==16)
          diffstep=CInfOrNaN::NaN();
       //--- check
-      if(_spoil_scenario==20)
+      if(_spoil_scenario==17)
          diffstep=CInfOrNaN::PositiveInfinity();
       //--- check
-      if(_spoil_scenario==21)
+      if(_spoil_scenario==18)
          diffstep=CInfOrNaN::NegativeInfinity();
       //--- Fitting withweights
       CAlglib::LSFitCreateF(x,y,c,diffstep,state);
@@ -8969,7 +9207,7 @@ void TEST_LSFit_D_NLF(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
       //--- function call
-      CAlglib::LSFitSetCond(state,epsf,epsx,maxits);
+      CAlglib::LSFitSetCond(state,epsx,maxits);
       //--- handling exceptions
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
@@ -9026,7 +9264,7 @@ void TEST_LSFit_D_NLF(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
       //--- function call
-      CAlglib::LSFitSetCond(state,epsf,epsx,maxits);
+      CAlglib::LSFitSetCond(state,epsx,maxits);
       //--- handling exceptions
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
@@ -9051,7 +9289,7 @@ void TEST_LSFit_D_NLF(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","lsfit_d_nlf");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -9072,24 +9310,24 @@ void TEST_LSFit_D_NLFG(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
    CNDimensional_CX_1_Grad fcx1grad;
    CNDimensional_Rep       frep;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<24;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<21; _spoil_scenario++)
      {
       //--- In this example we demonstrate exponential fitting
       //--- by f(x)=exp(-c*x^2)
       //--- using function value and gradient (with respect to c).
       x.Resize(11,1);
       //--- initialization
-      x[0].Set(0,-1);
-      x[1].Set(0,-0.8);
-      x[2].Set(0,-0.6);
-      x[3].Set(0,-0.4);
-      x[4].Set(0,-0.2);
-      x[5].Set(0,0);
-      x[6].Set(0,0.2);
-      x[7].Set(0,0.4);
-      x[8].Set(0,0.6);
-      x[9].Set(0,0.8);
-      x[10].Set(0,1);
+      x.Set(0,0,-1);
+      x.Set(1,0,-0.8);
+      x.Set(2,0,-0.6);
+      x.Set(3,0,-0.4);
+      x.Set(4,0,-0.2);
+      x.Set(5,0,0);
+      x.Set(6,0,0.2);
+      x.Set(7,0,0.4);
+      x.Set(8,0,0.6);
+      x.Set(9,0,0.8);
+      x.Set(10,0,1);
       //--- check
       if(_spoil_scenario==0)
          Spoil_Matrix_By_Value(x,CInfOrNaN::NaN());
@@ -9147,25 +9385,15 @@ void TEST_LSFit_D_NLFG(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
       //--- check
       if(_spoil_scenario==12)
          Spoil_Vector_By_Value(c,CInfOrNaN::NegativeInfinity());
-      double epsf=0;
-      //--- check
-      if(_spoil_scenario==13)
-         epsf=CInfOrNaN::NaN();
-      //--- check
-      if(_spoil_scenario==14)
-         epsf=CInfOrNaN::PositiveInfinity();
-      //--- check
-      if(_spoil_scenario==15)
-         epsf=CInfOrNaN::NegativeInfinity();
       double epsx=0.000001;
       //--- check
-      if(_spoil_scenario==16)
+      if(_spoil_scenario==13)
          epsx=CInfOrNaN::NaN();
       //--- check
-      if(_spoil_scenario==17)
+      if(_spoil_scenario==14)
          epsx=CInfOrNaN::PositiveInfinity();
       //--- check
-      if(_spoil_scenario==18)
+      if(_spoil_scenario==15)
          epsx=CInfOrNaN::NegativeInfinity();
       //--- create variables
       int maxits=0;
@@ -9178,7 +9406,7 @@ void TEST_LSFit_D_NLFG(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
       //--- function call
-      CAlglib::LSFitSetCond(state,epsf,epsx,maxits);
+      CAlglib::LSFitSetCond(state,epsx,maxits);
       //--- handling exceptions
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
@@ -9215,19 +9443,19 @@ void TEST_LSFit_D_NLFG(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
       w[9]=1;
       w[10]=1;
       //--- check
-      if(_spoil_scenario==19)
+      if(_spoil_scenario==16)
          Spoil_Vector_By_Value(w,CInfOrNaN::NaN());
       //--- check
-      if(_spoil_scenario==20)
+      if(_spoil_scenario==17)
          Spoil_Vector_By_Value(w,CInfOrNaN::PositiveInfinity());
       //--- check
-      if(_spoil_scenario==21)
+      if(_spoil_scenario==18)
          Spoil_Vector_By_Value(w,CInfOrNaN::NegativeInfinity());
       //--- check
-      if(_spoil_scenario==22)
+      if(_spoil_scenario==19)
          Spoil_Vector_By_Adding_Element(w);
       //--- check
-      if(_spoil_scenario==23)
+      if(_spoil_scenario==20)
          Spoil_Vector_By_Deleting_Element(w);
       //--- function call
       CAlglib::LSFitCreateWFG(x,y,w,c,true,state);
@@ -9235,7 +9463,7 @@ void TEST_LSFit_D_NLFG(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
       //--- function call
-      CAlglib::LSFitSetCond(state,epsf,epsx,maxits);
+      CAlglib::LSFitSetCond(state,epsx,maxits);
       //--- handling exceptions
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
@@ -9260,7 +9488,7 @@ void TEST_LSFit_D_NLFG(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","lsfit_d_nlfg");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -9282,24 +9510,24 @@ void TEST_LSFit_D_NLFGH(int &_spoil_scenario,bool &_TestResult,bool &_TotalResul
    CNDimensional_CX_1_Hess fcx1hess;
    CNDimensional_Rep       frep;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<24;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<21; _spoil_scenario++)
      {
       //--- In this example we demonstrate exponential fitting
       //--- by f(x)=exp(-c*x^2)
       //--- using function value,gradient and Hessian (with respect to c)
       x.Resize(11,1);
       //--- initialization
-      x[0].Set(0,-1);
-      x[1].Set(0,-0.8);
-      x[2].Set(0,-0.6);
-      x[3].Set(0,-0.4);
-      x[4].Set(0,-0.2);
-      x[5].Set(0,0);
-      x[6].Set(0,0.2);
-      x[7].Set(0,0.4);
-      x[8].Set(0,0.6);
-      x[9].Set(0,0.8);
-      x[10].Set(0,1);
+      x.Set(0,0,-1);
+      x.Set(1,0,-0.8);
+      x.Set(2,0,-0.6);
+      x.Set(3,0,-0.4);
+      x.Set(4,0,-0.2);
+      x.Set(5,0,0);
+      x.Set(6,0,0.2);
+      x.Set(7,0,0.4);
+      x.Set(8,0,0.6);
+      x.Set(9,0,0.8);
+      x.Set(10,0,1);
       //--- check
       if(_spoil_scenario==0)
          Spoil_Matrix_By_Value(x,CInfOrNaN::NaN());
@@ -9357,25 +9585,15 @@ void TEST_LSFit_D_NLFGH(int &_spoil_scenario,bool &_TestResult,bool &_TotalResul
       //--- check
       if(_spoil_scenario==12)
          Spoil_Vector_By_Value(c,CInfOrNaN::NegativeInfinity());
-      double epsf=0;
-      //--- check
-      if(_spoil_scenario==13)
-         epsf=CInfOrNaN::NaN();
-      //--- check
-      if(_spoil_scenario==14)
-         epsf=CInfOrNaN::PositiveInfinity();
-      //--- check
-      if(_spoil_scenario==15)
-         epsf=CInfOrNaN::NegativeInfinity();
       double epsx=0.000001;
       //--- check
-      if(_spoil_scenario==16)
+      if(_spoil_scenario==13)
          epsx=CInfOrNaN::NaN();
       //--- check
-      if(_spoil_scenario==17)
+      if(_spoil_scenario==14)
          epsx=CInfOrNaN::PositiveInfinity();
       //--- check
-      if(_spoil_scenario==18)
+      if(_spoil_scenario==15)
          epsx=CInfOrNaN::NegativeInfinity();
       //--- create variables
       int maxits=0;
@@ -9388,7 +9606,7 @@ void TEST_LSFit_D_NLFGH(int &_spoil_scenario,bool &_TestResult,bool &_TotalResul
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
       //--- function call
-      CAlglib::LSFitSetCond(state,epsf,epsx,maxits);
+      CAlglib::LSFitSetCond(state,epsx,maxits);
       //--- handling exceptions
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
@@ -9425,19 +9643,19 @@ void TEST_LSFit_D_NLFGH(int &_spoil_scenario,bool &_TestResult,bool &_TotalResul
       w[9]=1;
       w[10]=1;
       //--- check
-      if(_spoil_scenario==19)
+      if(_spoil_scenario==16)
          Spoil_Vector_By_Value(w,CInfOrNaN::NaN());
       //--- check
-      if(_spoil_scenario==20)
+      if(_spoil_scenario==17)
          Spoil_Vector_By_Value(w,CInfOrNaN::PositiveInfinity());
       //--- check
-      if(_spoil_scenario==21)
+      if(_spoil_scenario==18)
          Spoil_Vector_By_Value(w,CInfOrNaN::NegativeInfinity());
       //--- check
-      if(_spoil_scenario==22)
+      if(_spoil_scenario==19)
          Spoil_Vector_By_Adding_Element(w);
       //--- check
-      if(_spoil_scenario==23)
+      if(_spoil_scenario==20)
          Spoil_Vector_By_Deleting_Element(w);
       //--- function call
       CAlglib::LSFitCreateWFGH(x,y,w,c,state);
@@ -9445,7 +9663,7 @@ void TEST_LSFit_D_NLFGH(int &_spoil_scenario,bool &_TestResult,bool &_TotalResul
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
       //--- function call
-      CAlglib::LSFitSetCond(state,epsf,epsx,maxits);
+      CAlglib::LSFitSetCond(state,epsx,maxits);
       //--- handling exceptions
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
@@ -9470,7 +9688,7 @@ void TEST_LSFit_D_NLFGH(int &_spoil_scenario,bool &_TestResult,bool &_TotalResul
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","lsfit_d_nlfgh");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -9492,7 +9710,7 @@ void TEST_LSFit_D_NLFB(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
    CNDimensional_CX_1_Func fcx1func;
    CNDimensional_Rep       frep;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<26;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<23; _spoil_scenario++)
      {
       //--- In this example we demonstrate exponential fitting by
       //---     f(x)=exp(-c*x^2)
@@ -9500,23 +9718,23 @@ void TEST_LSFit_D_NLFB(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
       //---     0.0 <= c <= 1.0
       //--- using function value only.
       //--- Gradient is estimated using combination of numerical differences
-      //--- and secant updates. diffstep variable stores differentiation step 
+      //--- and secant updates. diffstep variable stores differentiation step
       //--- (we have to tell algorithm what step to use).
       //--- Unconstrained solution is c=1.5,but because of constraints we should
       //--- get c=1.0 (at the boundary).
       x.Resize(11,1);
       //--- initialization
-      x[0].Set(0,-1);
-      x[1].Set(0,-0.8);
-      x[2].Set(0,-0.6);
-      x[3].Set(0,-0.4);
-      x[4].Set(0,-0.2);
-      x[5].Set(0,0);
-      x[6].Set(0,0.2);
-      x[7].Set(0,0.4);
-      x[8].Set(0,0.6);
-      x[9].Set(0,0.8);
-      x[10].Set(0,1);
+      x.Set(0,0,-1);
+      x.Set(1,0,-0.8);
+      x.Set(2,0,-0.6);
+      x.Set(3,0,-0.4);
+      x.Set(4,0,-0.2);
+      x.Set(5,0,0);
+      x.Set(6,0,0.2);
+      x.Set(7,0,0.4);
+      x.Set(8,0,0.6);
+      x.Set(9,0,0.8);
+      x.Set(10,0,1);
       //--- check
       if(_spoil_scenario==0)
          Spoil_Matrix_By_Value(x,CInfOrNaN::NaN());
@@ -9594,25 +9812,15 @@ void TEST_LSFit_D_NLFB(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
       //--- check
       if(_spoil_scenario==16)
          Spoil_Vector_By_Deleting_Element(bndu);
-      double epsf=0;
-      //--- check
-      if(_spoil_scenario==17)
-         epsf=CInfOrNaN::NaN();
-      //--- check
-      if(_spoil_scenario==18)
-         epsf=CInfOrNaN::PositiveInfinity();
-      //--- check
-      if(_spoil_scenario==19)
-         epsf=CInfOrNaN::NegativeInfinity();
       double epsx=0.000001;
       //--- check
-      if(_spoil_scenario==20)
+      if(_spoil_scenario==17)
          epsx=CInfOrNaN::NaN();
       //--- check
-      if(_spoil_scenario==21)
+      if(_spoil_scenario==18)
          epsx=CInfOrNaN::PositiveInfinity();
       //--- check
-      if(_spoil_scenario==22)
+      if(_spoil_scenario==19)
          epsx=CInfOrNaN::NegativeInfinity();
       //--- create variables
       int maxits=0;
@@ -9621,13 +9829,13 @@ void TEST_LSFit_D_NLFB(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
       CLSFitReportShell rep;
       double diffstep=0.0001;
       //--- check
-      if(_spoil_scenario==23)
+      if(_spoil_scenario==20)
          diffstep=CInfOrNaN::NaN();
       //--- check
-      if(_spoil_scenario==24)
+      if(_spoil_scenario==21)
          diffstep=CInfOrNaN::PositiveInfinity();
       //--- check
-      if(_spoil_scenario==25)
+      if(_spoil_scenario==22)
          diffstep=CInfOrNaN::NegativeInfinity();
       //--- function call
       CAlglib::LSFitCreateF(x,y,c,diffstep,state);
@@ -9640,7 +9848,7 @@ void TEST_LSFit_D_NLFB(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
       //--- function call
-      CAlglib::LSFitSetCond(state,epsf,epsx,maxits);
+      CAlglib::LSFitSetCond(state,epsx,maxits);
       //--- handling exceptions
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
@@ -9664,7 +9872,7 @@ void TEST_LSFit_D_NLFB(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","lsfit_d_nlfb");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -9686,7 +9894,7 @@ void TEST_LSFit_D_NLScale(int &_spoil_scenario,bool &_TestResult,bool &_TotalRes
    CNDimensional_Debt_Func fdebtfunc;
    CNDimensional_Rep       frep;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<30;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<27; _spoil_scenario++)
      {
       //--- In this example we demonstrate fitting by
       //---     f(x)=c[0]*(1+c[1]*((x-1999)^c[2]-1))
@@ -9701,26 +9909,26 @@ void TEST_LSFit_D_NLScale(int &_spoil_scenario,bool &_TestResult,bool &_TotalRes
       //---     c[0] - debt value at initial moment (2000),
       //---     c[1] - direction coefficient (growth or decrease),
       //---     c[2] - curvature coefficient.
-      //--- You may see that our variables are badly scaled - first one 
-      //--- is order of 10^12,and next two are somewhere ab1 in 
+      //--- You may see that our variables are badly scaled - first one
+      //--- is order of 10^12,and next two are somewhere ab1 in
       //--- magnitude. Such problem is difficult to solve withsome
       //--- kind of scaling.
       //--- That is exactly where lsfitsetscale() function can be used.
       //--- We set scale of our variables to [1.0E12,1,1],which allows
       //--- us to easily solve this problem.
-      //--- You can try commenting lsfitsetscale() call - and you will 
+      //--- You can try commenting lsfitsetscale() call - and you will
       //--- see that algorithm will fail to converge.
       x.Resize(9,1);
       //--- initialization
-      x[0].Set(0,2000);
-      x[1].Set(0,2001);
-      x[2].Set(0,2002);
-      x[3].Set(0,2003);
-      x[4].Set(0,2004);
-      x[5].Set(0,2005);
-      x[6].Set(0,2006);
-      x[7].Set(0,2007);
-      x[8].Set(0,2008);
+      x.Set(0,0,2000);
+      x.Set(1,0,2001);
+      x.Set(2,0,2002);
+      x.Set(3,0,2003);
+      x.Set(4,0,2004);
+      x.Set(5,0,2005);
+      x.Set(6,0,2006);
+      x.Set(7,0,2007);
+      x.Set(8,0,2008);
       //--- check
       if(_spoil_scenario==0)
          Spoil_Matrix_By_Value(x,CInfOrNaN::NaN());
@@ -9778,25 +9986,15 @@ void TEST_LSFit_D_NLScale(int &_spoil_scenario,bool &_TestResult,bool &_TotalRes
       //--- check
       if(_spoil_scenario==12)
          Spoil_Vector_By_Value(c,CInfOrNaN::NegativeInfinity());
-      double epsf=0;
-      //--- check
-      if(_spoil_scenario==13)
-         epsf=CInfOrNaN::NaN();
-      //--- check
-      if(_spoil_scenario==14)
-         epsf=CInfOrNaN::PositiveInfinity();
-      //--- check
-      if(_spoil_scenario==15)
-         epsf=CInfOrNaN::NegativeInfinity();
       double epsx=1.0e-5;
       //--- check
-      if(_spoil_scenario==16)
+      if(_spoil_scenario==13)
          epsx=CInfOrNaN::NaN();
       //--- check
-      if(_spoil_scenario==17)
+      if(_spoil_scenario==14)
          epsx=CInfOrNaN::PositiveInfinity();
       //--- check
-      if(_spoil_scenario==18)
+      if(_spoil_scenario==15)
          epsx=CInfOrNaN::NegativeInfinity();
       //--- allocation
       ArrayResize(bndl,3);
@@ -9805,10 +10003,10 @@ void TEST_LSFit_D_NLScale(int &_spoil_scenario,bool &_TestResult,bool &_TotalRes
       bndl[1]=-10;
       bndl[2]=0.1;
       //--- check
-      if(_spoil_scenario==19)
+      if(_spoil_scenario==16)
          Spoil_Vector_By_Value(bndl,CInfOrNaN::NaN());
       //--- check
-      if(_spoil_scenario==20)
+      if(_spoil_scenario==17)
          Spoil_Vector_By_Deleting_Element(bndl);
       //--- allocation
       ArrayResize(bndu,3);
@@ -9817,10 +10015,10 @@ void TEST_LSFit_D_NLScale(int &_spoil_scenario,bool &_TestResult,bool &_TotalRes
       bndu[1]=10;
       bndu[2]=2;
       //--- check
-      if(_spoil_scenario==21)
+      if(_spoil_scenario==18)
          Spoil_Vector_By_Value(bndu,CInfOrNaN::NaN());
       //--- check
-      if(_spoil_scenario==22)
+      if(_spoil_scenario==19)
          Spoil_Vector_By_Deleting_Element(bndu);
       //--- allocation
       ArrayResize(s,3);
@@ -9829,16 +10027,16 @@ void TEST_LSFit_D_NLScale(int &_spoil_scenario,bool &_TestResult,bool &_TotalRes
       s[1]=1;
       s[2]=1;
       //--- check
-      if(_spoil_scenario==23)
+      if(_spoil_scenario==20)
          Spoil_Vector_By_Value(s,CInfOrNaN::NaN());
       //--- check
-      if(_spoil_scenario==24)
+      if(_spoil_scenario==21)
          Spoil_Vector_By_Value(s,CInfOrNaN::PositiveInfinity());
       //--- check
-      if(_spoil_scenario==25)
+      if(_spoil_scenario==22)
          Spoil_Vector_By_Value(s,CInfOrNaN::NegativeInfinity());
       //--- check
-      if(_spoil_scenario==26)
+      if(_spoil_scenario==23)
          Spoil_Vector_By_Deleting_Element(s);
       //--- create variables
       int maxits=0;
@@ -9847,13 +10045,13 @@ void TEST_LSFit_D_NLScale(int &_spoil_scenario,bool &_TestResult,bool &_TotalRes
       CLSFitReportShell rep;
       double diffstep=1.0e-5;
       //--- check
-      if(_spoil_scenario==27)
+      if(_spoil_scenario==24)
          diffstep=CInfOrNaN::NaN();
       //--- check
-      if(_spoil_scenario==28)
+      if(_spoil_scenario==25)
          diffstep=CInfOrNaN::PositiveInfinity();
       //--- check
-      if(_spoil_scenario==29)
+      if(_spoil_scenario==26)
          diffstep=CInfOrNaN::NegativeInfinity();
       //--- function call
       CAlglib::LSFitCreateF(x,y,c,diffstep,state);
@@ -9861,7 +10059,7 @@ void TEST_LSFit_D_NLScale(int &_spoil_scenario,bool &_TestResult,bool &_TotalRes
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
       //--- function call
-      CAlglib::LSFitSetCond(state,epsf,epsx,maxits);
+      CAlglib::LSFitSetCond(state,epsx,maxits);
       //--- handling exceptions
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
@@ -9876,7 +10074,7 @@ void TEST_LSFit_D_NLScale(int &_spoil_scenario,bool &_TestResult,bool &_TotalRes
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
       //--- function call
-      CAlglib::LSFitFit(state,fdebtfunc,frep,0,obj);
+      CAlglib::LSFitFit(state,fdebtfunc,frep,false,obj);
       //--- handling exceptions
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
@@ -9898,7 +10096,7 @@ void TEST_LSFit_D_NLScale(int &_spoil_scenario,bool &_TestResult,bool &_TotalRes
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","lsfit_d_nlscale");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -9917,7 +10115,7 @@ void TEST_LSFit_D_Lin(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
    double        temparray[];
    double        w[];
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<13;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<13; _spoil_scenario++)
      {
       //--- In this example we demonstrate linear fitting by f(x|a)=a*exp(0.5*x).
       //--- We have:
@@ -9926,17 +10124,17 @@ void TEST_LSFit_D_Lin(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
       //---              Actually,we have only one basis function F0=exp(0.5*x).
       fmatrix.Resize(11,1);
       //--- initialization
-      fmatrix[0].Set(0,0.606531);
-      fmatrix[1].Set(0,0.67032);
-      fmatrix[2].Set(0,0.740818);
-      fmatrix[3].Set(0,0.818731);
-      fmatrix[4].Set(0,0.904837);
-      fmatrix[5].Set(0,1);
-      fmatrix[6].Set(0,1.105171);
-      fmatrix[7].Set(0,1.221403);
-      fmatrix[8].Set(0,1.349859);
-      fmatrix[9].Set(0,1.491825);
-      fmatrix[10].Set(0,1.648721);
+      fmatrix.Set(0,0,0.606531);
+      fmatrix.Set(1,0,0.67032);
+      fmatrix.Set(2,0,0.740818);
+      fmatrix.Set(3,0,0.818731);
+      fmatrix.Set(4,0,0.904837);
+      fmatrix.Set(5,0,1);
+      fmatrix.Set(6,0,1.105171);
+      fmatrix.Set(7,0,1.221403);
+      fmatrix.Set(8,0,1.349859);
+      fmatrix.Set(9,0,1.491825);
+      fmatrix.Set(10,0,1.648721);
       //--- check
       if(_spoil_scenario==0)
          Spoil_Matrix_By_Value(fmatrix,CInfOrNaN::NaN());
@@ -10035,7 +10233,7 @@ void TEST_LSFit_D_Lin(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","lsfit_d_lin");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -10054,7 +10252,7 @@ void TEST_LSFit_D_Linc(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
    double        temparray[];
    double        w[];
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<20;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<20; _spoil_scenario++)
      {
       //--- In this example we demonstrate linear fitting by f(x|a,b)=a*x+b
       //--- with simple constraint f(0)=0.
@@ -10073,7 +10271,7 @@ void TEST_LSFit_D_Linc(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
       //---                  [ 1.0  0.0  0.0 ]
       //---              first two columns contain coefficients before basis functions,
       //---              last column contains desired value of their sum.
-      //---              So [1,0,0] means "1*constant_term + 0*linear_term=0" 
+      //---              So [1,0,0] means "1*constant_term + 0*linear_term=0"
       ArrayResize(y,6);
       //--- initialization
       y[0]=0.072436;
@@ -10100,18 +10298,18 @@ void TEST_LSFit_D_Linc(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
       //--- allocation
       fmatrix.Resize(6,2);
       //--- initialization
-      fmatrix[0].Set(0,1);
-      fmatrix[0].Set(1,0);
-      fmatrix[1].Set(0,1);
-      fmatrix[1].Set(1,0.2);
-      fmatrix[2].Set(0,1);
-      fmatrix[2].Set(1,0.4);
-      fmatrix[3].Set(0,1);
-      fmatrix[3].Set(1,0.6);
-      fmatrix[4].Set(0,1);
-      fmatrix[4].Set(1,0.8);
-      fmatrix[5].Set(0,1);
-      fmatrix[5].Set(1,1);
+      fmatrix.Set(0,0,1);
+      fmatrix.Set(0,1,0);
+      fmatrix.Set(1,0,1);
+      fmatrix.Set(1,1,0.2);
+      fmatrix.Set(2,0,1);
+      fmatrix.Set(2,1,0.4);
+      fmatrix.Set(3,0,1);
+      fmatrix.Set(3,1,0.6);
+      fmatrix.Set(4,0,1);
+      fmatrix.Set(4,1,0.8);
+      fmatrix.Set(5,0,1);
+      fmatrix.Set(5,1,1);
       //--- check
       if(_spoil_scenario==5)
          Spoil_Matrix_By_Value(fmatrix,CInfOrNaN::NaN());
@@ -10136,9 +10334,9 @@ void TEST_LSFit_D_Linc(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
       //--- allocation
       cmatrix.Resize(1,3);
       //--- initialization
-      cmatrix[0].Set(0,1);
-      cmatrix[0].Set(1,0);
-      cmatrix[0].Set(2,0);
+      cmatrix.Set(0,0,1);
+      cmatrix.Set(0,1,0);
+      cmatrix.Set(0,2,0);
       //--- check
       if(_spoil_scenario==12)
          Spoil_Matrix_By_Value(cmatrix,CInfOrNaN::NaN());
@@ -10205,7 +10403,7 @@ void TEST_LSFit_D_Linc(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","lsfit_d_linc");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -10226,7 +10424,7 @@ void TEST_LSFit_D_Pol(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
    double t;
    double v;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<20;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<20; _spoil_scenario++)
      {
       //--- This example demonstrates polynomial fitting.
       //--- Fitting is done by two (M=2) functions from polynomial basis:
@@ -10313,7 +10511,7 @@ void TEST_LSFit_D_Pol(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
       //--- NOTE: result is returned as barycentricinterpolant structure.
       //---       if you want to get representation in the power basis,
       //---       you can use barycentricbar2pow() function to convert
-      //---       from barycentric to power representation (see docs for 
+      //---       from barycentric to power representation (see docs for
       //---       POLINT subpackage for more info).
       CAlglib::PolynomialFit(x,y,m,info,p,rep);
       //--- handling exceptions
@@ -10387,7 +10585,7 @@ void TEST_LSFit_D_Pol(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","lsfit_d_pol");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -10408,7 +10606,7 @@ void TEST_LSFit_D_Polc(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
    int    info;
    double v;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<29;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<29; _spoil_scenario++)
      {
       //--- This example demonstrates polynomial fitting.
       //--- Fitting is done by two (M=2) functions from polynomial basis:
@@ -10560,7 +10758,7 @@ void TEST_LSFit_D_Polc(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","lsfit_d_polc");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -10577,7 +10775,7 @@ void TEST_LSFit_D_Spline(int &_spoil_scenario,bool &_TestResult,bool &_TotalResu
    double v;
    double rho;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<19;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<19; _spoil_scenario++)
      {
       //--- In this example we demonstrate penalized spline fitting of noisy data
       //--- We have:
@@ -10719,7 +10917,7 @@ void TEST_LSFit_D_Spline(int &_spoil_scenario,bool &_TestResult,bool &_TotalResu
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","lsfit_d_spline");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -10735,7 +10933,7 @@ void TEST_LSFit_T_PolFit_1(int &_spoil_scenario,bool &_TestResult,bool &_TotalRe
    int    info;
    double v;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<10;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<10; _spoil_scenario++)
      {
       //--- allocation
       ArrayResize(x,11);
@@ -10816,7 +11014,7 @@ void TEST_LSFit_T_PolFit_1(int &_spoil_scenario,bool &_TestResult,bool &_TotalRe
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","lsfit_t_polfit_1");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -10838,7 +11036,7 @@ void TEST_LSFit_T_PolFit_2(int &_spoil_scenario,bool &_TestResult,bool &_TotalRe
    int    info;
    double v;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<14;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<14; _spoil_scenario++)
      {
       //--- allocation
       ArrayResize(x,11);
@@ -10950,7 +11148,7 @@ void TEST_LSFit_T_PolFit_2(int &_spoil_scenario,bool &_TestResult,bool &_TotalRe
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","lsfit_t_polfit_2");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -10972,7 +11170,7 @@ void TEST_LSFit_T_PolFit_3(int &_spoil_scenario,bool &_TestResult,bool &_TotalRe
    int    info;
    double v;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<23;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<23; _spoil_scenario++)
      {
       //--- allocation
       ArrayResize(x,2);
@@ -11091,7 +11289,7 @@ void TEST_LSFit_T_PolFit_3(int &_spoil_scenario,bool &_TestResult,bool &_TotalRe
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","lsfit_t_polfit_3");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -11105,15 +11303,15 @@ void TEST_MatDet_D_1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
    double        a;
    CMatrixDouble b;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<7;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<7; _spoil_scenario++)
      {
       //--- allocation
       b.Resize(2,2);
       //--- initialization
-      b[0].Set(0,1);
-      b[0].Set(1,2);
-      b[1].Set(0,2);
-      b[1].Set(1,1);
+      b.Set(0,0,1);
+      b.Set(0,1,2);
+      b.Set(1,0,2);
+      b.Set(1,1,1);
       //--- check
       if(_spoil_scenario==0)
          Spoil_Matrix_By_Value(b,CInfOrNaN::NaN());
@@ -11146,7 +11344,7 @@ void TEST_MatDet_D_1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","matdet_d_1");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -11160,15 +11358,15 @@ void TEST_MatDet_D_2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
    double        a;
    CMatrixDouble b;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<5;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<5; _spoil_scenario++)
      {
       //--- allocation
       b.Resize(2,2);
       //--- initialization
-      b[0].Set(0,5);
-      b[0].Set(1,4);
-      b[1].Set(0,4);
-      b[1].Set(1,5);
+      b.Set(0,0,5);
+      b.Set(0,1,4);
+      b.Set(1,0,4);
+      b.Set(1,1,5);
       //--- check
       if(_spoil_scenario==0)
          Spoil_Matrix_By_Value(b,CInfOrNaN::NaN());
@@ -11195,7 +11393,7 @@ void TEST_MatDet_D_2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","matdet_d_2");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -11206,36 +11404,36 @@ void TEST_MatDet_D_3(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
   {
    _TestResult=true;
 //--- create variables
-   al_complex     a;
-   al_complex     tempcomplex1;
-   al_complex     tempcomplex2;
-   al_complex     tempcomplex3;
+   complex        a;
+   complex        tempcomplex1;
+   complex        tempcomplex2;
+   complex        tempcomplex3;
    CMatrixComplex b;
-   al_complex     cnan;
-   al_complex     cpositiveinfinity;
-   al_complex     cnegativeinfinity;
+   complex        cnan;
+   complex        cpositiveinfinity;
+   complex        cnegativeinfinity;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<7;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<7; _spoil_scenario++)
      {
       //--- initialization
-      tempcomplex1.re=1;
-      tempcomplex1.im=1;
-      tempcomplex2.re=1;
-      tempcomplex2.im=-1;
+      tempcomplex1.real=1;
+      tempcomplex1.imag=1;
+      tempcomplex2.real=1;
+      tempcomplex2.imag=-1;
       //--- allocation
       b.Resize(2,2);
       //--- initialization
-      b[0].Set(0,tempcomplex1);
-      b[0].Set(1,2);
-      b[1].Set(0,2);
-      b[1].Set(1,tempcomplex2);
+      b.Set(0,0,tempcomplex1);
+      b.Set(0,1,2);
+      b.Set(1,0,2);
+      b.Set(1,1,tempcomplex2);
       //--- initialization
-      cnan.re=CInfOrNaN::NaN();
-      cnan.im=CInfOrNaN::NaN();
-      cpositiveinfinity.re=CInfOrNaN::PositiveInfinity();
-      cpositiveinfinity.im=CInfOrNaN::PositiveInfinity();
-      cnegativeinfinity.re=CInfOrNaN::NegativeInfinity();
-      cnegativeinfinity.im=CInfOrNaN::NegativeInfinity();
+      cnan.real=CInfOrNaN::NaN();
+      cnan.imag=CInfOrNaN::NaN();
+      cpositiveinfinity.real=CInfOrNaN::PositiveInfinity();
+      cpositiveinfinity.imag=CInfOrNaN::PositiveInfinity();
+      cnegativeinfinity.real=CInfOrNaN::NegativeInfinity();
+      cnegativeinfinity.imag=CInfOrNaN::NegativeInfinity();
       //--- check
       if(_spoil_scenario==0)
          Spoil_Matrix_By_Value(b,cnan);
@@ -11263,15 +11461,15 @@ void TEST_MatDet_D_3(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
       //--- initialization
-      tempcomplex3.re=-2;
-      tempcomplex3.im=0;
+      tempcomplex3.real=-2;
+      tempcomplex3.imag=0;
       //--- check result
       _TestResult=_TestResult && Doc_Test_Complex(a,tempcomplex3,0.0001);
       _TestResult=_TestResult && (_spoil_scenario==-1);
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","matdet_d_3");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -11282,36 +11480,36 @@ void TEST_MatDet_D_4(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
   {
    _TestResult=true;
 //--- create variables
-   al_complex     a;
-   al_complex     tempcomplex1;
-   al_complex     tempcomplex2;
-   al_complex     tempcomplex3;
+   complex        a;
+   complex        tempcomplex1;
+   complex        tempcomplex2;
+   complex        tempcomplex3;
    CMatrixComplex b;
-   al_complex     cnan;
-   al_complex     cpositiveinfinity;
-   al_complex     cnegativeinfinity;
+   complex        cnan;
+   complex        cpositiveinfinity;
+   complex        cnegativeinfinity;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<5;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<5; _spoil_scenario++)
      {
       //--- initialization
-      tempcomplex1.re=0;
-      tempcomplex1.im=5;
-      tempcomplex2.re=0;
-      tempcomplex2.im=4;
+      tempcomplex1.real=0;
+      tempcomplex1.imag=5;
+      tempcomplex2.real=0;
+      tempcomplex2.imag=4;
       //--- allocation
       b.Resize(2,2);
       //--- initialization
-      b[0].Set(0,tempcomplex1);
-      b[0].Set(1,4);
-      b[1].Set(0,tempcomplex2);
-      b[1].Set(1,5);
+      b.Set(0,0,tempcomplex1);
+      b.Set(0,1,4);
+      b.Set(1,0,tempcomplex2);
+      b.Set(1,1,5);
       //--- initialization
-      cnan.re=CInfOrNaN::NaN();
-      cnan.im=CInfOrNaN::NaN();
-      cpositiveinfinity.re=CInfOrNaN::PositiveInfinity();
-      cpositiveinfinity.im=CInfOrNaN::PositiveInfinity();
-      cnegativeinfinity.re=CInfOrNaN::NegativeInfinity();
-      cnegativeinfinity.im=CInfOrNaN::NegativeInfinity();
+      cnan.real=CInfOrNaN::NaN();
+      cnan.imag=CInfOrNaN::NaN();
+      cpositiveinfinity.real=CInfOrNaN::PositiveInfinity();
+      cpositiveinfinity.imag=CInfOrNaN::PositiveInfinity();
+      cnegativeinfinity.real=CInfOrNaN::NegativeInfinity();
+      cnegativeinfinity.imag=CInfOrNaN::NegativeInfinity();
       //--- check
       if(_spoil_scenario==0)
          Spoil_Matrix_By_Value(b,cnan);
@@ -11333,15 +11531,15 @@ void TEST_MatDet_D_4(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
       //--- initialization
-      tempcomplex3.re=0;
-      tempcomplex3.im=9;
+      tempcomplex3.real=0;
+      tempcomplex3.imag=9;
       //--- check result
       _TestResult=_TestResult && Doc_Test_Complex(a,tempcomplex3,0.0001);
       _TestResult=_TestResult && (_spoil_scenario==-1);
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","matdet_d_4");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -11353,29 +11551,29 @@ void TEST_MatDet_D_5(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
   {
    _TestResult=true;
 //--- create variables
-   al_complex     a;
-   al_complex     tempcomplex;
+   complex        a;
+   complex        tempcomplex;
    CMatrixComplex b;
-   al_complex     cnan;
-   al_complex     cpositiveinfinity;
-   al_complex     cnegativeinfinity;
+   complex        cnan;
+   complex        cpositiveinfinity;
+   complex        cnegativeinfinity;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<7;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<7; _spoil_scenario++)
      {
       //--- allocation
       b.Resize(2,2);
       //--- initialization
-      b[0].Set(0,9);
-      b[0].Set(1,1);
-      b[1].Set(0,2);
-      b[1].Set(1,1);
+      b.Set(0,0,9);
+      b.Set(0,1,1);
+      b.Set(1,0,2);
+      b.Set(1,1,1);
       //--- initialization
-      cnan.re=CInfOrNaN::NaN();
-      cnan.im=CInfOrNaN::NaN();
-      cpositiveinfinity.re=CInfOrNaN::PositiveInfinity();
-      cpositiveinfinity.im=CInfOrNaN::PositiveInfinity();
-      cnegativeinfinity.re=CInfOrNaN::NegativeInfinity();
-      cnegativeinfinity.im=CInfOrNaN::NegativeInfinity();
+      cnan.real=CInfOrNaN::NaN();
+      cnan.imag=CInfOrNaN::NaN();
+      cpositiveinfinity.real=CInfOrNaN::PositiveInfinity();
+      cpositiveinfinity.imag=CInfOrNaN::PositiveInfinity();
+      cnegativeinfinity.real=CInfOrNaN::NegativeInfinity();
+      cnegativeinfinity.imag=CInfOrNaN::NegativeInfinity();
       //--- check
       if(_spoil_scenario==0)
          Spoil_Matrix_By_Value(b,cnan);
@@ -11403,15 +11601,15 @@ void TEST_MatDet_D_5(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
       //--- initialization
-      tempcomplex.re=7;
-      tempcomplex.im=0;
+      tempcomplex.real=7;
+      tempcomplex.imag=0;
       //--- check result
       _TestResult=_TestResult && Doc_Test_Complex(a,tempcomplex,0.0001);
       _TestResult=_TestResult && (_spoil_scenario==-1);
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","matdet_d_5");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -11425,15 +11623,15 @@ void TEST_MatDet_T_0(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
    double        a;
    CMatrixDouble b;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<5;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<5; _spoil_scenario++)
      {
       //--- allocation
       b.Resize(2,2);
       //--- initialization
-      b[0].Set(0,3);
-      b[0].Set(1,4);
-      b[1].Set(0,-4);
-      b[1].Set(1,3);
+      b.Set(0,0,3);
+      b.Set(0,1,4);
+      b.Set(1,0,-4);
+      b.Set(1,1,3);
       //--- check
       if(_spoil_scenario==0)
          Spoil_Matrix_By_Value(b,CInfOrNaN::NaN());
@@ -11460,7 +11658,7 @@ void TEST_MatDet_T_0(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","matdet_t_0");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -11475,15 +11673,15 @@ void TEST_MatDet_T_1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
    CMatrixDouble b;
    int           p[];
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<9;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<9; _spoil_scenario++)
      {
       //--- allocation
       b.Resize(2,2);
       //--- initialization
-      b[0].Set(0,1);
-      b[0].Set(1,2);
-      b[1].Set(0,2);
-      b[1].Set(1,5);
+      b.Set(0,0,1);
+      b.Set(0,1,2);
+      b.Set(1,0,2);
+      b.Set(1,1,5);
       //--- check
       if(_spoil_scenario==0)
          Spoil_Matrix_By_Value(b,CInfOrNaN::NaN());
@@ -11527,7 +11725,7 @@ void TEST_MatDet_T_1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","matdet_t_1");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -11542,15 +11740,15 @@ void TEST_MatDet_T_2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
    int           p[];
    CMatrixDouble b;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<6;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<6; _spoil_scenario++)
      {
       //--- allocation
       b.Resize(2,2);
       //--- initialization
-      b[0].Set(0,5);
-      b[0].Set(1,4);
-      b[1].Set(0,4);
-      b[1].Set(1,5);
+      b.Set(0,0,5);
+      b.Set(0,1,4);
+      b.Set(1,0,4);
+      b.Set(1,1,5);
       //--- check
       if(_spoil_scenario==0)
          Spoil_Matrix_By_Value(b,CInfOrNaN::NaN());
@@ -11585,7 +11783,7 @@ void TEST_MatDet_T_2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","matdet_t_2");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -11596,33 +11794,33 @@ void TEST_MatDet_T_3(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
   {
    _TestResult=true;
 //--- create variables
-   al_complex     a;
+   complex        a;
    CMatrixComplex b;
-   al_complex     tempcomplex1;
-   al_complex     tempcomplex2;
-   al_complex     cnan;
-   al_complex     cpositiveinfinity;
-   al_complex     cnegativeinfinity;
+   complex        tempcomplex1;
+   complex        tempcomplex2;
+   complex        cnan;
+   complex        cpositiveinfinity;
+   complex        cnegativeinfinity;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<5;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<5; _spoil_scenario++)
      {
       //--- initialization
-      tempcomplex1.re=0;
-      tempcomplex1.im=5;
+      tempcomplex1.real=0;
+      tempcomplex1.imag=5;
       //--- allocation
       b.Resize(2,2);
       //--- initialization
-      b[0].Set(0,tempcomplex1);
-      b[0].Set(1,4);
-      b[1].Set(0,-4);
-      b[1].Set(1,tempcomplex1);
+      b.Set(0,0,tempcomplex1);
+      b.Set(0,1,4);
+      b.Set(1,0,-4);
+      b.Set(1,1,tempcomplex1);
       //--- initialization
-      cnan.re=CInfOrNaN::NaN();
-      cnan.im=CInfOrNaN::NaN();
-      cpositiveinfinity.re=CInfOrNaN::PositiveInfinity();
-      cpositiveinfinity.im=CInfOrNaN::PositiveInfinity();
-      cnegativeinfinity.re=CInfOrNaN::NegativeInfinity();
-      cnegativeinfinity.im=CInfOrNaN::NegativeInfinity();
+      cnan.real=CInfOrNaN::NaN();
+      cnan.imag=CInfOrNaN::NaN();
+      cpositiveinfinity.real=CInfOrNaN::PositiveInfinity();
+      cpositiveinfinity.imag=CInfOrNaN::PositiveInfinity();
+      cnegativeinfinity.real=CInfOrNaN::NegativeInfinity();
+      cnegativeinfinity.imag=CInfOrNaN::NegativeInfinity();
       //--- check
       if(_spoil_scenario==0)
          Spoil_Matrix_By_Value(b,cnan);
@@ -11644,15 +11842,15 @@ void TEST_MatDet_T_3(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
       //--- initialization
-      tempcomplex2.re=-9;
-      tempcomplex2.im=0;
+      tempcomplex2.real=-9;
+      tempcomplex2.imag=0;
       //--- check result
       _TestResult=_TestResult && Doc_Test_Complex(a,tempcomplex2,0.0001);
       _TestResult=_TestResult && (_spoil_scenario==-1);
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","matdet_t_3");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -11663,34 +11861,34 @@ void TEST_MatDet_T_4(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
   {
    _TestResult=true;
 //--- create variables
-   al_complex     a;
+   complex        a;
    int            p[];
-   al_complex     tempcomplex1;
-   al_complex     tempcomplex2;
+   complex        tempcomplex1;
+   complex        tempcomplex2;
    CMatrixComplex b;
-   al_complex     cnan;
-   al_complex     cpositiveinfinity;
-   al_complex     cnegativeinfinity;
+   complex        cnan;
+   complex        cpositiveinfinity;
+   complex        cnegativeinfinity;
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<9;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<9; _spoil_scenario++)
      {
       //--- initialization
-      tempcomplex1.re=0;
-      tempcomplex1.im=5;
+      tempcomplex1.real=0;
+      tempcomplex1.imag=5;
       //--- allocation
       b.Resize(2,2);
       //--- initialization
-      b[0].Set(0,1);
-      b[0].Set(1,2);
-      b[1].Set(0,2);
-      b[1].Set(1,tempcomplex1);
+      b.Set(0,0,1);
+      b.Set(0,1,2);
+      b.Set(1,0,2);
+      b.Set(1,1,tempcomplex1);
       //--- initialization
-      cnan.re=CInfOrNaN::NaN();
-      cnan.im=CInfOrNaN::NaN();
-      cpositiveinfinity.re=CInfOrNaN::PositiveInfinity();
-      cpositiveinfinity.im=CInfOrNaN::PositiveInfinity();
-      cnegativeinfinity.re=CInfOrNaN::NegativeInfinity();
-      cnegativeinfinity.im=CInfOrNaN::NegativeInfinity();
+      cnan.real=CInfOrNaN::NaN();
+      cnan.imag=CInfOrNaN::NaN();
+      cpositiveinfinity.real=CInfOrNaN::PositiveInfinity();
+      cpositiveinfinity.imag=CInfOrNaN::PositiveInfinity();
+      cnegativeinfinity.real=CInfOrNaN::NegativeInfinity();
+      cnegativeinfinity.imag=CInfOrNaN::NegativeInfinity();
       //--- check
       if(_spoil_scenario==0)
          Spoil_Matrix_By_Value(b,cnan);
@@ -11729,15 +11927,15 @@ void TEST_MatDet_T_4(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
       //--- initialization
-      tempcomplex2.re=0;
-      tempcomplex2.im=-5;
+      tempcomplex2.real=0;
+      tempcomplex2.imag=-5;
       //--- check result
       _TestResult=_TestResult && Doc_Test_Complex(a,tempcomplex2,0.0001);
       _TestResult=_TestResult && (_spoil_scenario==-1);
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","matdet_t_4");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
    _TotalResult=_TotalResult && _TestResult;
   }
@@ -11748,34 +11946,34 @@ void TEST_MatDet_T_5(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
   {
    _TestResult=true;
 //--- create variables
-   al_complex     a;
-   al_complex     tempcomplex1;
-   al_complex     tempcomplex2;
+   complex        a;
+   complex        tempcomplex1;
+   complex        tempcomplex2;
    CMatrixComplex b;
-   al_complex     cnan;
-   al_complex     cpositiveinfinity;
-   al_complex     cnegativeinfinity;
+   complex        cnan;
+   complex        cpositiveinfinity;
+   complex        cnegativeinfinity;
    int            p[];
 //--- testing
-   for(_spoil_scenario=-1;_spoil_scenario<6;_spoil_scenario++)
+   for(_spoil_scenario=-1; _spoil_scenario<6; _spoil_scenario++)
      {
       //--- initialization
-      tempcomplex1.re=0;
-      tempcomplex1.im=4;
+      tempcomplex1.real=0;
+      tempcomplex1.imag=4;
       //--- allocation
       b.Resize(2,2);
       //--- initialization
-      b[0].Set(0,5);
-      b[0].Set(1,tempcomplex1);
-      b[1].Set(0,4);
-      b[1].Set(1,5);
+      b.Set(0,0,5);
+      b.Set(0,1,tempcomplex1);
+      b.Set(1,0,4);
+      b.Set(1,1,5);
       //--- initialization
-      cnan.re=CInfOrNaN::NaN();
-      cnan.im=CInfOrNaN::NaN();
-      cpositiveinfinity.re=CInfOrNaN::PositiveInfinity();
-      cpositiveinfinity.im=CInfOrNaN::PositiveInfinity();
-      cnegativeinfinity.re=CInfOrNaN::NegativeInfinity();
-      cnegativeinfinity.im=CInfOrNaN::NegativeInfinity();
+      cnan.real=CInfOrNaN::NaN();
+      cnan.imag=CInfOrNaN::NaN();
+      cpositiveinfinity.real=CInfOrNaN::PositiveInfinity();
+      cpositiveinfinity.imag=CInfOrNaN::PositiveInfinity();
+      cnegativeinfinity.real=CInfOrNaN::NegativeInfinity();
+      cnegativeinfinity.imag=CInfOrNaN::NegativeInfinity();
       //--- check
       if(_spoil_scenario==0)
          Spoil_Matrix_By_Value(b,cnan);
@@ -11805,16 +12003,5987 @@ void TEST_MatDet_T_5(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
       if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
          continue;
       //--- initialization
-      tempcomplex2.re=25;
-      tempcomplex2.im=0;
+      tempcomplex2.real=25;
+      tempcomplex2.imag=0;
       //--- check result
       _TestResult=_TestResult && Doc_Test_Complex(a,tempcomplex2,0.0001);
       _TestResult=_TestResult && (_spoil_scenario==-1);
      }
 //--- check
    if(!_TestResult)
-      Print("{0,-32} FAILED","matdet_t_5");
+      PrintFormat("%-32s FAILED",__FUNCTION__);
 //--- change total result
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Matrix multiplication (single-threaded)                          |
+//+------------------------------------------------------------------+
+void TEST_Ablas_D_Gemm(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   _spoil_scenario=-1;
+   matrix<double> A={{2,1},{1,3}};
+   CMatrixDouble a=A;
+   matrix<double> B={{2,1},{0,1}};
+   CMatrixDouble b=B;
+   CMatrixDouble c=matrix<double>::Zeros(2,2);
+//--- rmatrixgemm() function allows us to calculate matrix product C:=A*B or
+//--- to perform more general operation, C:=alpha*op1(A)*op2(B)+beta*C,
+//--- where A, B, C are rectangular matrices, op(X) can be X or X^T,
+//--- alpha and beta are scalars.
+//--- This function:
+//--- * can apply transposition and/or multiplication by scalar to operands
+//--- * can use arbitrary part of matrices A/B (given by submatrix offset)
+//--- * can store result into arbitrary part of C
+//--- * for performance reasons requires C to be preallocated
+//--- Parameters of this function are:
+//--- * M, N, K            -   sizes of op1(A) (which is MxK), op2(B) (which
+//---                          is KxN) and C (which is MxN)
+//--- * Alpha              -   coefficient before A*B
+//--- * A, IA, JA          -   matrix A and offset of the submatrix
+//--- * OpTypeA            -   transformation type:
+//---                          0 - no transformation
+//---                          1 - transposition
+//--- * B, IB, JB          -   matrix B and offset of the submatrix
+//--- * OpTypeB            -   transformation type:
+//---                          0 - no transformation
+//---                          1 - transposition
+//--- * Beta               -   coefficient before C
+//--- * C, IC, JC          -   preallocated matrix C and offset of the submatrix
+//--- Below we perform simple product C:=A*B (alpha=1, beta=0)
+//--- IMPORTANT: this function works with preallocated C, which must be large
+//---            enough to store multiplication result.
+   int    m=2;
+   int    n=2;
+   int    k=2;
+   double alpha=1.0;
+   int    ia=0;
+   int    ja=0;
+   int    optypea=0;
+   int    ib=0;
+   int    jb=0;
+   int    optypeb=0;
+   double beta=0.0;
+   int    ic=0;
+   int    jc=0;
+
+   CAlglib::RMatrixGemm(m,n,k,alpha,a,ia,ja,optypea,b,ib,jb,optypeb,beta,c,ic,jc);
+     {
+      matrix<double> check={{4.0,3.0},{2.0,4.0}};
+      CMatrixDouble Check=check;
+      if(Func_spoil_scenario(_spoil_scenario,_TestResult))
+         _TestResult=_TestResult && Doc_Test_Real_Matrix(c,Check,0.0001);
+     }
+//--- Now we try to apply some simple transformation to operands: C:=A*B^T
+   optypeb=1;
+   CAlglib::RMatrixGemm(m,n,k,alpha,a,ia,ja,optypea,b,ib,jb,optypeb,beta,c,ic,jc);
+     {
+      matrix<double> check={{5,1},{5,3}};
+      CMatrixDouble Check=check;
+      if(Func_spoil_scenario(_spoil_scenario,_TestResult))
+         _TestResult=_TestResult && Doc_Test_Real_Matrix(c,Check,0.0001);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Symmetric rank-K update (single-threaded)                        |
+//+------------------------------------------------------------------+
+void TEST_Ablas_D_Syrk(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   _spoil_scenario=-1;
+//--- rmatrixsyrk() function allows us to calculate symmetric rank-K update
+//--- C := beta*C + alpha*A'*A, where C is square N*N matrix, A is square K*N
+//--- matrix, alpha and beta are scalars. It is also possible to update by
+//--- adding A*A' instead of A'*A.
+//--- Parameters of this function are:
+//--- * N, K       -   matrix size
+//--- * Alpha      -   coefficient before A
+//--- * A, IA, JA  -   matrix and submatrix offsets
+//--- * OpTypeA    -   multiplication type:
+//---                  * 0 - A*A^T is calculated
+//---                  * 2 - A^T*A is calculated
+//--- * Beta       -   coefficient before C
+//--- * C, IC, JC  -   preallocated input/output matrix and submatrix offsets
+//--- * IsUpper    -   whether upper or lower triangle of C is updated;
+//---                  this function updates only one half of C, leaving
+//---                  other half unchanged (not referenced at all).
+//--- Below we will show how to calculate simple product C:=A'*A
+//--- NOTE: beta=0 and we do not use previous value of C, but still it
+//---       MUST be preallocated.
+   int    n=2;
+   int    k=1;
+   double alpha=1.0;
+   int    ia=0;
+   int    ja=0;
+   int    optypea=2;
+   double beta=0.0;
+   int    ic=0;
+   int    jc=0;
+   bool   isupper=true;
+   CMatrixDouble a;
+     {
+      matrix<double> init={{1,2}};
+      a=init;
+     }
+//--- preallocate space to store result
+   CMatrixDouble c=matrix<double>::Zeros(2,2);
+//--- calculate product, store result into upper part of c
+   CAlglib::RMatrixSyrk(n,k,alpha,a,ia,ja,optypea,beta,c,ic,jc,isupper);
+   if(Func_spoil_scenario(_spoil_scenario,_TestResult))
+     {
+      //--- output result.
+      //--- IMPORTANT: lower triangle of C was NOT updated!
+      matrix<double> check={{1,2},{0,4}};
+      CMatrixDouble Check=check;
+      _TestResult=_TestResult && Doc_Test_Real_Matrix(c,Check,0.0001);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Basis test for complex matrix functions (correctness and presence|
+//| of SMP support)                                                  |
+//+------------------------------------------------------------------+
+void TEST_Ablas_T_Complex(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   _spoil_scenario=-1;
+   CMatrixComplex a;
+   CMatrixComplex b;
+   CMatrixComplex c;
+//--- test cmatrixgemm()
+     {
+      matrix<complex> init={{(0+2i),(0+1i)},{(1+0i),(3+0i)}};
+      a=init;
+     }
+     {
+      matrix<complex> init={{(2+0i),(1+0i)},{(0+0i),(1+0i)}};
+      b=init;
+     }
+   c=matrix<complex>::Full(2,2,0);
+   CAlglib::CMatrixGemm(2,2,2,(complex)(1.0),a,0,0,0,b,0,0,0,(complex)0.0,c,0,0);
+   if(Func_spoil_scenario(_spoil_scenario,_TestResult))
+     {
+      matrix<complex> check={{(0+4i),(0+3i)},{(2+0i),(4+0i)}};
+      CMatrixComplex Check=check;
+      _TestResult=_TestResult && Doc_Test_Complex_Matrix(c,Check,0.0001);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Basic operations with sparse matrices                            |
+//+------------------------------------------------------------------+
+void TEST_Sparse_D_1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<1; _spoil_scenario++)
+     {
+      //--- This example demonstrates creation/initialization of the sparse matrix
+      //--- and matrix-vector multiplication.
+      //--- First, we have to create matrix and initialize it. Matrix is initially created
+      //--- in the Hash-Table format, which allows convenient initialization. We can modify
+      //--- Hash-Table matrix with SparseSet() and sparseadd() functions.
+      //--- NOTE: Unlike CRS format, Hash-Table representation allows you to initialize
+      //--- elements in the arbitrary order. You may see that we initialize a[0][0] first,
+      //--- then move to the second row, and then move back to the first row.
+      CSparseMatrix s;
+      CAlglib::SparseCreate(2,2,s);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SparseSet(s,0,0,2.0);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SparseSet(s,1,1,1.0);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SparseSet(s,0,1,1.0);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SparseAdd(s,1,1,4.0);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Now S is equal to
+      //---   [ 2 1 ]
+      //---   [   5 ]
+      //--- Lets check it by reading matrix contents with SparseGet().
+      //--- You may see that with SparseGet() you may read both non-zero
+      //--- and zero elements.
+      double v;
+      v=CAlglib::SparseGet(s,0,0);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Real(v,2.0000,0.005);
+      v=CAlglib::SparseGet(s,0,1);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Real(v,1.0000,0.005);
+      v=CAlglib::SparseGet(s,1,0);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Real(v,0.0000,0.005);
+      v=CAlglib::SparseGet(s,1,1);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Real(v,5.0000,0.005);
+      //--- After successful creation we can use our matrix for linear operations.
+      //--- However, there is one more thing we MUST do before using S in linear
+      //--- operations: we have to convert it from HashTable representation (used for
+      //--- initialization and dynamic operations) to CRS format with sparseconverttocrs()
+      //--- call. If you omit this call, ALGLIB will generate exception on the first
+      //--- attempt to use S in linear operations.
+      CAlglib::SparseConvertToCRS(s);
+      //--- Now S is in the CRS format and we are ready to do linear operations.
+      //--- Lets calculate A*x for some x.
+      CRowDouble x;
+        {
+         vector<double> init={1,-1};
+         x=init;
+        }
+      if(_spoil_scenario==0)
+         Spoil_Vector_By_Deleting_Element(x);
+      CRowDouble y;
+      CAlglib::SparseMV(s,x,y);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      double check[]={1.000,-5.000};
+      _TestResult=_TestResult && Doc_Test_Real_Vector(y,check,0.005);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Advanced topic: creation in the CRS format.                      |
+//+------------------------------------------------------------------+
+void TEST_Sparse_D_CRS(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<2; _spoil_scenario++)
+     {
+      //--- This example demonstrates creation/initialization of the sparse matrix in the
+      //--- CRS format.
+      //--- Hash-Table format used by default is very convenient (it allows easy
+      //--- insertion of elements, automatic memory reallocation), but has
+      //--- significant memory and performance overhead. Insertion of one element
+      //--- costs hundreds of CPU cycles, and memory consumption is several times
+      //--- higher than that of CRS.
+      //--- When you work with really large matrices and when you can tell in
+      //--- advance how many elements EXACTLY you need, it can be beneficial to
+      //--- create matrix in the CRS format from the very beginning.
+      //--- If you want to create matrix in the CRS format, you should:
+      //--- * use sparsecreatecrs() function
+      //--- * know row sizes in advance (number of non-zero entries in the each row)
+      //--- * initialize matrix with SparseSet() - another function, sparseadd(), is not allowed
+      //--- * initialize elements from left to right, from top to bottom, each
+      //---   element is initialized only once.
+      CSparseMatrix s;
+      CRowInt row_sizes;
+        {
+         int init[]={2,2,2,1};
+         row_sizes=init;
+        }
+      if(_spoil_scenario==0)
+         Spoil_Vector_By_Deleting_Element(row_sizes);
+      CAlglib::SparseCreateCRS(4,4,row_sizes,s);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SparseSet(s,0,0,2.0);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SparseSet(s,0,1,1.0);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SparseSet(s,1,1,4.0);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SparseSet(s,1,2,2.0);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SparseSet(s,2,2,3.0);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SparseSet(s,2,3,1.0);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SparseSet(s,3,3,9.0);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Now S is equal to
+      //---   [ 2 1     ]
+      //---   [   4 2   ]
+      //---   [     3 1 ]
+      //---   [       9 ]
+      //--- We should point that we have initialized S elements from left to right,
+      //--- from top to bottom. CRS representation does NOT allow you to do so in
+      //--- the different order. Try to change order of the SparseSet() calls above,
+      //--- and you will see that your program generates exception.
+      //--- We can check it by reading matrix contents with SparseGet().
+      //--- However, you should remember that SparseGet() is inefficient on
+      //--- CRS matrices (it may have to pass through all elements of the row
+      //--- until it finds element you need).
+      double v=CAlglib::SparseGet(s,0,0);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Real(v,2.0000,0.005);
+      v=CAlglib::SparseGet(s,2,3);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Real(v,1.0000,0.005);
+      //--- you may see that you can read zero elements (which are not stored) with SparseGet()
+      v=CAlglib::SparseGet(s,3,2);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Real(v,0.0000,0.005);
+      //--- After successful creation we can use our matrix for linear operations.
+      //--- Lets calculate A*x for some x.
+      CRowDouble x;
+        {
+         double init[]={1,-1,1,-1};
+         x=init;
+        }
+      if(_spoil_scenario==1)
+         Spoil_Vector_By_Deleting_Element(x);
+      CRowDouble y;
+      CAlglib::SparseMV(s,x,y);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      double check[]={1.000,-2.000,2.000,-9};
+      _TestResult=_TestResult && Doc_Test_Real_Vector(y,check,0.005);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Solving positive definite sparse system using Skyline(SKS) solver|                                                                |
+//+------------------------------------------------------------------+
+void TEST_SolveSKS_D_1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<4; _spoil_scenario++)
+     {
+      //--- This example demonstrates creation/initialization of the sparse matrix
+      //--- in the SKS (Skyline) storage format and solution using SKS-based direct
+      //--- solver.
+      //--- First, we have to create matrix and initialize it. Matrix is created
+      //--- in the SKS format, using fixed bandwidth initialization function.
+      //--- Several points should be noted:
+      //--- 1. SKS sparse storage format also allows variable bandwidth matrices;
+      //---    we just do not want to overcomplicate this example.
+      //--- 2. SKS format requires you to specify matrix geometry prior to
+      //---    initialization of its elements with SparseSet(). If you specified
+      //---    bandwidth=1, you can not change your mind afterwards and call
+      //---    SparseSet() for non-existent elements.
+      //--- 3. Because SKS solver need just one triangle of SPD matrix, we can
+      //---    omit initialization of the lower triangle of our matrix.
+      int n=4;
+      int bandwidth=1;
+      CSparseMatrix s;
+      CAlglib::SparseCreateSKSBand(n,n,bandwidth,s);
+      CAlglib::SparseSet(s,0,0,2.0);
+      CAlglib::SparseSet(s,0,1,1.0);
+      CAlglib::SparseSet(s,1,1,3.0);
+      CAlglib::SparseSet(s,1,2,1.0);
+      CAlglib::SparseSet(s,2,2,3.0);
+      CAlglib::SparseSet(s,2,3,1.0);
+      CAlglib::SparseSet(s,3,3,2.0);
+      //--- Now we have symmetric positive definite 4x4 system width bandwidth=1:
+      //---     [ 2 1     ]   [ x0]]   [  4 ]
+      //---     [ 1 3 1   ]   [ x1 ]   [ 10 ]
+      //---     [   1 3 1 ] * [ x2 ] = [ 15 ]
+      //---     [     1 2 ]   [ x3 ]   [ 11 ]
+      //--- After successful creation we can call SKS solver.
+      CRowDouble b;
+        {
+         double init[]={4,10,15,11};
+         b=init;
+        }
+      if(_spoil_scenario==0)
+         Spoil_Vector_By_Value(b,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Vector_By_Value(b,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Vector_By_Value(b,AL_NEGINF);
+      if(_spoil_scenario==3)
+         Spoil_Vector_By_Deleting_Element(b);
+      CSparseSolverReport rep;
+      CRowDouble x;
+      bool isuppertriangle=true;
+      CAlglib::SparseSPDSolveSKS(s,isuppertriangle,b,x,rep);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      double check[]={1.0000,2.0000,3.0000,4.0000};
+      _TestResult=_TestResult && Doc_Test_Real_Vector(x,check,0.00005);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Solution of sparse linear systems with CG                        |
+//+------------------------------------------------------------------+
+void TEST_LinCG_D_1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<4; _spoil_scenario++)
+     {
+      //--- This example illustrates solution of sparse linear systems with
+      //--- conjugate gradient method.
+      //--- Suppose that we have linear system A*x=b with sparse symmetric
+      //--- positive definite A (represented by SparseMatrix object)
+      //---         [ 5 1       ]
+      //---         [ 1 7 2     ]
+      //---     A = [   2 8 1   ]
+      //---         [     1 4 1 ]
+      //---         [       1 4 ]
+      //--- and right part b
+      //---     [  7 ]
+      //---     [ 17 ]
+      //--- b = [ 14 ]
+      //---     [ 10 ]
+      //---     [  6 ]
+      //--- and we want to solve this system using sparse linear CG. In order
+      //--- to do so, we have to create left part (SparseMatrix object) and
+      //--- right part (dense array).
+      //--- Initially, sparse matrix is created in the Hash-Table format,
+      //--- which allows easy initialization, but do not allow matrix to be
+      //--- used in the linear solvers. So after construction you should convert
+      //--- sparse matrix to CRS format (one suited for linear operations).
+      //--- It is important to note that in our example we initialize full
+      //--- matrix A, both lower and upper triangles. However, it is symmetric
+      //--- and sparse solver needs just one half of the matrix. So you may
+      //--- save about half of the space by filling only one of the triangles.
+      CSparseMatrix a;
+      CAlglib::SparseCreate(5,5,a);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SparseSet(a,0,0,5.0);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SparseSet(a,0,1,1.0);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SparseSet(a,1,0,1.0);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SparseSet(a,1,1,7.0);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SparseSet(a,1,2,2.0);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SparseSet(a,2,1,2.0);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SparseSet(a,2,2,8.0);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SparseSet(a,2,3,1.0);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SparseSet(a,3,2,1.0);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SparseSet(a,3,3,4.0);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SparseSet(a,3,4,1.0);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SparseSet(a,4,3,1.0);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SparseSet(a,4,4,4.0);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Now our matrix is fully initialized, but we have to do one more
+      //--- step - convert it from Hash-Table format to CRS format (see
+      //--- documentation on sparse matrices for more information about these
+      //--- formats).
+      //--- If you omit this call, ALGLIB will generate exception on the first
+      //--- attempt to use A in linear operations.
+      CAlglib::SparseConvertToCRS(a);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Initialization of the right part
+      CRowDouble b;
+        {
+         double init[]={7,17,14,10,6};
+         b=init;
+        }
+      if(_spoil_scenario==0)
+         Spoil_Vector_By_Value(b,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Vector_By_Value(b,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Vector_By_Value(b,AL_NEGINF);
+      if(_spoil_scenario==3)
+         Spoil_Vector_By_Deleting_Element(b);
+      //--- Now we have to create linear solver object and to use it for the
+      //--- solution of the linear system.
+      //--- NOTE: lincgsolvesparse() accepts additional parameter which tells
+      //---       what triangle of the symmetric matrix should be used - upper
+      //---       or lower. Because we've filled both parts of the matrix, we
+      //---       can use any part - upper or lower.
+      CLinCGState s;
+      CLinCGReport rep;
+      CRowDouble x;
+      CAlglib::LinCGCreate(5,s);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::LinCGSolveSparse(s,a,true,b);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::LinCGResult(s,x,rep);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Int(rep.m_terminationtype,1);
+      double check[]={1.000,2.000,1.000,2.000,1.000};
+      _TestResult=_TestResult && Doc_Test_Real_Vector(x,check,0.005);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Solution of sparse linear systems with CG                        |
+//+------------------------------------------------------------------+
+void TEST_LinLSQR_D_1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<4; _spoil_scenario++)
+     {
+      //--- This example illustrates solution of sparse linear least squares problem
+      //--- with LSQR algorithm.
+      //--- Suppose that we have least squares problem min|A*x-b| with sparse A
+      //--- represented by SparseMatrix object
+      //---         [ 1 1 ]
+      //---         [ 1 1 ]
+      //---     A = [ 2 1 ]
+      //---         [ 1   ]
+      //---         [   1 ]
+      //--- and right part b
+      //---     [ 4 ]
+      //---     [ 2 ]
+      //--- b = [ 4 ]
+      //---     [ 1 ]
+      //---     [ 2 ]
+      //--- and we want to solve this system in the least squares sense using
+      //--- LSQR algorithm. In order to do so, we have to create left part
+      //--- (SparseMatrix object) and right part (dense array).
+      //--- Initially, sparse matrix is created in the Hash-Table format,
+      //--- which allows easy initialization, but do not allow matrix to be
+      //--- used in the linear solvers. So after construction you should convert
+      //--- sparse matrix to CRS format (one suited for linear operations).
+      CSparseMatrix a;
+      CAlglib::SparseCreate(5,2,a);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SparseSet(a,0,0,1.0);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SparseSet(a,0,1,1.0);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SparseSet(a,1,0,1.0);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SparseSet(a,1,1,1.0);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SparseSet(a,2,0,2.0);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SparseSet(a,2,1,1.0);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SparseSet(a,3,0,1.0);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SparseSet(a,4,1,1.0);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Now our matrix is fully initialized, but we have to do one more
+      //--- step - convert it from Hash-Table format to CRS format (see
+      //--- documentation on sparse matrices for more information about these
+      //--- formats).
+      //--- If you omit this call, ALGLIB will generate exception on the first
+      //--- attempt to use A in linear operations.
+      CAlglib::SparseConvertToCRS(a);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Initialization of the right part
+      CRowDouble b;
+        {
+         double init[]={4,2,4,1,2};
+         b=init;
+        }
+      if(_spoil_scenario==0)
+         Spoil_Vector_By_Value(b,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Vector_By_Value(b,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Vector_By_Value(b,AL_NEGINF);
+      if(_spoil_scenario==3)
+         Spoil_Vector_By_Deleting_Element(b);
+      //--- Now we have to create linear solver object and to use it for the
+      //--- solution of the linear system.
+      CLinLSQRState s;
+      CLinLSQRReport rep;
+      CRowDouble x;
+      CAlglib::LinLSQRCreate(5,2,s);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::LinLSQRSolveSparse(s,a,b);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::LinLSQRResults(s,x,rep);
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Int(rep.m_terminationtype,4);
+      double check[]={1.000,2.000};
+      _TestResult=_TestResult && Doc_Test_Real_Vector(x,check,0.005);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Linearly constrained dense quadratic programming                 |
+//+------------------------------------------------------------------+
+void TEST_MinQP_D_LC1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<16; _spoil_scenario++)
+     {
+      //--- This example demonstrates minimization of F(x0,x1) = x0^2 + x1^2 -6*x0 - 4*x1
+      //--- subject to linear constraint x0+x1<=2
+      //--- Exact solution is [x0,x1] = [1.5,0.5]
+      //--- IMPORTANT: this solver minimizes  following  function:
+      //---     f(x) = 0.5*x'*A*x + b'*x.
+      //--- Note that quadratic term has 0.5 before it. So if you want to minimize
+      //--- quadratic function, you should rewrite it in such way that quadratic term
+      //--- is multiplied by 0.5 too.
+      //--- For example, our function is f(x)=x0^2+x1^2+..., but we rewrite it as
+      //---     f(x) = 0.5*(2*x0^2+2*x1^2) + ....
+      //--- and pass diag(2,2) as quadratic term - NOT diag(1,1)!
+      matrix<double> A={{2,0},{0,2}};
+      CMatrixDouble a=A;
+      if(_spoil_scenario==0)
+         Spoil_Matrix_By_Value(a,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Matrix_By_Value(a,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Matrix_By_Value(a,AL_NEGINF);
+      if(_spoil_scenario==3)
+         Spoil_Matrix_By_Deleting_Row(a);
+      if(_spoil_scenario==4)
+         Spoil_Matrix_By_Deleting_Col(a);
+      double b[];
+        {
+         double init[]={-6,-4};
+         ArrayCopy(b,init);
+        }
+      if(_spoil_scenario==5)
+         Spoil_Vector_By_Value(b,AL_NaN);
+      if(_spoil_scenario==6)
+         Spoil_Vector_By_Value(b,AL_POSINF);
+      if(_spoil_scenario==7)
+         Spoil_Vector_By_Value(b,AL_NEGINF);
+      if(_spoil_scenario==8)
+         Spoil_Vector_By_Deleting_Element(b);
+      CRowDouble s=vector<double>::Ones(2);
+      if(_spoil_scenario==9)
+         Spoil_Vector_By_Value(s,AL_NaN);
+      if(_spoil_scenario==10)
+         Spoil_Vector_By_Value(s,AL_POSINF);
+      if(_spoil_scenario==11)
+         Spoil_Vector_By_Value(s,AL_NEGINF);
+      if(_spoil_scenario==12)
+         Spoil_Vector_By_Deleting_Element(s);
+      matrix<double> C={{1.0,1.0,2.0}};
+      CMatrixDouble c=C;
+      if(_spoil_scenario==13)
+         Spoil_Matrix_By_Value(c,AL_NaN);
+      if(_spoil_scenario==14)
+         Spoil_Matrix_By_Value(c,AL_POSINF);
+      if(_spoil_scenario==15)
+         Spoil_Matrix_By_Value(c,AL_NEGINF);
+      int Ct[]={-1};
+      CRowInt ct=Ct;
+      double x[];
+      CMinQPStateShell state;
+      CMinQPReportShell rep;
+      //--- create solver, set quadratic/linear terms
+      CAlglib::MinQPCreate(2,state);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinQPSetQuadraticTerm(state,a);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinQPSetLinearTerm(state,b);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinQPSetLC(state,c,ct);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Set scale of the parameters.
+      //--- It is strongly recommended that you set scale of your variables.
+      //--- Knowing their scales is essential for evaluation of stopping criteria
+      //--- and for preconditioning of the algorithm steps.
+      //--- You can find more information on scaling at http://www.CAlglib::net/optimization/scaling.php
+      //--- NOTE: for convex problems you may try using minqpsetscaleautodiag()
+      //---       which automatically determines variable scales.
+      CAlglib::MinQPSetScale(state,s);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Solve problem with BLEIC-based QP solver.
+      //--- This solver is intended for problems with moderate (up to 50) number
+      //--- of general linear constraints and unlimited number of box constraints.
+      //--- Default stopping criteria are used.
+      CAlglib::MinQPSetAlgoBLEIC(state,0.0,0.0,0.0,0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinQPOptimize(state);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinQPResults(state,x,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+        {
+         double check[]={1.500,0.500};
+         _TestResult=_TestResult && Doc_Test_Real_Vector(x,check,0.05);
+        }
+      //--- Solve problem with DENSE-AUL solver.
+      //--- This solver is optimized for problems with up to several thousands of
+      //--- variables and large amount of general linear constraints. Problems with
+      //--- less than 50 general linear constraints can be efficiently solved with
+      //--- BLEIC, problems with box-only constraints can be solved with QuickQP.
+      //--- However, DENSE-AUL will work in any (including unconstrained) case.
+      //--- Default stopping criteria are used.
+      CAlglib::MinQPSetAlgoDenseAUL(state,1.0e-9,1.0e+4,5);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinQPOptimize(state);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinQPResults(state,x,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+        {
+         double check[]={1.500,0.500};
+         _TestResult=_TestResult && Doc_Test_Real_Vector(x,check,0.05);
+        }
+      //--- Solve problem with QuickQP solver.
+      //--- This solver is intended for medium and large-scale problems with box
+      //--- constraints, and...
+      //--- ...Oops! It does not support general linear constraints, -5 returned as completion code!
+      CAlglib::MinQPSetAlgoQuickQP(state,0.0,0.0,0.0,0,true);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinQPOptimize(state);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinQPResults(state,x,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Int(rep.GetTerminationType(),-5);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Unconstrained sparse quadratic programming                       |
+//+------------------------------------------------------------------+
+void TEST_MinQP_D_U2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<12; _spoil_scenario++)
+     {
+      //--- This example demonstrates minimization of F(x0,x1) = x0^2 + x1^2 -6*x0 - 4*x1,
+      //--- with quadratic term given by sparse matrix structure.
+      //--- Exact solution is [x0,x1] = [3,2]
+      //--- We provide algorithm with starting point, although in this case
+      //--- (dense matrix, no constraints) it can work without such information.
+      //--- IMPORTANT: this solver minimizes  following  function:
+      //---     f(x) = 0.5*x'*A*x + b'*x.
+      //--- Note that quadratic term has 0.5 before it. So if you want to minimize
+      //--- quadratic function, you should rewrite it in such way that quadratic term
+      //--- is multiplied by 0.5 too.
+      //--- For example, our function is f(x)=x0^2+x1^2+..., but we rewrite it as
+      //---     f(x) = 0.5*(2*x0^2+2*x1^2) + ....
+      //--- and pass diag(2,2) as quadratic term - NOT diag(1,1)!
+      CSparseMatrix a;
+      double b[];
+        {
+         double init[]={-6,-4};
+         ArrayCopy(b,init);
+        }
+      if(_spoil_scenario==0)
+         Spoil_Vector_By_Value(b,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Vector_By_Value(b,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Vector_By_Value(b,AL_NEGINF);
+      if(_spoil_scenario==3)
+         Spoil_Vector_By_Deleting_Element(b);
+      double x0[];
+        {
+         double init[]={0,1};
+         ArrayCopy(x0,init);
+        }
+      if(_spoil_scenario==4)
+         Spoil_Vector_By_Value(x0,AL_NaN);
+      if(_spoil_scenario==5)
+         Spoil_Vector_By_Value(x0,AL_POSINF);
+      if(_spoil_scenario==6)
+         Spoil_Vector_By_Value(x0,AL_NEGINF);
+      if(_spoil_scenario==7)
+         Spoil_Vector_By_Deleting_Element(x0);
+      CRowDouble s=vector<double>::Ones(2);
+      if(_spoil_scenario==8)
+         Spoil_Vector_By_Value(s,AL_NaN);
+      if(_spoil_scenario==9)
+         Spoil_Vector_By_Value(s,AL_POSINF);
+      if(_spoil_scenario==10)
+         Spoil_Vector_By_Value(s,AL_NEGINF);
+      if(_spoil_scenario==11)
+         Spoil_Vector_By_Deleting_Element(s);
+      double x[];
+      CMinQPStateShell state;
+      CMinQPReportShell rep;
+      //--- initialize sparsematrix structure
+      CAlglib::SparseCreate(2,2,0,a);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SparseSet(a,0,0,2.0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SparseSet(a,1,1,2.0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- create solver, set quadratic/linear terms
+      CAlglib::MinQPCreate(2,state);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinQPSetQuadraticTermSparse(state,a,true);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinQPSetLinearTerm(state,b);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinQPSetStartingPoint(state,x0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Set scale of the parameters.
+      //--- It is strongly recommended that you set scale of your variables.
+      //--- Knowing their scales is essential for evaluation of stopping criteria
+      //--- and for preconditioning of the algorithm steps.
+      //--- You can find more information on scaling at http://www.CAlglib::net/optimization/scaling.php
+      //--- NOTE: for convex problems you may try using minqpsetscaleautodiag()
+      //---       which automatically determines variable scales.
+      CAlglib::MinQPSetScale(state,s);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Solve problem with BLEIC-based QP solver.
+      //--- This solver is intended for problems with moderate (up to 50) number
+      //--- of general linear constraints and unlimited number of box constraints.
+      //--- It also supports sparse problems.
+      //--- Default stopping criteria are used.
+      CAlglib::MinQPSetAlgoBLEIC(state,0.0,0.0,0.0,0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinQPOptimize(state);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinQPResults(state,x,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      double check[]={3,2};
+      _TestResult=_TestResult && Doc_Test_Real_Vector(x,check,0.005);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Nonconvex quadratic programming                                  |
+//+------------------------------------------------------------------+
+void TEST_MinQP_D_NonConvex(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<21; _spoil_scenario++)
+     {
+      //--- This example demonstrates minimization of nonconvex function
+      //---     F(x0,x1) = -(x0^2+x1^2)
+      //--- subject to constraints x0,x1 in [1.0,2.0]
+      //--- Exact solution is [x0,x1] = [2,2].
+      //--- Non-convex problems are harded to solve than convex ones, and they
+      //--- may have more than one local minimum. However, ALGLIB solves may deal
+      //--- with such problems (altough they do not guarantee convergence to
+      //--- global minimum).
+      //--- IMPORTANT: this solver minimizes  following  function:
+      //---     f(x) = 0.5*x'*A*x + b'*x.
+      //--- Note that quadratic term has 0.5 before it. So if you want to minimize
+      //--- quadratic function, you should rewrite it in such way that quadratic term
+      //--- is multiplied by 0.5 too.
+      //--- For example, our function is f(x)=-(x0^2+x1^2), but we rewrite it as
+      //---     f(x) = 0.5*(-2*x0^2-2*x1^2)
+      //--- and pass diag(-2,-2) as quadratic term - NOT diag(-1,-1)!
+      matrix<double> A={{-2,0},{0,-2}};
+      CMatrixDouble a=A;
+      if(_spoil_scenario==0)
+         Spoil_Matrix_By_Value(a,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Matrix_By_Value(a,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Matrix_By_Value(a,AL_NEGINF);
+      if(_spoil_scenario==3)
+         Spoil_Matrix_By_Deleting_Row(a);
+      if(_spoil_scenario==4)
+         Spoil_Matrix_By_Deleting_Col(a);
+      double x0[];
+        {
+         double init[]={1,1};
+         ArrayCopy(x0,init);
+        }
+      if(_spoil_scenario==5)
+         Spoil_Vector_By_Value(x0,AL_NaN);
+      if(_spoil_scenario==6)
+         Spoil_Vector_By_Value(x0,AL_POSINF);
+      if(_spoil_scenario==7)
+         Spoil_Vector_By_Value(x0,AL_NEGINF);
+      if(_spoil_scenario==8)
+         Spoil_Vector_By_Deleting_Element(x0);
+      CRowDouble s=vector<double>::Ones(2);
+      if(_spoil_scenario==9)
+         Spoil_Vector_By_Value(s,AL_NaN);
+      if(_spoil_scenario==10)
+         Spoil_Vector_By_Value(s,AL_POSINF);
+      if(_spoil_scenario==11)
+         Spoil_Vector_By_Value(s,AL_NEGINF);
+      if(_spoil_scenario==12)
+         Spoil_Vector_By_Deleting_Element(s);
+      double bndl[];
+        {
+         double init[]={1.0,1.0};
+         ArrayCopy(bndl,init);
+        }
+      if(_spoil_scenario==13)
+         Spoil_Vector_By_Value(bndl,AL_NaN);
+      if(_spoil_scenario==14)
+         Spoil_Vector_By_Deleting_Element(bndl);
+      double bndu[];
+        {
+         double init[]={2.0,2.0};
+         ArrayCopy(bndu,init);
+        }
+      if(_spoil_scenario==15)
+         Spoil_Vector_By_Value(bndu,AL_NaN);
+      if(_spoil_scenario==16)
+         Spoil_Vector_By_Deleting_Element(bndu);
+      double x[];
+      CMinQPStateShell state;
+      CMinQPReportShell rep;
+      //--- create solver, set quadratic/linear terms, constraints
+      CAlglib::MinQPCreate(2,state);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinQPSetQuadraticTerm(state,a);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinQPSetStartingPoint(state,x0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinQPSetBC(state,bndl,bndu);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Set scale of the parameters.
+      //--- It is strongly recommended that you set scale of your variables.
+      //--- Knowing their scales is essential for evaluation of stopping criteria
+      //--- and for preconditioning of the algorithm steps.
+      //--- You can find more information on scaling at http://www.CAlglib::net/optimization/scaling.php
+      //--- NOTE: there also exists minqpsetscaleautodiag() function
+      //---       which automatically determines variable scales; however,
+      //---       it does NOT work for non-convex problems.
+      CAlglib::MinQPSetScale(state,s);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Solve problem with BLEIC-based QP solver.
+      //--- This solver is intended for problems with moderate (up to 50) number
+      //--- of general linear constraints and unlimited number of box constraints.
+      //--- It may solve non-convex problems as long as they are bounded from
+      //--- below under constraints.
+      //--- Default stopping criteria are used.
+      CAlglib::MinQPSetAlgoBLEIC(state,0.0,0.0,0.0,0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinQPOptimize(state);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinQPResults(state,x,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      double check[]={2,2};
+      _TestResult=_TestResult && Doc_Test_Real_Vector(x,check,0.005);
+      //--- Solve problem with DENSE-AUL solver.
+      //--- This solver is optimized for problems with up to several thousands of
+      //--- variables and large amount of general linear constraints. Problems with
+      //--- less than 50 general linear constraints can be efficiently solved with
+      //--- BLEIC, problems with box-only constraints can be solved with QuickQP.
+      //--- However, DENSE-AUL will work in any (including unconstrained) case.
+      //--- Algorithm convergence is guaranteed only for convex case, but you may
+      //--- expect that it will work for non-convex problems too (because near the
+      //--- solution they are locally convex).
+      //--- Default stopping criteria are used.
+      CAlglib::MinQPSetAlgoDenseAUL(state,1.0e-9,1.0e+4,5);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinQPOptimize(state);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinQPResults(state,x,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Real_Vector(x,check,0.005);
+      //--- Hmm... this problem is bounded from below (has solution) only under constraints.
+      //--- What it we remove them?
+      //--- You may see that BLEIC algorithm detects unboundedness of the problem,
+      //--- -4 is returned as completion code. However, DENSE-AUL is unable to detect
+      //--- such situation and it will cycle forever (we do not test it here).
+      double nobndl[];
+        {
+         double init[]={-AL_POSINF,-AL_POSINF};
+         ArrayCopy(nobndl,init);
+        }
+      if(_spoil_scenario==17)
+         Spoil_Vector_By_Value(nobndl,AL_NaN);
+      if(_spoil_scenario==18)
+         Spoil_Vector_By_Deleting_Element(nobndl);
+      double nobndu[];
+        {
+         double init[]={AL_POSINF,+AL_POSINF};
+         ArrayCopy(nobndu,init);
+        }
+      if(_spoil_scenario==19)
+         Spoil_Vector_By_Value(nobndu,AL_NaN);
+      if(_spoil_scenario==20)
+         Spoil_Vector_By_Deleting_Element(nobndu);
+      CAlglib::MinQPSetBC(state,nobndl,nobndu);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinQPSetAlgoBLEIC(state,0.0,0.0,0.0,0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinQPOptimize(state);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinQPResults(state,x,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Int(rep.GetTerminationType(),-4);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Basic linear programming example                                 |
+//+------------------------------------------------------------------+
+void TEST_MinLP_Basic(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<15; _spoil_scenario++)
+     {
+      //--- This example demonstrates how to minimize
+      //---     F(x0,x1) = -0.1*x0 - x1
+      //--- subject to box constraints
+      //---     -1 <= x0,x1 <= +1
+      //--- and general linear constraints
+      //---     x0 - x1 >= -1
+      //---     x0 + x1 <=  1
+      //--- We use dual simplex solver provided by ALGLIB for this task. Box
+      //--- constraints are specified by means of constraint vectors bndl and
+      //--- bndu (we have bndl<=x<=bndu). General linear constraints are
+      //--- specified as AL<=A*x<=AU, with AL/AU being 2x1 vectors and A being
+      //--- 2x2 matrix.
+      //--- NOTE: some/all components of AL/AU can be +-INF, same applies to
+      //---       bndl/bndu. You can also have AL[I]=AU[i] (as well as
+      //---       BndL[i]=BndU[i]).
+      matrix<double> A={{1,-1},{1,+1}};
+      CMatrixDouble a=A;
+      if(_spoil_scenario==0)
+         Spoil_Matrix_By_Value(a,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Matrix_By_Deleting_Row(a);
+      if(_spoil_scenario==2)
+         Spoil_Matrix_By_Deleting_Col(a);
+      double Al[]={-1,-AL_POSINF};
+      CRowDouble al=Al;
+      if(_spoil_scenario==3)
+         Spoil_Vector_By_Value(al,AL_NaN);
+      if(_spoil_scenario==4)
+         Spoil_Vector_By_Deleting_Element(al);
+      double Au[]={AL_POSINF,+1};
+      CRowDouble au=Au;
+      if(_spoil_scenario==5)
+         Spoil_Vector_By_Value(au,AL_NaN);
+      if(_spoil_scenario==6)
+         Spoil_Vector_By_Deleting_Element(au);
+      double C[]={-0.1,-1};
+      CRowDouble c=C;
+      if(_spoil_scenario==7)
+         Spoil_Vector_By_Value(c,AL_NaN);
+      if(_spoil_scenario==8)
+         Spoil_Vector_By_Deleting_Element(c);
+      CRowDouble s=vector<double>::Ones(2);
+      if(_spoil_scenario==9)
+         Spoil_Vector_By_Value(s,AL_NaN);
+      if(_spoil_scenario==10)
+         Spoil_Vector_By_Deleting_Element(s);
+      CRowDouble bndl=vector<double>::Full(2,-1);
+      if(_spoil_scenario==11)
+         Spoil_Vector_By_Value(bndl,AL_NaN);
+      if(_spoil_scenario==12)
+         Spoil_Vector_By_Deleting_Element(bndl);
+      CRowDouble bndu=vector<double>::Ones(2);
+      if(_spoil_scenario==13)
+         Spoil_Vector_By_Value(bndu,AL_NaN);
+      if(_spoil_scenario==14)
+         Spoil_Vector_By_Deleting_Element(bndu);
+      CRowDouble x;
+      CMinLPState state;
+      CMinLPReport rep;
+      CAlglib::MinLPCreate(2,state);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Set cost vector, box constraints, general linear constraints.
+      //--- Box constraints can be set in one call to minlpsetbc() or minlpsetbcall()
+      //--- (latter sets same constraints for all variables and accepts two scalars
+      //--- instead of two vectors).
+      //--- General linear constraints can be specified in several ways:
+      //--- * minlpsetlc2dense() - accepts dense 2D array as input; sometimes this
+      //---   approach is more convenient, although less memory-efficient.
+      //--- * minlpsetlc2() - accepts sparse matrix as input
+      //--- * minlpaddlc2dense() - appends one row to the current set of constraints;
+      //---   row being appended is specified as dense vector
+      //--- * minlpaddlc2() - appends one row to the current set of constraints;
+      //---   row being appended is specified as sparse set of elements
+      //--- Independently from specific function being used, LP solver uses sparse
+      //--- storage format for internal representation of constraints.
+      CAlglib::MinLPSetCost(state,c);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinLPSetBC(state,bndl,bndu);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinLPSetLC2Dense(state,a,al,au,2);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Set scale of the parameters.
+      //--- It is strongly recommended that you set scale of your variables.
+      //--- Knowing their scales is essential for evaluation of stopping criteria
+      //--- and for preconditioning of the algorithm steps.
+      //--- You can find more information on scaling at http://www.CAlglib::net/optimization/scaling.php
+      CAlglib::MinLPSetScale(state,s);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Solve
+      CAlglib::MinLPOptimize(state);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinLPResults(state,x,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      double check[]={0,1};
+      _TestResult=_TestResult && Doc_Test_Real_Vector(x,check,0.0005);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Nonlinearly constrained optimization (inequality constraints)    |
+//+------------------------------------------------------------------+
+void TEST_MinNLC_D_Inequality(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   CNDimensional_NLCFunc1_Jac Jac;
+   CNDimensional_Rep Rep;
+   CObject Obj;
+   for(_spoil_scenario=-1; _spoil_scenario<9; _spoil_scenario++)
+     {
+      //--- This example demonstrates minimization of
+      //---     f(x0,x1) = -x0+x1
+      //--- subject to box constraints
+      //---    x0>=0, x1>=0
+      //--- and nonlinear inequality constraint
+      //---    x0^2 + x1^2 - 1 <= 0
+      CRowDouble x0=vector<double>::Zeros(2);
+      if(_spoil_scenario==0)
+         Spoil_Vector_By_Value(x0,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Vector_By_Value(x0,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Vector_By_Value(x0,AL_NEGINF);
+      CRowDouble s=vector<double>::Ones(2);
+      if(_spoil_scenario==3)
+         Spoil_Vector_By_Value(s,AL_NaN);
+      if(_spoil_scenario==4)
+         Spoil_Vector_By_Value(s,AL_POSINF);
+      if(_spoil_scenario==5)
+         Spoil_Vector_By_Value(s,AL_NEGINF);
+      double epsx=0.000001;
+      if(_spoil_scenario==6)
+         epsx=AL_NaN;
+      if(_spoil_scenario==7)
+         epsx=AL_POSINF;
+      if(_spoil_scenario==8)
+         epsx=AL_NEGINF;
+      int maxits=0;
+      CRowDouble bndl=vector<double>::Zeros(2);
+      CRowDouble bndu=vector<double>::Full(2,AL_POSINF);
+      CMinNLCState state;
+      //--- Create optimizer object and tune its settings:
+      //--- * epsx=0.000001  stopping condition for inner iterations
+      //--- * s=[1,1]        all variables have unit scale; it is important to
+      //---                  tell optimizer about scales of your variables - it
+      //---                  greatly accelerates convergence and helps to perform
+      //---                  some important integrity checks.
+      CAlglib::MinNLCCreate(2,x0,state);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinNLCSetCond(state,epsx,maxits);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinNLCSetScale(state,s);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Choose one of the nonlinear programming solvers supported by minnlc
+      //--- optimizer:
+      //--- * SQP - sequential quadratic programming NLP solver
+      //--- * AUL - augmented Lagrangian NLP solver
+      //--- * SLP - successive linear programming NLP solver
+      //--- Different solvers have different properties:
+      //--- * SQP needs less function evaluations than any other solver, but it
+      //---   has much higher iteration cost than other solvers (a QP subproblem
+      //---   has to be solved during each step)
+      //--- * AUL solver has cheaper iterations, but needs more target function
+      //---   evaluations
+      //--- * SLP is the most robust solver provided by ALGLIB, but it performs
+      //---   order of magnitude more iterations than SQP.
+      //--- In the code below we set solver to be AUL but then override it with SLP,
+      //--- and then with SQP, so the effective choice is to use SLP. We recommend
+      //--- you to use SQP at least for early prototyping stages, and then switch
+      //--- to AUL if possible.
+      double rho=1000.0;
+      int outerits=5;
+      CAlglib::MinNLCSetAlgoAUL(state,rho,outerits);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinNLCSetAlgoSLP(state);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinNLCSetAlgoSQP(state);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Set constraints:
+      //--- 1. boundary constraints are passed with minnlcsetbc() call
+      //--- 2. nonlinear constraints are more tricky-you can not "pack" general
+      //---    nonlinear function into double precision array. That's why
+      //---    MinNLCSetNLC() does not accept constraints itself - only constraint
+      //---    counts are passed: first parameter is number of equality constraints,
+      //---    second one is number of inequality constraints.
+      //---    As for constraining functions - these functions are passed as part
+      //---    of problem Jacobian (see below).
+      //--- NOTE: MinNLC optimizer supports arbitrary combination of boundary, general
+      //---       linear and general nonlinear constraints. This example does not
+      //---       show how to work with general linear constraints, but you can
+      //---       easily find it in documentation on minnlcsetlc() function.
+      CAlglib::MinNLCSetBC(state,bndl,bndu);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinNLCSetNLC(state,0,1);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Activate OptGuard integrity checking.
+      //--- OptGuard monitor helps to catch common coding and problem statement
+      //--- issues, like:
+      //--- * discontinuity of the target/constraints (C0 continuity violation)
+      //--- * nonsmoothness of the target/constraints (C1 continuity violation)
+      //--- * erroneous analytic Jacobian, i.e. one inconsistent with actual
+      //---   change in the target/constraints
+      //--- OptGuard is essential for early prototyping stages because such
+      //--- problems often result in premature termination of the optimizer
+      //--- which is really hard to distinguish from the correct termination.
+      //--- IMPORTANT: GRADIENT VERIFICATION IS PERFORMED BY MEANS OF NUMERICAL
+      //---            DIFFERENTIATION, THUS DO NOT USE IT IN PRODUCTION CODE!
+      //---            Other OptGuard checks add moderate overhead, but anyway
+      //---            it is better to turn them off when they are not needed.
+      CAlglib::MinNLCOptGuardSmoothness(state);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinNLCOptGuardGradient(state,0.001);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Optimize and test results.
+      //--- Optimizer object accepts vector function and its Jacobian, with first
+      //--- component (Jacobian row) being target function, and next components
+      //--- (Jacobian rows) being nonlinear equality and inequality constraints.
+      //--- So, our vector function has form
+      //---     {f0,f1} = { -x0+x1 , x0^2+x1^2-1 }
+      //--- with Jacobian
+      //---         [  -1    +1  ]
+      //---     J = [            ]
+      //---         [ 2*x0  2*x1 ]
+      //--- with f0 being target function, f1 being constraining function. Number
+      //--- of equality/inequality constraints is specified by minnlcsetnlc(),
+      //--- with equality ones always being first, inequality ones being last.
+      CMinNLCReport rep;
+      CRowDouble x1;
+      CAlglib::MinNLCOptimize(state,Jac,Rep,Obj);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinNLCResults(state,x1,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+        {
+         double check[]={1.0000,0.0000};
+         _TestResult=_TestResult && Doc_Test_Real_Vector(x1,check,0.005);
+        }
+      //--- Check that OptGuard did not report errors
+      //--- NOTE: want to test OptGuard? Try breaking the Jacobian - say, add
+      //---       1.0 to some of its components.
+      COptGuardReport ogrep;
+      CAlglib::MinNLCOptGuardResults(state,ogrep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Bool(ogrep.m_badgradsuspected,false);
+      _TestResult=_TestResult && Doc_Test_Bool(ogrep.m_nonc0suspected,false);
+      _TestResult=_TestResult && Doc_Test_Bool(ogrep.m_nonc1suspected,false);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Nonlinearly constrained optimization (equality constraints)      |
+//+------------------------------------------------------------------+
+void TEST_MinNLC_D_Equality(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   CNDimensional_NLCFunc1_Jac Jac;
+   CNDimensional_Rep Rep;
+   CObject Obj;
+//CAp::TraceFile("IPM.DETAILED,SLP.DETAILED,SLP.PROBING,SQP.DETAILED,SQP.PROBING,AGS.DETAILED.SAMPLE,OPTGUARD.ALWAYS,OPTIMIZERS.X,DSS.DETAILED,RBF.DETAILED,SCHOLESKY.SS", "alglib_interfaces.trs");
+   for(_spoil_scenario=-1; _spoil_scenario<9; _spoil_scenario++)
+     {
+      //--- This example demonstrates minimization of
+      //---     f(x0,x1) = -x0+x1
+      //--- subject to nonlinear equality constraint
+      //---    x0^2 + x1^2 - 1 = 0
+      CRowDouble x0=vector<double>::Zeros(2);
+      if(_spoil_scenario==0)
+         Spoil_Vector_By_Value(x0,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Vector_By_Value(x0,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Vector_By_Value(x0,AL_NEGINF);
+      CRowDouble s=vector<double>::Ones(2);
+      if(_spoil_scenario==3)
+         Spoil_Vector_By_Value(s,AL_NaN);
+      if(_spoil_scenario==4)
+         Spoil_Vector_By_Value(s,AL_POSINF);
+      if(_spoil_scenario==5)
+         Spoil_Vector_By_Value(s,AL_NEGINF);
+      double epsx=0.000001;
+      if(_spoil_scenario==6)
+         epsx=AL_NaN;
+      if(_spoil_scenario==7)
+         epsx=AL_POSINF;
+      if(_spoil_scenario==8)
+         epsx=AL_NEGINF;
+      int maxits=0;
+      CMinNLCState state;
+      //--- Create optimizer object and tune its settings:
+      //--- * epsx=0.000001  stopping condition for inner iterations
+      //--- * s=[1,1]        all variables have unit scale
+      CAlglib::MinNLCCreate(2,x0,state);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinNLCSetCond(state,epsx,maxits);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinNLCSetScale(state,s);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Choose one of the nonlinear programming solvers supported by minnlc
+      //--- optimizer:
+      //--- * SLP - successive linear programming NLP solver
+      //--- * AUL - augmented Lagrangian NLP solver
+      //--- Different solvers have different properties:
+      //--- * SLP is the most robust solver provided by ALGLIB: it can solve both
+      //---   convex and nonconvex optimization problems, it respects box and
+      //---   linear constraints (after you find feasible point it won't move away
+      //---   from the feasible area) and tries to respect nonlinear constraints
+      //---   as much as possible. It also usually needs less function evaluations
+      //---   to converge than AUL.
+      //---   However, it solves LP subproblems at each iterations which adds
+      //---   significant overhead to its running time. Sometimes it can be as much
+      //---   as 7x times slower than AUL.
+      //--- * AUL solver is less robust than SLP - it can violate box and linear
+      //---   constraints at any moment, and it is intended for convex optimization
+      //---   problems (although in many cases it can deal with nonconvex ones too).
+      //---   Also, unlike SLP it needs some tuning (penalty factor and number of
+      //---   outer iterations).
+      //---   However, it is often much faster than the current version of SLP.
+      //--- In the code below we set solver to be AUL but then override it with SLP,
+      //--- so the effective choice is to use SLP. We recommend you to use SLP at
+      //--- least for early prototyping stages.
+      //--- You can comment line with SLP if you want to solve your problem with
+      //--- AUL solver.
+      double rho=1000.0;
+      int outerits=5;
+      CAlglib::MinNLCSetAlgoAUL(state,rho,outerits);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinNLCSetAlgoSLP(state);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Set constraints:
+      //--- Nonlinear constraints are tricky-you can not "pack" general
+      //--- nonlinear function into double precision array. That's why
+      //--- MinNLCSetNLC() does not accept constraints itself - only constraint
+      //--- counts are passed: first parameter is number of equality constraints,
+      //--- second one is number of inequality constraints.
+      //--- As for constraining functions - these functions are passed as part
+      //--- of problem Jacobian (see below).
+      //--- NOTE: MinNLC optimizer supports arbitrary combination of boundary, general
+      //---       linear and general nonlinear constraints. This example does not
+      //---       show how to work with general linear constraints, but you can
+      //---       easily find it in documentation on minnlcsetbc() and
+      //---       minnlcsetlc() functions.
+      CAlglib::MinNLCSetNLC(state,1,0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Activate OptGuard integrity checking.
+      //--- OptGuard monitor helps to catch common coding and problem statement
+      //--- issues, like:
+      //--- * discontinuity of the target/constraints (C0 continuity violation)
+      //--- * nonsmoothness of the target/constraints (C1 continuity violation)
+      //--- * erroneous analytic Jacobian, i.e. one inconsistent with actual
+      //---   change in the target/constraints
+      //--- OptGuard is essential for early prototyping stages because such
+      //--- problems often result in premature termination of the optimizer
+      //--- which is really hard to distinguish from the correct termination.
+      //--- IMPORTANT: GRADIENT VERIFICATION IS PERFORMED BY MEANS OF NUMERICAL
+      //---            DIFFERENTIATION, THUS DO NOT USE IT IN PRODUCTION CODE!
+      //---            Other OptGuard checks add moderate overhead, but anyway
+      //---            it is better to turn them off when they are not needed.
+      CAlglib::MinNLCOptGuardSmoothness(state);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinNLCOptGuardGradient(state,0.001);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Optimize and test results.
+      //--- Optimizer object accepts vector function and its Jacobian, with first
+      //--- component (Jacobian row) being target function, and next components
+      //--- (Jacobian rows) being nonlinear equality and inequality constraints.
+      //--- So, our vector function has form
+      //---     {f0,f1} = { -x0+x1 , x0^2+x1^2-1 }
+      //--- with Jacobian
+      //---         [  -1    +1  ]
+      //---     J = [            ]
+      //---         [ 2*x0  2*x1 ]
+      //--- with f0 being target function, f1 being constraining function. Number
+      //--- of equality/inequality constraints is specified by minnlcsetnlc(),
+      //--- with equality ones always being first, inequality ones being last.
+      CMinNLCReport rep;
+      CRowDouble x1;
+      CAlglib::MinNLCOptimize(state,Jac,Rep,Obj);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinNLCResults(state,x1,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+        {
+         double check[]={0.70710,-0.70710};
+         _TestResult=_TestResult && Doc_Test_Real_Vector(x1,check,0.005);
+        }
+      //--- Check that OptGuard did not report errors
+      //--- NOTE: want to test OptGuard? Try breaking the Jacobian - say, add
+      //---       1.0 to some of its components.
+      COptGuardReport ogrep;
+      CAlglib::MinNLCOptGuardResults(state,ogrep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Bool(ogrep.m_badgradsuspected,false);
+      _TestResult=_TestResult && Doc_Test_Bool(ogrep.m_nonc0suspected,false);
+      _TestResult=_TestResult && Doc_Test_Bool(ogrep.m_nonc1suspected,false);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+      //CAp::TraceDisable();
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+//CAp::TraceDisable();
+  }
+//+------------------------------------------------------------------+
+//| Nonlinearly constrained optimization with mixed equality/        |
+//| inequality constraints                                           |
+//+------------------------------------------------------------------+
+void TEST_MinNLC_D_Mixed(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   CNDimensional_NLCFunc2_Jac Jac;
+   CNDimensional_Rep Rep;
+   CObject Obj;
+   for(_spoil_scenario=-1; _spoil_scenario<9; _spoil_scenario++)
+     {
+      //--- This example demonstrates minimization of
+      //---     f(x0,x1) = x0+x1
+      //--- subject to nonlinear inequality constraint
+      //---    x0^2 + x1^2 - 1 <= 0
+      //--- and nonlinear equality constraint
+      //---    x2-exp(x0) = 0
+      CRowDouble x0=vector<double>::Zeros(3);
+      if(_spoil_scenario==0)
+         Spoil_Vector_By_Value(x0,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Vector_By_Value(x0,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Vector_By_Value(x0,AL_NEGINF);
+      CRowDouble s=vector<double>::Ones(3);
+      if(_spoil_scenario==3)
+         Spoil_Vector_By_Value(s,AL_NaN);
+      if(_spoil_scenario==4)
+         Spoil_Vector_By_Value(s,AL_POSINF);
+      if(_spoil_scenario==5)
+         Spoil_Vector_By_Value(s,AL_NEGINF);
+      double epsx=0.000001;
+      if(_spoil_scenario==6)
+         epsx=AL_NaN;
+      if(_spoil_scenario==7)
+         epsx=AL_POSINF;
+      if(_spoil_scenario==8)
+         epsx=AL_NEGINF;
+      int maxits=0;
+      CMinNLCState state;
+      CMinNLCReport rep;
+      CRowDouble x1;
+      //--- Create optimizer object and tune its settings:
+      //--- * epsx=0.000001  stopping condition for inner iterations
+      //--- * s=[1,1]        all variables have unit scale
+      //--- * upper limit on step length is specified (to avoid probing locations where exp() is large)
+      CAlglib::MinNLCCreate(3,x0,state);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinNLCSetCond(state,epsx,maxits);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinNLCSetScale(state,s);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinNLCSetSTPMax(state,10.0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Choose one of the nonlinear programming solvers supported by minnlc
+      //--- optimizer:
+      //--- * SLP - successive linear programming NLP solver
+      //--- * AUL - augmented Lagrangian NLP solver
+      //--- Different solvers have different properties:
+      //--- * SLP is the most robust solver provided by ALGLIB: it can solve both
+      //---   convex and nonconvex optimization problems, it respects box and
+      //---   linear constraints (after you find feasible point it won't move away
+      //---   from the feasible area) and tries to respect nonlinear constraints
+      //---   as much as possible. It also usually needs less function evaluations
+      //---   to converge than AUL.
+      //---   However, it solves LP subproblems at each iterations which adds
+      //---   significant overhead to its running time. Sometimes it can be as much
+      //---   as 7x times slower than AUL.
+      //--- * AUL solver is less robust than SLP - it can violate box and linear
+      //---   constraints at any moment, and it is intended for convex optimization
+      //---   problems (although in many cases it can deal with nonconvex ones too).
+      //---   Also, unlike SLP it needs some tuning (penalty factor and number of
+      //---   outer iterations).
+      //---   However, it is often much faster than the current version of SLP.
+      //--- In the code below we set solver to be AUL but then override it with SLP,
+      //--- so the effective choice is to use SLP. We recommend you to use SLP at
+      //--- least for early prototyping stages.
+      //--- You can comment line with SLP if you want to solve your problem with
+      //--- AUL solver.
+      double rho=1000.0;
+      int outerits=5;
+      CAlglib::MinNLCSetAlgoAUL(state,rho,outerits);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinNLCSetAlgoSLP(state);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Set constraints:
+      //--- Nonlinear constraints are tricky-you can not "pack" general
+      //--- nonlinear function into double precision array. That's why
+      //--- minnlcsetnlc() does not accept constraints itself - only constraint
+      //--- counts are passed: first parameter is number of equality constraints,
+      //--- second one is number of inequality constraints.
+      //--- As for constraining functions - these functions are passed as part
+      //--- of problem Jacobian (see below).
+      //--- NOTE: MinNLC optimizer supports arbitrary combination of boundary, general
+      //---       linear and general nonlinear constraints. This example does not
+      //---       show how to work with boundary or general linear constraints, but you
+      //---       can easily find it in documentation on minnlcsetbc() and
+      //---       minnlcsetlc() functions.
+      CAlglib::MinNLCSetNLC(state,1,1);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Activate OptGuard integrity checking.
+      //--- OptGuard monitor helps to catch common coding and problem statement
+      //--- issues, like:
+      //--- * discontinuity of the target/constraints (C0 continuity violation)
+      //--- * nonsmoothness of the target/constraints (C1 continuity violation)
+      //--- * erroneous analytic Jacobian, i.e. one inconsistent with actual
+      //---   change in the target/constraints
+      //--- OptGuard is essential for early prototyping stages because such
+      //--- problems often result in premature termination of the optimizer
+      //--- which is really hard to distinguish from the correct termination.
+      //--- IMPORTANT: GRADIENT VERIFICATION IS PERFORMED BY MEANS OF NUMERICAL
+      //---            DIFFERENTIATION, THUS DO NOT USE IT IN PRODUCTION CODE!
+      //---            Other OptGuard checks add moderate overhead, but anyway
+      //---            it is better to turn them off when they are not needed.
+      CAlglib::MinNLCOptGuardSmoothness(state);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinNLCOptGuardGradient(state,0.001);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Optimize and test results.
+      //--- Optimizer object accepts vector function and its Jacobian, with first
+      //--- component (Jacobian row) being target function, and next components
+      //--- (Jacobian rows) being nonlinear equality and inequality constraints.
+      //--- So, our vector function has form
+      //---     {f0,f1,f2} = { x0+x1 , x2-exp(x0) , x0^2+x1^2-1 }
+      //--- with Jacobian
+      //---         [  +1      +1       0 ]
+      //---     J = [-exp(x0)  0        1 ]
+      //---         [ 2*x0    2*x1      0 ]
+      //--- with f0 being target function, f1 being equality constraint "f1=0",
+      //--- f2 being inequality constraint "f2<=0". Number of equality/inequality
+      //--- constraints is specified by minnlcsetnlc(), with equality ones always
+      //--- being first, inequality ones being last.
+      CAlglib::MinNLCOptimize(state,Jac,Rep,Obj);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinNLCResults(state,x1,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+        {
+         double check[]={-0.70710,-0.70710,0.49306};
+         _TestResult=_TestResult && Doc_Test_Real_Vector(x1,check,0.005);
+        }
+      //--- Check that OptGuard did not report errors
+      //--- NOTE: want to test OptGuard? Try breaking the Jacobian - say, add
+      //---       1.0 to some of its components.
+      COptGuardReport ogrep;
+      CAlglib::MinNLCOptGuardResults(state,ogrep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Bool(ogrep.m_badgradsuspected,false);
+      _TestResult=_TestResult && Doc_Test_Bool(ogrep.m_nonc0suspected,false);
+      _TestResult=_TestResult && Doc_Test_Bool(ogrep.m_nonc1suspected,false);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Nonsmooth unconstrained optimization                             |
+//+------------------------------------------------------------------+
+void TEST_MinNS_D_Unconstrained(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   CNDimensional_NSFunc1_Jac Jac;
+   CNDimensional_Rep Rep;
+   CObject Obj;
+   for(_spoil_scenario=-1; _spoil_scenario<15; _spoil_scenario++)
+     {
+      //--- This example demonstrates minimization of
+      //---     f(x0,x1) = 2*|x0|+|x1|
+      //--- using nonsmooth nonlinear optimizer.
+      CRowDouble x0=vector<double>::Ones(2);
+      if(_spoil_scenario==0)
+         Spoil_Vector_By_Value(x0,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Vector_By_Value(x0,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Vector_By_Value(x0,AL_NEGINF);
+      CRowDouble s=vector<double>::Ones(2);
+      if(_spoil_scenario==3)
+         Spoil_Vector_By_Value(s,AL_NaN);
+      if(_spoil_scenario==4)
+         Spoil_Vector_By_Value(s,AL_POSINF);
+      if(_spoil_scenario==5)
+         Spoil_Vector_By_Value(s,AL_NEGINF);
+      double epsx=0.00001;
+      if(_spoil_scenario==6)
+         epsx=AL_NaN;
+      if(_spoil_scenario==7)
+         epsx=AL_POSINF;
+      if(_spoil_scenario==8)
+         epsx=AL_NEGINF;
+      double radius=0.1;
+      if(_spoil_scenario==9)
+         radius=AL_NaN;
+      if(_spoil_scenario==10)
+         radius=AL_POSINF;
+      if(_spoil_scenario==11)
+         radius=AL_NEGINF;
+      double rho=0.0;
+      if(_spoil_scenario==12)
+         rho=AL_NaN;
+      if(_spoil_scenario==13)
+         rho=AL_POSINF;
+      if(_spoil_scenario==14)
+         rho=AL_NEGINF;
+      int maxits=0;
+      CMinNSState state;
+      CMinNSReport rep;
+      CRowDouble x1;
+      //--- Create optimizer object, choose AGS algorithm and tune its settings:
+      //--- * radius=0.1     good initial value; will be automatically decreased later.
+      //--- * rho=0.0        penalty coefficient for nonlinear constraints; can be zero
+      //---                  because we do not have such constraints
+      //--- * epsx=0.000001  stopping conditions
+      //--- * s=[1,1]        all variables have unit scale
+      CAlglib::MinNSCreate(2,x0,state);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinNSSetAlgoAGS(state,radius,rho);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinNSSetCond(state,epsx,maxits);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinNSSetScale(state,s);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Optimize and test results.
+      //--- Optimizer object accepts vector function and its Jacobian, with first
+      //--- component (Jacobian row) being target function, and next components
+      //--- (Jacobian rows) being nonlinear equality and inequality constraints
+      //--- (box/linear ones are passed separately by means of minnssetbc() and
+      //--- minnssetlc() calls).
+      //--- If you do not have nonlinear constraints (exactly our situation), then
+      //--- you will have one-component function vector and 1xN Jacobian matrix.
+      //--- So, our vector function has form
+      //---     {f0} = { 2*|x0|+|x1| }
+      //--- with Jacobian
+      //---         [                       ]
+      //---     J = [ 2*sign(x0)   sign(x1) ]
+      //---         [                       ]
+      //--- NOTE: nonsmooth optimizer requires considerably more function
+      //---       evaluations than smooth solver - about 2N times more. Using
+      //---       numerical differentiation introduces additional (multiplicative)
+      //---       2N speedup.
+      //---       It means that if smooth optimizer WITH user-supplied gradient
+      //---       needs 100 function evaluations to solve 50-dimensional problem,
+      //---       then AGS solver with user-supplied gradient will need about 10.000
+      //---       function evaluations, and with numerical gradient about 1.000.000
+      //---       function evaluations will be performed.
+      //--- NOTE: AGS solver used by us can handle nonsmooth and nonconvex
+      //---       optimization problems. It has convergence guarantees, i.e. it will
+      //---       converge to stationary point of the function after running for some
+      //---       time.
+      //---       However, it is important to remember that "stationary point" is not
+      //---       equal to "solution". If your problem is convex, everything is OK.
+      //---       But nonconvex optimization problems may have "flat spots" - large
+      //---       areas where gradient is exactly zero, but function value is far away
+      //---       from optimal. Such areas are stationary points too, and optimizer
+      //---       may be trapped here.
+      //---       "Flat spots" are nonsmooth equivalent of the saddle points, but with
+      //---       orders of magnitude worse properties - they may be quite large and
+      //---       hard to avoid. All nonsmooth optimizers are prone to this kind of the
+      //---       problem, because it is impossible to automatically distinguish "flat
+      //---       spot" from true solution.
+      //---       This note is here to warn you that you should be very careful when
+      //---       you solve nonsmooth optimization problems. Visual inspection of
+      //---       results is essential.
+      CAlglib::MinNSOptimize(state,Jac,Rep,Obj);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinNSResults(state,x1,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Real_Vector(x1,vector<double>::Zeros(2),0.005);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Nonsmooth unconstrained optimization with numerical              |
+//| differentiation                                                  |
+//+------------------------------------------------------------------+
+void TEST_MinNS_D_Diff(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   CNDimensional_NSFunc1_FVec FVec;
+   CNDimensional_Rep Rep;
+   CObject Obj;
+   for(_spoil_scenario=-1; _spoil_scenario<18; _spoil_scenario++)
+     {
+      //--- This example demonstrates minimization of
+      //---     f(x0,x1) = 2*|x0|+|x1|
+      //--- using nonsmooth nonlinear optimizer with numerical
+      //--- differentiation provided by ALGLIB.
+      //--- NOTE: nonsmooth optimizer requires considerably more function
+      //---       evaluations than smooth solver - about 2N times more. Using
+      //---       numerical differentiation introduces additional (multiplicative)
+      //---       2N speedup.
+      //---       It means that if smooth optimizer WITH user-supplied gradient
+      //---       needs 100 function evaluations to solve 50-dimensional problem,
+      //---       then AGS solver with user-supplied gradient will need about 10.000
+      //---       function evaluations, and with numerical gradient about 1.000.000
+      //---       function evaluations will be performed.
+      CRowDouble x0=vector<double>::Ones(2);
+      if(_spoil_scenario==0)
+         Spoil_Vector_By_Value(x0,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Vector_By_Value(x0,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Vector_By_Value(x0,AL_NEGINF);
+      CRowDouble s=vector<double>::Ones(2);
+      if(_spoil_scenario==3)
+         Spoil_Vector_By_Value(s,AL_NaN);
+      if(_spoil_scenario==4)
+         Spoil_Vector_By_Value(s,AL_POSINF);
+      if(_spoil_scenario==5)
+         Spoil_Vector_By_Value(s,AL_NEGINF);
+      double epsx=0.00001;
+      if(_spoil_scenario==6)
+         epsx=AL_NaN;
+      if(_spoil_scenario==7)
+         epsx=AL_POSINF;
+      if(_spoil_scenario==8)
+         epsx=AL_NEGINF;
+      double diffstep=0.000001;
+      if(_spoil_scenario==9)
+         diffstep=AL_NaN;
+      if(_spoil_scenario==10)
+         diffstep=AL_POSINF;
+      if(_spoil_scenario==11)
+         diffstep=AL_NEGINF;
+      double radius=0.1;
+      if(_spoil_scenario==12)
+         radius=AL_NaN;
+      if(_spoil_scenario==13)
+         radius=AL_POSINF;
+      if(_spoil_scenario==14)
+         radius=AL_NEGINF;
+      double rho=0.0;
+      if(_spoil_scenario==15)
+         rho=AL_NaN;
+      if(_spoil_scenario==16)
+         rho=AL_POSINF;
+      if(_spoil_scenario==17)
+         rho=AL_NEGINF;
+      int maxits=0;
+      CMinNSState state;
+      CMinNSReport rep;
+      CRowDouble x1;
+      //--- Create optimizer object, choose AGS algorithm and tune its settings:
+      //--- * radius=0.1     good initial value; will be automatically decreased later.
+      //--- * rho=0.0        penalty coefficient for nonlinear constraints; can be zero
+      //---                  because we do not have such constraints
+      //--- * epsx=0.000001  stopping conditions
+      //--- * s=[1,1]        all variables have unit scale
+      CAlglib::MinNSCreateF(2,x0,diffstep,state);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinNSSetAlgoAGS(state,radius,rho);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinNSSetCond(state,epsx,maxits);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinNSSetScale(state,s);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Optimize and test results.
+      //--- Optimizer object accepts vector function, with first component
+      //--- being target function, and next components being nonlinear equality
+      //--- and inequality constraints (box/linear ones are passed separately
+      //--- by means of minnssetbc() and minnssetlc() calls).
+      //--- If you do not have nonlinear constraints (exactly our situation), then
+      //--- you will have one-component function vector.
+      //--- So, our vector function has form
+      //---     {f0} = { 2*|x0|+|x1| }
+      CAlglib::MinNSOptimize(state,FVec,Rep,Obj);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinNSResults(state,x1,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Real_Vector(x1,vector<double>::Zeros(2),0.005);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void TEST_MinNS_D_BC(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   CNDimensional_NSFunc1_Jac Jac;
+   CNDimensional_Rep Rep;
+   CObject Obj;
+   for(_spoil_scenario=-1; _spoil_scenario<17; _spoil_scenario++)
+     {
+      //--- This example demonstrates minimization of
+      //---     f(x0,x1) = 2*|x0|+|x1|
+      //--- subject to box constraints
+      //---        1 <= x0 < +INF
+      //---     -INF <= x1 < +INF
+      //--- using nonsmooth nonlinear optimizer.
+      CRowDouble x0=vector<double>::Ones(2);
+      if(_spoil_scenario==0)
+         Spoil_Vector_By_Value(x0,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Vector_By_Value(x0,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Vector_By_Value(x0,AL_NEGINF);
+      CRowDouble s=vector<double>::Ones(2);
+      if(_spoil_scenario==3)
+         Spoil_Vector_By_Value(s,AL_NaN);
+      if(_spoil_scenario==4)
+         Spoil_Vector_By_Value(s,AL_POSINF);
+      if(_spoil_scenario==5)
+         Spoil_Vector_By_Value(s,AL_NEGINF);
+      vector<double> Bndl={1,-AL_POSINF};
+      CRowDouble bndl=Bndl;
+      if(_spoil_scenario==6)
+         Spoil_Vector_By_Value(bndl,AL_NaN);
+      CRowDouble bndu=vector<double>::Full(2,AL_POSINF);
+      if(_spoil_scenario==7)
+         Spoil_Vector_By_Value(bndu,AL_NaN);
+      double epsx=0.00001;
+      if(_spoil_scenario==8)
+         epsx=AL_NaN;
+      if(_spoil_scenario==9)
+         epsx=AL_POSINF;
+      if(_spoil_scenario==10)
+         epsx=AL_NEGINF;
+      double radius=0.1;
+      if(_spoil_scenario==11)
+         radius=AL_NaN;
+      if(_spoil_scenario==12)
+         radius=AL_POSINF;
+      if(_spoil_scenario==13)
+         radius=AL_NEGINF;
+      double rho=0.0;
+      if(_spoil_scenario==14)
+         rho=AL_NaN;
+      if(_spoil_scenario==15)
+         rho=AL_POSINF;
+      if(_spoil_scenario==16)
+         rho=AL_NEGINF;
+      int maxits=0;
+      CMinNSState state;
+      CMinNSReport rep;
+      CRowDouble x1;
+      //--- Create optimizer object, choose AGS algorithm and tune its settings:
+      //--- * radius=0.1     good initial value; will be automatically decreased later.
+      //--- * rho=0.0        penalty coefficient for nonlinear constraints; can be zero
+      //---                  because we do not have such constraints
+      //--- * epsx=0.000001  stopping conditions
+      //--- * s=[1,1]        all variables have unit scale
+      CAlglib::MinNSCreate(2,x0,state);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinNSSetAlgoAGS(state,radius,rho);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinNSSetCond(state,epsx,maxits);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinNSSetScale(state,s);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Set box constraints.
+      //--- General linear constraints are set in similar way (see comments on
+      //--- minnssetlc() function for more information).
+      //--- You may combine box, linear and nonlinear constraints in one optimization
+      //--- problem.
+      CAlglib::MinNSSetBC(state,bndl,bndu);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Optimize and test results.
+      //--- Optimizer object accepts vector function and its Jacobian, with first
+      //--- component (Jacobian row) being target function, and next components
+      //--- (Jacobian rows) being nonlinear equality and inequality constraints
+      //--- (box/linear ones are passed separately by means of minnssetbc() and
+      //--- minnssetlc() calls).
+      //--- If you do not have nonlinear constraints (exactly our situation), then
+      //--- you will have one-component function vector and 1xN Jacobian matrix.
+      //--- So, our vector function has form
+      //---     {f0} = { 2*|x0|+|x1| }
+      //--- with Jacobian
+      //---         [                       ]
+      //---     J = [ 2*sign(x0)   sign(x1) ]
+      //---         [                       ]
+      //--- NOTE: nonsmooth optimizer requires considerably more function
+      //---       evaluations than smooth solver - about 2N times more. Using
+      //---       numerical differentiation introduces additional (multiplicative)
+      //---       2N speedup.
+      //---       It means that if smooth optimizer WITH user-supplied gradient
+      //---       needs 100 function evaluations to solve 50-dimensional problem,
+      //---       then AGS solver with user-supplied gradient will need about 10.000
+      //---       function evaluations, and with numerical gradient about 1.000.000
+      //---       function evaluations will be performed.
+      //--- NOTE: AGS solver used by us can handle nonsmooth and nonconvex
+      //---       optimization problems. It has convergence guarantees, i.e. it will
+      //---       converge to stationary point of the function after running for some
+      //---       time.
+      //---       However, it is important to remember that "stationary point" is not
+      //---       equal to "solution". If your problem is convex, everything is OK.
+      //---       But nonconvex optimization problems may have "flat spots" - large
+      //---       areas where gradient is exactly zero, but function value is far away
+      //---       from optimal. Such areas are stationary points too, and optimizer
+      //---       may be trapped here.
+      //---       "Flat spots" are nonsmooth equivalent of the saddle points, but with
+      //---       orders of magnitude worse properties - they may be quite large and
+      //---       hard to avoid. All nonsmooth optimizers are prone to this kind of the
+      //---       problem, because it is impossible to automatically distinguish "flat
+      //---       spot" from true solution.
+      //---       This note is here to warn you that you should be very careful when
+      //---       you solve nonsmooth optimization problems. Visual inspection of
+      //---       results is essential.
+      CAlglib::MinNSOptimize(state,Jac,Rep,Obj);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinNSResults(state,x1,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      double check[]={1.0000,0.0000};
+      _TestResult=_TestResult && Doc_Test_Real_Vector(x1,check,0.005);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Nonsmooth nonlinearly constrained optimization                   |
+//+------------------------------------------------------------------+
+void TEST_MinNS_D_NLC(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   CNDimensional_NSFunc2_Jac Jac;
+   CNDimensional_Rep Rep;
+   CObject Obj;
+   for(_spoil_scenario=-1; _spoil_scenario<15; _spoil_scenario++)
+     {
+      //--- This example demonstrates minimization of
+      //---     f(x0,x1) = 2*|x0|+|x1|
+      //--- subject to combination of equality and inequality constraints
+      //---      x0  =  1
+      //---      x1 >= -1
+      //--- using nonsmooth nonlinear optimizer. Although these constraints
+      //--- are linear, we treat them as general nonlinear ones in order to
+      //--- demonstrate nonlinearly constrained optimization setup.
+      CRowDouble x0=vector<double>::Ones(2);
+      if(_spoil_scenario==0)
+         Spoil_Vector_By_Value(x0,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Vector_By_Value(x0,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Vector_By_Value(x0,AL_NEGINF);
+      CRowDouble s=vector<double>::Ones(2);
+      if(_spoil_scenario==3)
+         Spoil_Vector_By_Value(s,AL_NaN);
+      if(_spoil_scenario==4)
+         Spoil_Vector_By_Value(s,AL_POSINF);
+      if(_spoil_scenario==5)
+         Spoil_Vector_By_Value(s,AL_NEGINF);
+      double epsx=0.00001;
+      if(_spoil_scenario==6)
+         epsx=AL_NaN;
+      if(_spoil_scenario==7)
+         epsx=AL_POSINF;
+      if(_spoil_scenario==8)
+         epsx=AL_NEGINF;
+      double radius=0.1;
+      if(_spoil_scenario==9)
+         radius=AL_NaN;
+      if(_spoil_scenario==10)
+         radius=AL_POSINF;
+      if(_spoil_scenario==11)
+         radius=AL_NEGINF;
+      double rho=50.0;
+      if(_spoil_scenario==12)
+         rho=AL_NaN;
+      if(_spoil_scenario==13)
+         rho=AL_POSINF;
+      if(_spoil_scenario==14)
+         rho=AL_NEGINF;
+      int maxits=0;
+      CMinNSState state;
+      CMinNSReport rep;
+      CRowDouble x1;
+      //--- Create optimizer object, choose AGS algorithm and tune its settings:
+      //--- * radius=0.1     good initial value; will be automatically decreased later.
+      //--- * rho=50.0       penalty coefficient for nonlinear constraints. It is your
+      //---                  responsibility to choose good one - large enough that it
+      //---                  enforces constraints, but small enough in order to avoid
+      //---                  extreme slowdown due to ill-conditioning.
+      //--- * epsx=0.000001  stopping conditions
+      //--- * s=[1,1]        all variables have unit scale
+      CAlglib::MinNSCreate(2,x0,state);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinNSSetAlgoAGS(state,radius,rho);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinNSSetCond(state,epsx,maxits);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinNSSetScale(state,s);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Set general nonlinear constraints.
+      //--- This part is more tricky than working with box/linear constraints - you
+      //--- can not "pack" general nonlinear function into double precision array.
+      //--- That's why minnssetnlc() does not accept constraints itself - only
+      //--- constraint COUNTS are passed: first parameter is number of equality
+      //--- constraints, second one is number of inequality constraints.
+      //--- As for constraining functions - these functions are passed as part
+      //--- of problem Jacobian (see below).
+      //--- NOTE: MinNS optimizer supports arbitrary combination of boundary, general
+      //---       linear and general nonlinear constraints. This example does not
+      //---       show how to work with general linear constraints, but you can
+      //---       easily find it in documentation on minnlcsetlc() function.
+      CAlglib::MinNSSetNLC(state,1,1);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Optimize and test results.
+      //--- Optimizer object accepts vector function and its Jacobian, with first
+      //--- component (Jacobian row) being target function, and next components
+      //--- (Jacobian rows) being nonlinear equality and inequality constraints
+      //--- (box/linear ones are passed separately by means of minnssetbc() and
+      //--- minnssetlc() calls).
+      //--- Nonlinear equality constraints have form Gi(x)=0, inequality ones
+      //--- have form Hi(x)<=0, so we may have to "normalize" constraints prior
+      //--- to passing them to optimizer (right side is zero, constraints are
+      //--- sorted, multiplied by -1 when needed).
+      //--- So, our vector function has form
+      //---     {f0,f1,f2} = { 2*|x0|+|x1|,  x0-1, -x1-1 }
+      //--- with Jacobian
+      //---         [ 2*sign(x0)   sign(x1) ]
+      //---     J = [     1           0     ]
+      //---         [     0          -1     ]
+      //--- which means that we have optimization problem
+      //---     min{f0} subject to f1=0, f2<=0
+      //--- which is essentially same as
+      //---     min { 2*|x0|+|x1| } subject to x0=1, x1>=-1
+      //--- NOTE: AGS solver used by us can handle nonsmooth and nonconvex
+      //---       optimization problems. It has convergence guarantees, i.e. it will
+      //---       converge to stationary point of the function after running for some
+      //---       time.
+      //---       However, it is important to remember that "stationary point" is not
+      //---       equal to "solution". If your problem is convex, everything is OK.
+      //---       But nonconvex optimization problems may have "flat spots" - large
+      //---       areas where gradient is exactly zero, but function value is far away
+      //---       from optimal. Such areas are stationary points too, and optimizer
+      //---       may be trapped here.
+      //---       "Flat spots" are nonsmooth equivalent of the saddle points, but with
+      //---       orders of magnitude worse properties - they may be quite large and
+      //---       hard to avoid. All nonsmooth optimizers are prone to this kind of the
+      //---       problem, because it is impossible to automatically distinguish "flat
+      //---       spot" from true solution.
+      //---       This note is here to warn you that you should be very careful when
+      //---       you solve nonsmooth optimization problems. Visual inspection of
+      //---       results is essential.
+      CAlglib::MinNSOptimize(state,Jac,Rep,Obj);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinNSResults(state,x1,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      double check[]={1.0000,0.0000};
+      _TestResult=_TestResult && Doc_Test_Real_Vector(x1,check,0.005);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Nonlinear optimization with box constraints                      |
+//+------------------------------------------------------------------+
+void TEST_MinBC_D_1(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   CNDimensional_Grad1 Grad;
+   CNDimensional_Rep Rep;
+   CObject Obj;
+   for(_spoil_scenario=-1; _spoil_scenario<20; _spoil_scenario++)
+     {
+      //--- This example demonstrates minimization of
+      //---     f(x,y) = 100*(x+3)^4+(y-3)^4
+      //--- subject to box constraints
+      //---     -1<=x<=+1, -1<=y<=+1
+      //--- using MinBC optimizer with:
+      //--- * initial point x=[0,0]
+      //--- * unit scale being set for all variables (see minbcsetscale for more info)
+      //---*stopping criteria set to "terminate after short enough step"
+      //--- * OptGuard integrity check being used to check problem statement
+      //---   for some common errors like nonsmoothness or bad analytic gradient
+      //--- First, we create optimizer object and tune its properties:
+      //--- * set box constraints
+      //--- * set variable scales
+      //--- * set stopping criteria
+      CRowDouble x=vector<double>::Zeros(2);
+      if(_spoil_scenario==0)
+         Spoil_Vector_By_Value(x,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Vector_By_Value(x,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Vector_By_Value(x,AL_NEGINF);
+      CRowDouble s=vector<double>::Ones(2);
+      if(_spoil_scenario==3)
+         Spoil_Vector_By_Value(s,AL_NaN);
+      if(_spoil_scenario==4)
+         Spoil_Vector_By_Value(s,AL_POSINF);
+      if(_spoil_scenario==5)
+         Spoil_Vector_By_Value(s,AL_NEGINF);
+      if(_spoil_scenario==6)
+         Spoil_Vector_By_Deleting_Element(s);
+      CRowDouble bndl=vector<double>::Full(2,-1);
+      if(_spoil_scenario==7)
+         Spoil_Vector_By_Value(bndl,AL_NaN);
+      if(_spoil_scenario==8)
+         Spoil_Vector_By_Deleting_Element(bndl);
+      CRowDouble bndu=vector<double>::Ones(2);
+      if(_spoil_scenario==9)
+         Spoil_Vector_By_Value(bndu,AL_NaN);
+      if(_spoil_scenario==10)
+         Spoil_Vector_By_Deleting_Element(bndu);
+      CMinBCState state;
+      double epsg=0;
+      if(_spoil_scenario==11)
+         epsg=AL_NaN;
+      if(_spoil_scenario==12)
+         epsg=AL_POSINF;
+      if(_spoil_scenario==13)
+         epsg=AL_NEGINF;
+      double epsf=0;
+      if(_spoil_scenario==14)
+         epsf=AL_NaN;
+      if(_spoil_scenario==15)
+         epsf=AL_POSINF;
+      if(_spoil_scenario==16)
+         epsf=AL_NEGINF;
+      double epsx=0.000001;
+      if(_spoil_scenario==17)
+         epsx=AL_NaN;
+      if(_spoil_scenario==18)
+         epsx=AL_POSINF;
+      if(_spoil_scenario==19)
+         epsx=AL_NEGINF;
+      int maxits=0;
+      CAlglib::MinBCCreate(x,state);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinBCSetBC(state,bndl,bndu);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinBCSetScale(state,s);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinBCSetCond(state,epsg,epsf,epsx,maxits);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Then we activate OptGuard integrity checking.
+      //--- OptGuard monitor helps to catch common coding and problem statement
+      //--- issues, like:
+      //--- * discontinuity of the target function (C0 continuity violation)
+      //--- * nonsmoothness of the target function (C1 continuity violation)
+      //--- * erroneous analytic gradient, i.e. one inconsistent with actual
+      //---   change in the target/constraints
+      //--- OptGuard is essential for early prototyping stages because such
+      //--- problems often result in premature termination of the optimizer
+      //--- which is really hard to distinguish from the correct termination.
+      //--- IMPORTANT: GRADIENT VERIFICATION IS PERFORMED BY MEANS OF NUMERICAL
+      //---            DIFFERENTIATION. DO NOT USE IT IN PRODUCTION CODE!!!!!!!
+      //---            Other OptGuard checks add moderate overhead, but anyway
+      //---            it is better to turn them off when they are not needed.
+      CAlglib::MinBCOptGuardSmoothness(state);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinBCOptGuardGradient(state,0.001);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Optimize and evaluate results
+      CMinBCReport rep;
+      CAlglib::MinBCOptimize(state,Grad,Rep,Obj);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinBCResults(state,x,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+        {
+         double check[]={-1,1};
+         _TestResult=_TestResult && Doc_Test_Real_Vector(x,check,0.005);
+        }
+      //--- Check that OptGuard did not report errors
+      //--- NOTE: want to test OptGuard? Try breaking the gradient - say, add
+      //---       1.0 to some of its components.
+      COptGuardReport ogrep;
+      CAlglib::MinBCOptGuardResults(state,ogrep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Bool(ogrep.m_badgradsuspected,false);
+      _TestResult=_TestResult && Doc_Test_Bool(ogrep.m_nonc0suspected,false);
+      _TestResult=_TestResult && Doc_Test_Bool(ogrep.m_nonc1suspected,false);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void TEST_MinBC_NumDif(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   CNDimensional_Func1 Func;
+   CNDimensional_Rep Rep;
+   CObject Obj;
+
+   for(_spoil_scenario=-1; _spoil_scenario<23; _spoil_scenario++)
+     {
+      //--- This example demonstrates minimization of
+      //---     f(x,y) = 100*(x+3)^4+(y-3)^4
+      //--- subject to box constraints
+      //---    -1<=x<=+1, -1<=y<=+1
+      //--- using MinBC optimizer with:
+      //--- * numerical differentiation being used
+      //--- * initial point x=[0,0]
+      //--- * unit scale being set for all variables (see minbcsetscale for more info)
+      //---*stopping criteria set to "terminate after short enough step"
+      //--- * OptGuard integrity check being used to check problem statement
+      //---   for some common errors like nonsmoothness or bad analytic gradient
+      CRowDouble x=vector<double>::Zeros(2);
+      if(_spoil_scenario==0)
+         Spoil_Vector_By_Value(x,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Vector_By_Value(x,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Vector_By_Value(x,AL_NEGINF);
+      CRowDouble s=vector<double>::Ones(2);
+      if(_spoil_scenario==3)
+         Spoil_Vector_By_Value(s,AL_NaN);
+      if(_spoil_scenario==4)
+         Spoil_Vector_By_Value(s,AL_POSINF);
+      if(_spoil_scenario==5)
+         Spoil_Vector_By_Value(s,AL_NEGINF);
+      if(_spoil_scenario==6)
+         Spoil_Vector_By_Deleting_Element(s);
+      CRowDouble bndl=vector<double>::Full(2,-1);
+      if(_spoil_scenario==7)
+         Spoil_Vector_By_Value(bndl,AL_NaN);
+      if(_spoil_scenario==8)
+         Spoil_Vector_By_Deleting_Element(bndl);
+      CRowDouble bndu=vector<double>::Ones(2);
+      if(_spoil_scenario==9)
+         Spoil_Vector_By_Value(bndu,AL_NaN);
+      if(_spoil_scenario==10)
+         Spoil_Vector_By_Deleting_Element(bndu);
+      CMinBCState state;
+      double epsg=0;
+      if(_spoil_scenario==11)
+         epsg=AL_NaN;
+      if(_spoil_scenario==12)
+         epsg=AL_POSINF;
+      if(_spoil_scenario==13)
+         epsg=AL_NEGINF;
+      double epsf=0;
+      if(_spoil_scenario==14)
+         epsf=AL_NaN;
+      if(_spoil_scenario==15)
+         epsf=AL_POSINF;
+      if(_spoil_scenario==16)
+         epsf=AL_NEGINF;
+      double epsx=0.000001;
+      if(_spoil_scenario==17)
+         epsx=AL_NaN;
+      if(_spoil_scenario==18)
+         epsx=AL_POSINF;
+      if(_spoil_scenario==19)
+         epsx=AL_NEGINF;
+      int maxits=0;
+      double diffstep=1.0e-6;
+      if(_spoil_scenario==20)
+         diffstep=AL_NaN;
+      if(_spoil_scenario==21)
+         diffstep=AL_POSINF;
+      if(_spoil_scenario==22)
+         diffstep=AL_NEGINF;
+      //--- Now we are ready to actually optimize something:
+      //--- * first we create optimizer
+      //--- * we add boundary constraints
+      //--- * we tune stopping conditions
+      //--- * and, finally, optimize and obtain results...
+      CAlglib::MinBCCreateF(x,diffstep,state);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinBCSetBC(state,bndl,bndu);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinBCSetScale(state,s);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinBCSetCond(state,epsg,epsf,epsx,maxits);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Then we activate OptGuard integrity checking.
+      //--- Numerical differentiation always produces "correct" gradient
+      //--- (with some truncation error, but unbiased). Thus, we just have
+      //--- to check smoothness properties of the target: C0 and C1 continuity.
+      //--- Sometimes user accidentally tries to solve nonsmooth problems
+      //--- with smooth optimizer. OptGuard helps to detect such situations
+      //--- early, at the prototyping stage.
+      CAlglib::MinBCOptGuardSmoothness(state);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Optimize and evaluate results
+      CMinBCReport rep;
+      CAlglib::MinBCOptimize(state,Func,Rep,Obj);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinBCResults(state,x,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+        {
+         double check[]={-1,1};
+         _TestResult=_TestResult && Doc_Test_Real_Vector(x,check,0.005);
+        }
+      //--- Check that OptGuard did not report errors
+      //--- Want to challenge OptGuard? Try to make your problem
+      //--- nonsmooth by replacing 100*(x+3)^4 by 100*|x+3| and
+      //--- real-run optimizer.
+      COptGuardReport ogrep;
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MinBCOptGuardResults(state,ogrep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Bool(ogrep.m_nonc0suspected,false);
+      _TestResult=_TestResult && Doc_Test_Bool(ogrep.m_nonc1suspected,false);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Simple model built with IDW-MSTAB algorithm                      |
+//+------------------------------------------------------------------+
+void TEST_IDW_D_MSTAB(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<3; _spoil_scenario++)
+     {
+      //--- This example illustrates basic concepts of the IDW models:
+      //--- creation and evaluation.
+      //--- Suppose that we have set of 2-dimensional points with associated
+      //--- scalar function values, and we want to build an IDW model using
+      //--- our data.
+      //--- NOTE: we can work with N-dimensional models and vector-valued functions too :)
+      //--- Typical sequence of steps is given below:
+      //--- 1. we create IDW builder object
+      //--- 2. we attach our dataset to the IDW builder and tune algorithm settings
+      //--- 3. we generate IDW model
+      //--- 4. we use IDW model instance (evaluate, serialize, etc.)
+      double v;
+      //--- Step 1: IDW builder creation.
+      //--- We have to specify dimensionality of the space (2 or 3) and
+      //--- dimensionality of the function (scalar or vector).
+      //--- New builder object is empty - it has not dataset and uses
+      //--- default model construction settings
+      CIDWBuilder builder;
+      CAlglib::IDWBuilderCreate(2,1,builder);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Step 2: dataset addition
+      //--- XY contains two points - x0=(-1,0) and x1=(+1,0) -
+      //--- and two function values f(x0)=2, f(x1)=3.
+      matrix<double> XY={{-1,0,2},{+1,0,3}};
+      CMatrixDouble xy=XY;
+      if(_spoil_scenario==0)
+         Spoil_Matrix_By_Value(xy,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Matrix_By_Value(xy,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Matrix_By_Value(xy,AL_NEGINF);
+      CAlglib::IDWBuilderSetPoints(builder,xy);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Step 3: choose IDW algorithm and generate model
+      //--- We use modified stabilized IDW algorithm with following parameters:
+      //--- * SRad - set to 5.0 (search radius must be large enough)
+      //--- IDW-MSTAB algorithm is a state-of-the-art implementation of IDW which
+      //--- is competitive with RBFs and bicubic splines. See comments on the
+      //--- idwbuildersetalgomstab() function for more information.
+      CIDWModelShell model;
+      CIDWReport rep;
+      CAlglib::IDWBuilderSetAlgoMSTAB(builder,5.0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::IDWFit(builder,model,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Step 4: model was built, evaluate its value
+      v=CAlglib::IDWCalc2(model,1.0,0.0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Real(v,3.000,0.005);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| IDW model serialization/unserialization                          |
+//+------------------------------------------------------------------+
+void TEST_IDW_D_Serialize(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<3; _spoil_scenario++)
+     {
+      //--- This example shows how to serialize and unserialize IDW model.
+      //--- Suppose that we have set of 2-dimensional points with associated
+      //--- scalar function values, and we have built an IDW model using
+      //--- our data.
+      //--- This model can be serialized to string or stream. ALGLIB supports
+      //--- flexible (un)serialization, i.e. you can move serialized model
+      //--- representation between different machines (32-bit or 64-bit),
+      //--- different CPU architectures (x86/64, ARM) or even different
+      //--- programming languages supported by ALGLIB (C#, C++, ...).
+      //--- Our first step is to build model, evaluate it at point (1,0),
+      //--- and serialize it to string.
+      string s;
+      double v;
+      matrix<double> XY={{-1,0,2},{+1,0,3}};
+      CMatrixDouble xy=XY;
+      if(_spoil_scenario==0)
+         Spoil_Matrix_By_Value(xy,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Matrix_By_Value(xy,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Matrix_By_Value(xy,AL_NEGINF);
+      CIDWBuilder builder;
+      CIDWModelShell model;
+      CIDWModelShell model2;
+      CIDWReport rep;
+      CAlglib::IDWBuilderCreate(2,1,builder);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::IDWBuilderSetPoints(builder,xy);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::IDWBuilderSetAlgoMSTAB(builder,5.0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::IDWFit(builder,model,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      v=CAlglib::IDWCalc2(model,1.0,0.0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Real(v,3.000,0.005);
+      //--- Serialization + unserialization to a different instance
+      //--- of the model class.
+      CAlglib::IDWSerialize(model,s);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::IDWUnserialize(s,model2);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Evaluate unserialized model at the same point
+      v=CAlglib::IDWCalc2(model2,1.0,0.0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Real(v,3.000,0.005);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Parametric Ramer-Douglas-Peucker approximation                   |
+//+------------------------------------------------------------------+
+void TEST_Parametric_RDP(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<7; _spoil_scenario++)
+     {
+      //--- We use RDP algorithm to approximate parametric 2D curve given by
+      //--- locations in t=0,1,2,3 (see below), which form piecewise linear
+      //--- trajectory through D-dimensional space (2-dimensional in our example).
+      //---     |
+      //---     |
+      //---     -     *     *     X2................X3
+      //---     |                .
+      //---     |               .
+      //---     -     *     *  .  *     *     *     *
+      //---     |             .
+      //---     |            .
+      //---     -     *     X1    *     *     *     *
+      //---     |      .....
+      //---     |  ....
+      //---     X0----|-----|-----|-----|-----|-----|---
+      int npoints=4;
+      int ndimensions=2;
+      matrix<double> X={{0,0},{2,1},{3,3},{6,3}};
+      CMatrixDouble x=X;
+      if(_spoil_scenario==0)
+         Spoil_Matrix_By_Value(x,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Matrix_By_Value(x,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Matrix_By_Value(x,AL_NEGINF);
+      if(_spoil_scenario==3)
+         Spoil_Matrix_By_Deleting_Row(x);
+      if(_spoil_scenario==4)
+         Spoil_Matrix_By_Deleting_Col(x);
+      //--- Approximation of parametric curve is performed by another parametric curve
+      //--- with lesser amount of points. It allows to work with "compressed"
+      //--- representation, which needs smaller amount of memory. Say, in our example
+      //--- (we allow points with error smaller than 0.8) approximation will have
+      //--- just two sequential sections connecting X0 with X2, and X2 with X3.
+      //---     |
+      //---     |
+      //---     -     *     *     X2................X3
+      //---     |               .
+      //---     |             .
+      //---     -     *     .     *     *     *     *
+      //---     |         .
+      //---     |       .
+      //---     -     .     X1    *     *     *     *
+      //---     |   .
+      //---     | .
+      //---     X0----|-----|-----|-----|-----|-----|---
+      CMatrixDouble y;
+      int idxy[];
+      int nsections;
+      int limitcnt=0;
+      double limiteps=0.8;
+      if(_spoil_scenario==5)
+         limiteps=AL_POSINF;
+      if(_spoil_scenario==6)
+         limiteps=AL_NEGINF;
+      CAlglib::ParametricRDPFixed(x,npoints,ndimensions,limitcnt,limiteps,y,idxy,nsections);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      int check[]={0,2,3};
+      _TestResult=_TestResult && Doc_Test_Int(nsections,2);
+      _TestResult=_TestResult && Doc_Test_Int_Vector(idxy,check);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Bilinear spline interpolation                                    |
+//+------------------------------------------------------------------+
+void TEST_Spline2D_Bilinear(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<16; _spoil_scenario++)
+     {
+      //--- We use bilinear spline to interpolate f(x,y)=x^2+2*y^2 sampled
+      //--- at (x,y) from [0.0, 0.5, 1.0] X [0.0, 1.0].
+      double X[]={0.0,0.5,1.0};
+      CRowDouble x=X;
+      if(_spoil_scenario==0)
+         Spoil_Vector_By_Value(x,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Vector_By_Value(x,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Vector_By_Value(x,AL_NEGINF);
+      if(_spoil_scenario==3)
+         Spoil_Vector_By_Deleting_Element(x);
+      double Y[]={0.0,1.0};
+      CRowDouble y=Y;
+      if(_spoil_scenario==4)
+         Spoil_Vector_By_Value(y,AL_NaN);
+      if(_spoil_scenario==5)
+         Spoil_Vector_By_Value(y,AL_POSINF);
+      if(_spoil_scenario==6)
+         Spoil_Vector_By_Value(y,AL_NEGINF);
+      if(_spoil_scenario==7)
+         Spoil_Vector_By_Deleting_Element(y);
+      double F[]={0.00,0.25,1.00,2.00,2.25,3.00};
+      CRowDouble f=F;
+      if(_spoil_scenario==8)
+         Spoil_Vector_By_Value(f,AL_NaN);
+      if(_spoil_scenario==9)
+         Spoil_Vector_By_Value(f,AL_POSINF);
+      if(_spoil_scenario==10)
+         Spoil_Vector_By_Value(f,AL_NEGINF);
+      if(_spoil_scenario==11)
+         Spoil_Vector_By_Deleting_Element(f);
+      double vx=0.25;
+      if(_spoil_scenario==12)
+         vx=AL_POSINF;
+      if(_spoil_scenario==13)
+         vx=AL_NEGINF;
+      double vy=0.50;
+      if(_spoil_scenario==14)
+         vy=AL_POSINF;
+      if(_spoil_scenario==15)
+         vy=AL_NEGINF;
+      double v;
+      CSpline2DInterpolantShell s;
+      //--- build spline
+      CAlglib::Spline2DBuildBilinearV(x,3,y,2,f,1,s);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- calculate S(0.25,0.50)
+      v=CAlglib::Spline2DCalc(s,vx,vy);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Real(v,1.1250,0.00005);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Bilinear spline interpolation                                    |
+//+------------------------------------------------------------------+
+void TEST_Spline2D_Bicubic(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<16; _spoil_scenario++)
+     {
+      //--- We use bilinear spline to interpolate f(x,y)=x^2+2*y^2 sampled
+      //--- at (x,y) from [0.0, 0.5, 1.0] X [0.0, 1.0].
+      double X[]={0.0,0.5,1.0};
+      CRowDouble x=X;
+      if(_spoil_scenario==0)
+         Spoil_Vector_By_Value(x,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Vector_By_Value(x,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Vector_By_Value(x,AL_NEGINF);
+      if(_spoil_scenario==3)
+         Spoil_Vector_By_Deleting_Element(x);
+      double Y[]={0.0,1.0};
+      CRowDouble y=Y;
+      if(_spoil_scenario==4)
+         Spoil_Vector_By_Value(y,AL_NaN);
+      if(_spoil_scenario==5)
+         Spoil_Vector_By_Value(y,AL_POSINF);
+      if(_spoil_scenario==6)
+         Spoil_Vector_By_Value(y,AL_NEGINF);
+      if(_spoil_scenario==7)
+         Spoil_Vector_By_Deleting_Element(y);
+      double F[]={0.00,0.25,1.00,2.00,2.25,3.00};
+      CRowDouble f=F;
+      if(_spoil_scenario==8)
+         Spoil_Vector_By_Value(f,AL_NaN);
+      if(_spoil_scenario==9)
+         Spoil_Vector_By_Value(f,AL_POSINF);
+      if(_spoil_scenario==10)
+         Spoil_Vector_By_Value(f,AL_NEGINF);
+      if(_spoil_scenario==11)
+         Spoil_Vector_By_Deleting_Element(f);
+      double vx=0.25;
+      if(_spoil_scenario==12)
+         vx=AL_POSINF;
+      if(_spoil_scenario==13)
+         vx=AL_NEGINF;
+      double vy=0.50;
+      if(_spoil_scenario==14)
+         vy=AL_POSINF;
+      if(_spoil_scenario==15)
+         vy=AL_NEGINF;
+      double v;
+      double dx;
+      double dy;
+      double dxy;
+      CSpline2DInterpolantShell s;
+      //--- build spline
+      CAlglib::Spline2DBuildBicubicV(x,3,y,2,f,1,s);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- calculate S(0.25,0.50)
+      v=CAlglib::Spline2DCalc(s,vx,vy);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Real(v,1.0625,0.00005);
+      //--- calculate derivatives
+      CAlglib::Spline2DDiff(s,vx,vy,v,dx,dy,dxy);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Real(v,1.0625,0.00005);
+      _TestResult=_TestResult && Doc_Test_Real(dx,0.5000,0.00005);
+      _TestResult=_TestResult && Doc_Test_Real(dy,2.0000,0.00005);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Fitting bicubic spline to irregular data                         |
+//+------------------------------------------------------------------+
+void TEST_Spline2D_Fit_Blocklls(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<5; _spoil_scenario++)
+     {
+      //--- We use bicubic spline to reproduce f(x,y)=1/(1+x^2+2*y^2) sampled
+      //--- at irregular points (x,y) from [-1,+1]*[-1,+1]
+      //--- We have 5 such points, located approximately at corners of the area
+      //--- and its center -  but not exactly at the grid. Thus, we have to FIT
+      //--- the spline, i.e. to solve least squares problem
+      matrix<double> XY={{-0.987,-0.902,0.359},{0.948,-0.992,0.347},{-1.000,1.000,0.333},{1.000,0.973,0.339},{0.017,0.180,0.968}};
+      CMatrixDouble xy=XY;
+      if(_spoil_scenario==0)
+         Spoil_Matrix_By_Value(xy,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Matrix_By_Value(xy,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Matrix_By_Value(xy,AL_NEGINF);
+      if(_spoil_scenario==3)
+         Spoil_Matrix_By_Deleting_Row(xy);
+      if(_spoil_scenario==4)
+         Spoil_Matrix_By_Deleting_Col(xy);
+      //--- First step is to create spline2dbuilder object and set its properties:
+      //--- * d=1 means that we create vector-valued spline with 1 component
+      //--- * we specify dataset xy
+      //--- * we rely on automatic selection of interpolation area
+      //--- * we tell builder that we want to use 5x5 grid for an underlying spline
+      //--- * we choose least squares solver named BlockLLS and configure it by
+      //---   telling that we want to apply zero nonlinearity penalty.
+      //--- NOTE: you can specify non-zero lambdav if you want to make your spline
+      //---       more "rigid", i.e. to penalize nonlinearity.
+      //--- NOTE: ALGLIB has two solvers which fit bicubic splines to irregular data,
+      //---       one of them is BlockLLS and another one is FastDDM. Former is
+      //---       intended for moderately sized grids (up to 512x512 nodes, although
+      //---       it may take up to few minutes); it is the most easy to use and
+      //---       control spline fitting function in the library. Latter, FastDDM,
+      //---       is intended for efficient solution of large-scale problems
+      //---       (up to 100.000.000 nodes). Both solvers can be parallelized, but
+      //---       FastDDM is much more efficient. See comments for more information.
+      CSpline2DBuilder builder;
+      int d=1;
+      double lambdav=0.000;
+      CAlglib::Spline2DBuilderCreate(d,builder);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::Spline2DBuilderSetPoints(builder,xy,5);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::Spline2DBuilderSetGrid(builder,5,5);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::Spline2DBuilderSetAlgoBlockLLS(builder,lambdav);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Now we are ready to fit and evaluate our results
+      CSpline2DInterpolantShell s;
+      CSpline2DFitReport rep;
+      CAlglib::Spline2DFit(builder,s,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- evaluate results - function value at the grid is reproduced exactly
+      double v;
+      v=CAlglib::Spline2DCalc(s,-1,1);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Real(v,0.333000,0.005);
+      //--- check maximum error - it must be nearly zero
+      _TestResult=_TestResult && Doc_Test_Real(rep.m_maxerror,0.000,0.005);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Unpacking bilinear spline                                        |
+//+------------------------------------------------------------------+
+void TEST_Spline2D_Unpack(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<12; _spoil_scenario++)
+     {
+      //--- We build bilinear spline for f(x,y)=x+2*y+3*xy for (x,y) in [0,1].
+      //--- Then we demonstrate how to unpack it.
+      double X[]={0.0,1.0};
+      CRowDouble x=X;
+      if(_spoil_scenario==0)
+         Spoil_Vector_By_Value(x,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Vector_By_Value(x,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Vector_By_Value(x,AL_NEGINF);
+      if(_spoil_scenario==3)
+         Spoil_Vector_By_Deleting_Element(x);
+      double Y[]={0.0,1.0};
+      CRowDouble y=Y;
+      if(_spoil_scenario==4)
+         Spoil_Vector_By_Value(y,AL_NaN);
+      if(_spoil_scenario==5)
+         Spoil_Vector_By_Value(y,AL_POSINF);
+      if(_spoil_scenario==6)
+         Spoil_Vector_By_Value(y,AL_NEGINF);
+      if(_spoil_scenario==7)
+         Spoil_Vector_By_Deleting_Element(y);
+      double F[]={0.00,1.00,2.00,6.00};
+      CRowDouble f=F;
+      if(_spoil_scenario==8)
+         Spoil_Vector_By_Value(f,AL_NaN);
+      if(_spoil_scenario==9)
+         Spoil_Vector_By_Value(f,AL_POSINF);
+      if(_spoil_scenario==10)
+         Spoil_Vector_By_Value(f,AL_NEGINF);
+      if(_spoil_scenario==11)
+         Spoil_Vector_By_Deleting_Element(f);
+      CMatrixDouble c;
+      int m;
+      int n;
+      int d;
+      CSpline2DInterpolantShell s;
+      //--- build spline
+      CAlglib::Spline2DBuildBilinearV(x,2,y,2,f,1,s);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- unpack and test
+      CAlglib::Spline2DUnpackV(s,m,n,d,c);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      matrix<double> check={{0,1,0,1,0,2,0,0,1,3,0,0,0,0,0,0,0,0,0,0}};
+      _TestResult=_TestResult && Doc_Test_Real_Matrix(c,check,0.00005);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Copy and transform                                               |
+//+------------------------------------------------------------------+
+void TEST_Spline2D_CopyTrans(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<16; _spoil_scenario++)
+     {
+      //--- We build bilinear spline for f(x,y)=x+2*y for (x,y) in [0,1].
+      //--- Then we apply several transformations to this spline.
+      double X[]={0.0,1.0};
+      CRowDouble x=X;
+      if(_spoil_scenario==0)
+         Spoil_Vector_By_Value(x,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Vector_By_Value(x,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Vector_By_Value(x,AL_NEGINF);
+      if(_spoil_scenario==3)
+         Spoil_Vector_By_Deleting_Element(x);
+      double Y[]={0.0,1.0};
+      CRowDouble y=Y;
+      if(_spoil_scenario==4)
+         Spoil_Vector_By_Value(y,AL_NaN);
+      if(_spoil_scenario==5)
+         Spoil_Vector_By_Value(y,AL_POSINF);
+      if(_spoil_scenario==6)
+         Spoil_Vector_By_Value(y,AL_NEGINF);
+      if(_spoil_scenario==7)
+         Spoil_Vector_By_Deleting_Element(y);
+      double F[]={0.00,1.00,2.00,3.00};
+      CRowDouble f=F;
+      if(_spoil_scenario==8)
+         Spoil_Vector_By_Value(f,AL_NaN);
+      if(_spoil_scenario==9)
+         Spoil_Vector_By_Value(f,AL_POSINF);
+      if(_spoil_scenario==10)
+         Spoil_Vector_By_Value(f,AL_NEGINF);
+      if(_spoil_scenario==11)
+         Spoil_Vector_By_Deleting_Element(f);
+      CSpline2DInterpolantShell s;
+      CSpline2DInterpolantShell snew;
+      double v;
+      CAlglib::Spline2DBuildBilinearV(x,2,y,2,f,1,s);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- copy spline, apply transformation x:=2*xnew, y:=4*ynew
+      //--- evaluate at (xnew,ynew) = (0.25,0.25) - should be same as (x,y)=(0.5,1.0)
+      CAlglib::Spline2DCopy(s,snew);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::Spline2DLinTransXY(snew,2.0,0.0,4.0,0.0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      v=CAlglib::Spline2DCalc(snew,0.25,0.25);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Real(v,2.500,0.00005);
+      //--- copy spline, apply transformation SNew:=2*S+3
+      CAlglib::Spline2DCopy(s,snew);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::Spline2DLinTransF(snew,2.0,3.0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      v=CAlglib::Spline2DCalc(snew,0.5,1.0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Real(v,8.000,0.00005);
+      //--- Same example, but for vector spline (f0,f1) = {x+2*y, 2*x+y}
+      double F2[]={0.00,0.00,1.00,2.00,2.00,1.00,3.00,3.00};
+      CRowDouble f2=F2;
+      if(_spoil_scenario==12)
+         Spoil_Vector_By_Value(f2,AL_NaN);
+      if(_spoil_scenario==13)
+         Spoil_Vector_By_Value(f2,AL_POSINF);
+      if(_spoil_scenario==14)
+         Spoil_Vector_By_Value(f2,AL_NEGINF);
+      if(_spoil_scenario==15)
+         Spoil_Vector_By_Deleting_Element(f2);
+      CRowDouble vr;
+      CAlglib::Spline2DBuildBilinearV(x,2,y,2,f2,2,s);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- copy spline, apply transformation x:=2*xnew, y:=4*ynew
+      CAlglib::Spline2DCopy(s,snew);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::Spline2DLinTransXY(snew,2.0,0.0,4.0,0.0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::Spline2DCalcV(snew,0.25,0.25,vr);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+        {
+         double check[]={2.500,2.000};
+         _TestResult=_TestResult && Doc_Test_Real_Vector(vr,check,0.00005);
+        }
+      //--- copy spline, apply transformation SNew:=2*S+3
+      CAlglib::Spline2DCopy(s,snew);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::Spline2DLinTransF(snew,2.0,3.0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::Spline2DCalcV(snew,0.5,1.0,vr);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      double check[]={8.000,7.000};
+      _TestResult=_TestResult && Doc_Test_Real_Vector(vr,check,0.00005);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Copy and transform                                               |
+//+------------------------------------------------------------------+
+void TEST_Spline2d_Vector(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<12; _spoil_scenario++)
+     {
+      //--- We build bilinear vector-valued spline (f0,f1) = {x+2*y, 2*x+y}
+      //--- Spline is built using function values at 2x2 grid: (x,y)=[0,1]*[0,1]
+      //--- Then we perform evaluation at (x,y)=(0.1,0.3)
+      double X[]={0.0,1.0};
+      CRowDouble x=X;
+      if(_spoil_scenario==0)
+         Spoil_Vector_By_Value(x,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Vector_By_Value(x,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Vector_By_Value(x,AL_NEGINF);
+      if(_spoil_scenario==3)
+         Spoil_Vector_By_Deleting_Element(x);
+      double Y[]={0.0,1.0};
+      CRowDouble y=Y;
+      if(_spoil_scenario==4)
+         Spoil_Vector_By_Value(y,AL_NaN);
+      if(_spoil_scenario==5)
+         Spoil_Vector_By_Value(y,AL_POSINF);
+      if(_spoil_scenario==6)
+         Spoil_Vector_By_Value(y,AL_NEGINF);
+      if(_spoil_scenario==7)
+         Spoil_Vector_By_Deleting_Element(y);
+      double F[]={0.00,0.00,1.00,2.00,2.00,1.00,3.00,3.00};
+      CRowDouble f=F;
+      if(_spoil_scenario==8)
+         Spoil_Vector_By_Value(f,AL_NaN);
+      if(_spoil_scenario==9)
+         Spoil_Vector_By_Value(f,AL_POSINF);
+      if(_spoil_scenario==10)
+         Spoil_Vector_By_Value(f,AL_NEGINF);
+      if(_spoil_scenario==11)
+         Spoil_Vector_By_Deleting_Element(f);
+      CSpline2DInterpolantShell s;
+      CRowDouble vr;
+      CAlglib::Spline2DBuildBilinearV(x,2,y,2,f,2,s);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::Spline2DCalcV(s,0.1,0.3,vr);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      double check[]={0.700,0.500};
+      _TestResult=_TestResult && Doc_Test_Real_Vector(vr,check,0.00005);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Trilinear spline interpolation                                   |
+//+------------------------------------------------------------------+
+void TEST_Spline3D_Trilinear(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<22; _spoil_scenario++)
+     {
+      //--- We use trilinear spline to interpolate f(x,y,z)=x+xy+z sampled
+      //--- at (x,y,z) from [0.0, 1.0] X [0.0, 1.0] X [0.0, 1.0].
+      //--- We store x, y and z-values at local arrays with same names.
+      //--- Function values are stored in the array F as follows:
+      //---     f[0]     (x,y,z) = (0,0,0)
+      //---     f[1]     (x,y,z) = (1,0,0)
+      //---     f[2]     (x,y,z) = (0,1,0)
+      //---     f[3]     (x,y,z) = (1,1,0)
+      //---     f[4]     (x,y,z) = (0,0,1)
+      //---     f[5]     (x,y,z) = (1,0,1)
+      //---     f[6]     (x,y,z) = (0,1,1)
+      //---     f[7]     (x,y,z) = (1,1,1)
+      double X[]={0.0,1.0};
+      CRowDouble x=X;
+      if(_spoil_scenario==0)
+         Spoil_Vector_By_Value(x,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Vector_By_Value(x,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Vector_By_Value(x,AL_NEGINF);
+      if(_spoil_scenario==3)
+         Spoil_Vector_By_Deleting_Element(x);
+      CRowDouble y=X;
+      if(_spoil_scenario==4)
+         Spoil_Vector_By_Value(y,AL_NaN);
+      if(_spoil_scenario==5)
+         Spoil_Vector_By_Value(y,AL_POSINF);
+      if(_spoil_scenario==6)
+         Spoil_Vector_By_Value(y,AL_NEGINF);
+      if(_spoil_scenario==7)
+         Spoil_Vector_By_Deleting_Element(y);
+      CRowDouble z=X;
+      if(_spoil_scenario==8)
+         Spoil_Vector_By_Value(z,AL_NaN);
+      if(_spoil_scenario==9)
+         Spoil_Vector_By_Value(z,AL_POSINF);
+      if(_spoil_scenario==10)
+         Spoil_Vector_By_Value(z,AL_NEGINF);
+      if(_spoil_scenario==11)
+         Spoil_Vector_By_Deleting_Element(z);
+      double F[]={0,1,0,2,1,2,1,3};
+      CRowDouble f=F;
+      if(_spoil_scenario==12)
+         Spoil_Vector_By_Value(f,AL_NaN);
+      if(_spoil_scenario==13)
+         Spoil_Vector_By_Value(f,AL_POSINF);
+      if(_spoil_scenario==14)
+         Spoil_Vector_By_Value(f,AL_NEGINF);
+      if(_spoil_scenario==15)
+         Spoil_Vector_By_Deleting_Element(f);
+      double vx=0.50;
+      if(_spoil_scenario==16)
+         vx=AL_POSINF;
+      if(_spoil_scenario==17)
+         vx=AL_NEGINF;
+      double vy=0.50;
+      if(_spoil_scenario==18)
+         vy=AL_POSINF;
+      if(_spoil_scenario==19)
+         vy=AL_NEGINF;
+      double vz=0.50;
+      if(_spoil_scenario==20)
+         vz=AL_POSINF;
+      if(_spoil_scenario==21)
+         vz=AL_NEGINF;
+      double v;
+      CSpline3DInterpolant s;
+      //--- build spline
+      CAlglib::Spline3DBuildTrilinearV(x,2,y,2,z,2,f,1,s);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- calculate S(0.5,0.5,0.5)
+      v=CAlglib::Spline3DCalc(s,vx,vy,vz);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Real(v,1.2500,0.00005);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Vector-valued trilinear spline interpolation                     |
+//+------------------------------------------------------------------+
+void TEST_Spline3D_Vector(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<22; _spoil_scenario++)
+     {
+      //--- We use trilinear vector-valued spline to interpolate {f0,f1}={x+xy+z,x+xy+yz+z}
+      //--- sampled at (x,y,z) from [0.0, 1.0] X [0.0, 1.0] X [0.0, 1.0].
+      //--- We store x, y and z-values at local arrays with same names.
+      //--- Function values are stored in the array F as follows:
+      //---     f[0]     f0, (x,y,z) = (0,0,0)
+      //---     f[1]     f1, (x,y,z) = (0,0,0)
+      //---     f[2]     f0, (x,y,z) = (1,0,0)
+      //---     f[3]     f1, (x,y,z) = (1,0,0)
+      //---     f[4]     f0, (x,y,z) = (0,1,0)
+      //---     f[5]     f1, (x,y,z) = (0,1,0)
+      //---     f[6]     f0, (x,y,z) = (1,1,0)
+      //---     f[7]     f1, (x,y,z) = (1,1,0)
+      //---     f[8]     f0, (x,y,z) = (0,0,1)
+      //---     f[9]     f1, (x,y,z) = (0,0,1)
+      //---     f[10]    f0, (x,y,z) = (1,0,1)
+      //---     f[11]    f1, (x,y,z) = (1,0,1)
+      //---     f[12]    f0, (x,y,z) = (0,1,1)
+      //---     f[13]    f1, (x,y,z) = (0,1,1)
+      //---     f[14]    f0, (x,y,z) = (1,1,1)
+      //---     f[15]    f1, (x,y,z) = (1,1,1)
+      double X[]={0.0,1.0};
+      CRowDouble x=X;
+      if(_spoil_scenario==0)
+         Spoil_Vector_By_Value(x,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Vector_By_Value(x,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Vector_By_Value(x,AL_NEGINF);
+      if(_spoil_scenario==3)
+         Spoil_Vector_By_Deleting_Element(x);
+      CRowDouble y=X;
+      if(_spoil_scenario==4)
+         Spoil_Vector_By_Value(y,AL_NaN);
+      if(_spoil_scenario==5)
+         Spoil_Vector_By_Value(y,AL_POSINF);
+      if(_spoil_scenario==6)
+         Spoil_Vector_By_Value(y,AL_NEGINF);
+      if(_spoil_scenario==7)
+         Spoil_Vector_By_Deleting_Element(y);
+      CRowDouble z=X;
+      if(_spoil_scenario==8)
+         Spoil_Vector_By_Value(z,AL_NaN);
+      if(_spoil_scenario==9)
+         Spoil_Vector_By_Value(z,AL_POSINF);
+      if(_spoil_scenario==10)
+         Spoil_Vector_By_Value(z,AL_NEGINF);
+      if(_spoil_scenario==11)
+         Spoil_Vector_By_Deleting_Element(z);
+      double F[]={0,0,1,1,0,0,2,2,1,1,2,2,1,2,3,4};
+      CRowDouble f=F;
+      if(_spoil_scenario==12)
+         Spoil_Vector_By_Value(f,AL_NaN);
+      if(_spoil_scenario==13)
+         Spoil_Vector_By_Value(f,AL_POSINF);
+      if(_spoil_scenario==14)
+         Spoil_Vector_By_Value(f,AL_NEGINF);
+      if(_spoil_scenario==15)
+         Spoil_Vector_By_Deleting_Element(f);
+      double vx=0.50;
+      if(_spoil_scenario==16)
+         vx=AL_POSINF;
+      if(_spoil_scenario==17)
+         vx=AL_NEGINF;
+      double vy=0.50;
+      if(_spoil_scenario==18)
+         vy=AL_POSINF;
+      if(_spoil_scenario==19)
+         vy=AL_NEGINF;
+      double vz=0.50;
+      if(_spoil_scenario==20)
+         vz=AL_POSINF;
+      if(_spoil_scenario==21)
+         vz=AL_NEGINF;
+      CSpline3DInterpolant s;
+      //--- build spline
+      CAlglib::Spline3DBuildTrilinearV(x,2,y,2,z,2,f,2,s);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- calculate S(0.5,0.5,0.5) - we have vector of values instead of single value
+      CRowDouble v;
+      CAlglib::Spline3DCalcV(s,vx,vy,vz,v);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      double check[]={1.2500,1.5000};
+      _TestResult=_TestResult && Doc_Test_Real_Vector(v,check,0.00005);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void TEST_RBF_D_HRBF(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<3; _spoil_scenario++)
+     {
+      //--- This example illustrates basic concepts of the RBF models: creation, modification,
+      //--- evaluation.
+      //--- Suppose that we have set of 2-dimensional points with associated
+      //--- scalar function values, and we want to build a RBF model using
+      //--- our data.
+      //--- NOTE: we can work with 3D models too :)
+      //--- Typical sequence of steps is given below:
+      //--- 1. we create RBF model object
+      //--- 2. we attach our dataset to the RBF model and tune algorithm settings
+      //--- 3. we rebuild RBF model using QNN algorithm on new data
+      //--- 4. we use RBF model (evaluate, serialize, etc.)
+      double v;
+      //--- Step 1: RBF model creation.
+      //--- We have to specify dimensionality of the space (2 or 3) and
+      //--- dimensionality of the function (scalar or vector).
+      //--- New model is empty - it can be evaluated,
+      //--- but we just get zero value at any point.
+      CRBFModel model;
+      CAlglib::RBFCreate(2,1,model);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      v=CAlglib::RBFCalc2(model,0.0,0.0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Real(v,0.000,0.005);
+      //--- Step 2: we add dataset.
+      //--- XY contains two points - x0=(-1,0) and x1=(+1,0) -
+      //--- and two function values f(x0)=2, f(x1)=3.
+      //--- We added points, but model was not rebuild yet.
+      //--- If we call RBFCalc2(), we still will get 0.0 as result.
+      matrix<double> XY={{-1,0,2},{+1,0,3}};
+      CMatrixDouble xy=XY;
+      if(_spoil_scenario==0)
+         Spoil_Matrix_By_Value(xy,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Matrix_By_Value(xy,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Matrix_By_Value(xy,AL_NEGINF);
+      CAlglib::RBFSetPoints(model,xy);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      v=CAlglib::RBFCalc2(model,0.0,0.0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Real(v,0.000,0.005);
+      //--- Step 3: rebuild model
+      //--- After we've configured model, we should rebuild it -
+      //--- it will change coefficients stored internally in the
+      //--- rbfmodel structure.
+      //--- We use hierarchical RBF algorithm with following parameters:
+      //--- * RBase - set to 1.0
+      //--- * NLayers - three layers are used (although such simple problem
+      //---   does not need more than 1 layer)
+      //--- * LambdaReg - is set to zero value, no smoothing is required
+      CRBFReport rep;
+      CAlglib::RBFSetAlgoHierarchical(model,1.0,3,0.0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::RBFBuildModel(model,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Int(rep.m_terminationtype,1);
+      //--- Step 4: model was built
+      //--- After call of RBFBuildModel(), RBFCalc2() will return
+      //--- value of the new model.
+      v=CAlglib::RBFCalc2(model,0.0,0.0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Real(v,2.500,0.005);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Working with vector functions                                    |
+//+------------------------------------------------------------------+
+void TEST_RBF_D_Vector(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<6; _spoil_scenario++)
+     {
+      //--- Suppose that we have set of 2-dimensional points with associated VECTOR
+      //--- function values, and we want to build a RBF model using our data.
+      //--- Typical sequence of steps is given below:
+      //--- 1. we create RBF model object
+      //--- 2. we attach our dataset to the RBF model and tune algorithm settings
+      //--- 3. we rebuild RBF model using new data
+      //--- 4. we use RBF model (evaluate, serialize, etc.)
+      CRowDouble x;
+      CRowDouble y;
+      //--- Step 1: RBF model creation.
+      //--- We have to specify dimensionality of the space (equal to 2) and
+      //--- dimensionality of the function (2-dimensional vector function).
+      //--- New model is empty - it can be evaluated,
+      //--- but we just get zero value at any point.
+      CRBFModel model;
+      CAlglib::RBFCreate(2,2,model);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      double X[]={+1,+1};
+      x=X;
+      if(_spoil_scenario==0)
+         Spoil_Vector_By_Value(x,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Vector_By_Value(x,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Vector_By_Value(x,AL_NEGINF);
+      CAlglib::RBFCalc(model,x,y);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+        {
+         double check[]={0.000,0.000};
+         _TestResult=_TestResult && Doc_Test_Real_Vector(y,check,0.005);
+        }
+      //--- Step 2: we add dataset.
+      //--- XY arrays containt four points:
+      //--- * (x0,y0) = (+1,+1), f(x0,y0)=(0,-1)
+      //--- * (x1,y1) = (+1,-1), f(x1,y1)=(-1,0)
+      //--- * (x2,y2) = (-1,-1), f(x2,y2)=(0,+1)
+      //--- * (x3,y3) = (-1,+1), f(x3,y3)=(+1,0)
+      matrix<double> XY={{+1,+1,0,-1},{+1,-1,-1,0},{-1,-1,0,+1},{-1,+1,+1,0}};
+      CMatrixDouble xy=XY;
+      if(_spoil_scenario==3)
+         Spoil_Matrix_By_Value(xy,AL_NaN);
+      if(_spoil_scenario==4)
+         Spoil_Matrix_By_Value(xy,AL_POSINF);
+      if(_spoil_scenario==5)
+         Spoil_Matrix_By_Value(xy,AL_NEGINF);
+      CAlglib::RBFSetPoints(model,xy);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- We added points, but model was not rebuild yet.
+      //--- If we call RBFCalc(), we still will get 0.0 as result.
+      CAlglib::RBFCalc(model,x,y);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Real_Vector(y,vector<double>::Zeros(2),0.005);
+      //--- Step 3: rebuild model
+      //--- We use hierarchical RBF algorithm with following parameters:
+      //--- * RBase - set to 1.0
+      //--- * NLayers - three layers are used (although such simple problem
+      //---   does not need more than 1 layer)
+      //--- * LambdaReg - is set to zero value, no smoothing is required
+      //--- After we've configured model, we should rebuild it -
+      //--- it will change coefficients stored internally in the
+      //--- rbfmodel structure.
+      CRBFReport rep;
+      CAlglib::RBFSetAlgoHierarchical(model,1.0,3,0.0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::RBFBuildModel(model,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Int(rep.m_terminationtype,1);
+      //--- Step 4: model was built
+      //--- After call of RBFBuildModel(), RBFCalc() will return
+      //--- value of the new model.
+      CAlglib::RBFCalc(model,x,y);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      double check[]={0.000,-1.000};
+      _TestResult=_TestResult && Doc_Test_Real_Vector(y,check,0.005);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//|RBF models - working with polynomial term                         |
+//+------------------------------------------------------------------+
+void TEST_RBF_D_PolTerm(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<3; _spoil_scenario++)
+     {
+      //--- This example show how to work with polynomial term
+      //--- Suppose that we have set of 2-dimensional points with associated
+      //--- scalar function values, and we want to build a RBF model using
+      //--- our data.
+      //--- We use hierarchical RBF algorithm with following parameters:
+      //--- * RBase - set to 1.0
+      //--- * NLayers - three layers are used (although such simple problem
+      //---   does not need more than 1 layer)
+      //--- * LambdaReg - is set to zero value, no smoothing is required
+      double v;
+      CRBFModel model;
+      matrix<double> XY={{-1,0,2},{+1,0,3}};
+      CMatrixDouble xy=XY;
+      if(_spoil_scenario==0)
+         Spoil_Matrix_By_Value(xy,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Matrix_By_Value(xy,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Matrix_By_Value(xy,AL_NEGINF);
+      CRBFReport rep;
+      CAlglib::RBFCreate(2,1,model);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::RBFSetPoints(model,xy);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::RBFSetAlgoHierarchical(model,1.0,3,0.0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- By default, RBF model uses linear term. It means that model
+      //--- looks like
+      //---     f(x,y) = SUM(RBF[i]) + a*x + b*y + c
+      //--- where RBF[i] is I-th radial basis function and a*x+by+c is a
+      //--- linear term. Having linear terms in a model gives us:
+      //--- (1) improved extrapolation properties
+      //--- (2) linearity of the model when data can be perfectly fitted
+      //---     by the linear function
+      //--- (3) linear asymptotic behavior
+      //--- Our simple dataset can be modelled by the linear function
+      //---     f(x,y) = 0.5*x + 2.5
+      //--- and RBFBuildModel() with default settings should preserve this
+      //--- linearity.
+      int nx;
+      int ny;
+      int nc;
+      int modelversion;
+      CMatrixDouble xwr;
+      CMatrixDouble c;
+      CAlglib::RBFBuildModel(model,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Int(rep.m_terminationtype,1);
+      CAlglib::RBFUnpack(model,nx,ny,xwr,nc,c,modelversion);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+        {
+         matrix<double> check={{0.500,0.000,2.500}};
+         _TestResult=_TestResult && Doc_Test_Real_Matrix(c,check,0.005);
+        }
+      //--- asymptotic behavior of our function is linear
+      v=CAlglib::RBFCalc2(model,1000.0,0.0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Real(v,502.50,0.05);
+      //--- Instead of linear term we can use constant term. In this case
+      //--- we will get model which has form
+      //---     f(x,y) = SUM(RBF[i]) + c
+      //--- where RBF[i] is I-th radial basis function and c is a constant,
+      //--- which is equal to the average function value on the dataset.
+      //--- Because we've already attached dataset to the model the only
+      //--- thing we have to do is to call rbfsetconstterm() and then
+      //--- rebuild model with RBFBuildModel().
+      CAlglib::RBFSetConstTerm(model);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::RBFBuildModel(model,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Int(rep.m_terminationtype,1);
+      CAlglib::RBFUnpack(model,nx,ny,xwr,nc,c,modelversion);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+        {
+         matrix<double> check={{0.000,0.000,2.500}};
+         _TestResult=_TestResult && Doc_Test_Real_Matrix(c,check,0.005);
+        }     //--- asymptotic behavior of our function is constant
+      v=CAlglib::RBFCalc2(model,1000.0,0.0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Real(v,2.500,0.005);
+      //--- Finally, we can use zero term. Just plain RBF without polynomial
+      //--- part:
+      //---     f(x,y) = SUM(RBF[i])
+      //--- where RBF[i] is I-th radial basis function.
+      CAlglib::RBFSetZeroTerm(model);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::RBFBuildModel(model,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Int(rep.m_terminationtype,1);
+      CAlglib::RBFUnpack(model,nx,ny,xwr,nc,c,modelversion);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+        {
+         matrix<double> check=matrix<double>::Zeros(1,3);
+         _TestResult=_TestResult && Doc_Test_Real_Matrix(c,check,0.005);
+        }
+      //--- asymptotic behavior of our function is just zero constant
+      v=CAlglib::RBFCalc2(model,1000.0,0.0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Real(v,0.000,0.005);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Serialization/unserialization                                    |
+//+------------------------------------------------------------------+
+void TEST_RBF_D_Serialize(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<3; _spoil_scenario++)
+     {
+      //--- This example show how to serialize and unserialize RBF model
+      //--- Suppose that we have set of 2-dimensional points with associated
+      //--- scalar function values, and we want to build a RBF model using
+      //--- our data. Then we want to serialize it to string and to unserialize
+      //--- from string, loading to another instance of RBF model.
+      //--- Here we assume that you already know how to create RBF models.
+      string s;
+      double v;
+      CRBFModel model0;
+      CRBFModel model1;
+      matrix<double> XY={{-1,0,2},{+1,0,3}};
+      CMatrixDouble xy=XY;
+      if(_spoil_scenario==0)
+         Spoil_Matrix_By_Value(xy,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Matrix_By_Value(xy,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Matrix_By_Value(xy,AL_NEGINF);
+      CRBFReport rep;
+      //--- model initialization
+      CAlglib::RBFCreate(2,1,model0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::RBFSetPoints(model0,xy);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::RBFSetAlgoHierarchical(model0,1.0,3,0.0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::RBFBuildModel(model0,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Int(rep.m_terminationtype,1);
+      //--- Serialization - it looks easy,
+      //--- but you should carefully read next section.
+      CAlglib::RBFSerialize(model0,s);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::RBFUnserialize(s,model1);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- both models return same value
+      v=CAlglib::RBFCalc2(model0,0.0,0.0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Real(v,2.500,0.005);
+      v=CAlglib::RBFCalc2(model1,0.0,0.0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Real(v,2.500,0.005);
+      //--- Previous section shows that model state is saved/restored during
+      //--- serialization. However, some properties are NOT serialized.
+      //--- Serialization saves/restores RBF model, but it does NOT saves/restores
+      //--- settings which were used to build current model. In particular, dataset
+      //--- which was used to build model, is not preserved.
+      //--- What does it mean in for us?
+      //--- Do you remember this sequence: RBFCreate-RBFSetPoints-RBFBuildModel?
+      //--- First step creates model, second step adds dataset and tunes model
+      //--- settings, third step builds model using current dataset and model
+      //--- construction settings.
+      //--- If you call RBFBuildModel() without calling RBFSetPoints() first, you
+      //--- will get empty (zero) RBF model. In our example, model0 contains
+      //--- dataset which was added by RBFSetPoints() call. However, model1 does
+      //--- NOT contain dataset - because dataset is NOT serialized.
+      //--- This, if we call RBFBuildModel(model0,rep), we will get same model,
+      //--- which returns 2.5 at (x,y)=(0,0). However, after same call model1 will
+      //--- return zero - because it contains RBF model (coefficients), but does NOT
+      //--- contain dataset which was used to build this model.
+      //--- Basically, it means that:
+      //--- * serialization of the RBF model preserves anything related to the model
+      //---   EVALUATION
+      //--- * but it does NOT creates perfect copy of the original object.
+      CAlglib::RBFBuildModel(model0,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      v=CAlglib::RBFCalc2(model0,0.0,0.0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Real(v,2.500,0.005);
+      CAlglib::RBFBuildModel(model1,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      v=CAlglib::RBFCalc2(model1,0.0,0.0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Real(v,0.000,0.005);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Simple hierarchical clusterization with Euclidean distance       |
+//| function                                                         |
+//+------------------------------------------------------------------+
+void TEST_Clst_AHC(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<3; _spoil_scenario++)
+     {
+      //--- The very simple clusterization example
+      //--- We have a set of points in 2D space:
+      //---     (P0,P1,P2,P3,P4) = ((1,1),(1,2),(4,1),(2,3),(4,1.5))
+      //---  |
+      //---  |     P3
+      //---  |
+      //---  | P1
+      //---  |             P4
+      //---  | P0          P2
+      //---  |-------------------------
+      //--- We want to perform Agglomerative Hierarchic Clusterization (AHC),
+      //--- using complete linkage (default algorithm) and Euclidean distance
+      //--- (default metric).
+      //--- In order to do that, we:
+      //--- * create clusterizer with ClusterizerCreate()
+      //--- * set points XY and metric (2=Euclidean) with ClusterizerSetPoints()
+      //--- * run AHC algorithm with ClusterizerRunAHC
+      //--- You may see that clusterization itself is a minor part of the example,
+      //--- most of which is dominated by comments :)
+      CClusterizerState s;
+      CAHCReport rep;
+      matrix<double> XY={{1,1},{1,2},{4,1},{2,3},{4,1.5}};
+      CMatrixDouble xy=XY;
+      if(_spoil_scenario==0)
+         Spoil_Matrix_By_Value(xy,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Matrix_By_Value(xy,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Matrix_By_Value(xy,AL_NEGINF);
+      CAlglib::ClusterizerCreate(s);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::ClusterizerSetPoints(s,xy,2);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::ClusterizerRunAHC(s,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Now we've built our clusterization tree. Rep.z contains information which
+      //--- is required to build dendrogram. I-th row of rep.z represents one merge
+      //--- operation, with first cluster to merge having index rep.z[I,0] and second
+      //--- one having index rep.z[I,1]. Merge result has index NPoints+I.
+      //--- Clusters with indexes less than NPoints are single-point initial clusters,
+      //--- while ones with indexes from NPoints to 2*NPoints-2 are multi-point
+      //--- clusters created during merges.
+      //--- In our example, Z=[[2,4], [0,1], [3,6], [5,7]]
+      //--- It means that:
+      //--- * first, we merge C2=(P2) and C4=(P4),    and create C5=(P2,P4)
+      //--- * then, we merge  C2=(P0) and C1=(P1),    and create C6=(P0,P1)
+      //--- * then, we merge  C3=(P3) and C6=(P0,P1), and create C7=(P0,P1,P3)
+      //--- * finally, we merge C5 and C7 and create C8=(P0,P1,P2,P3,P4)
+      //--- Thus, we have following dendrogram:
+      //---      ------8-----
+      //---      |          |
+      //---      |      ----7----
+      //---      |      |       |
+      //---   ---5---   |    ---6---
+      //---   |     |   |    |     |
+      //---   P2   P4   P3   P0   P1
+      CMatrixInt check;
+      check.Resize(4,2);
+      check.Set(0,0,2);
+      check.Set(0,1,4);
+      check.Set(1,0,0);
+      check.Set(1,1,1);
+      check.Set(2,0,3);
+      check.Set(2,1,6);
+      check.Set(3,0,5);
+      check.Set(3,1,7);
+      _TestResult=_TestResult && Doc_Test_Int_Matrix(rep.m_z,check);
+      //--- We've built dendrogram above by reordering our dataset.
+      //--- Without such reordering it would be impossible to build dendrogram without
+      //--- intersections. Luckily, ahcreport structure contains two additional fields
+      //--- which help to build dendrogram from your data:
+      //--- * rep.p, which contains permutation applied to dataset
+      //--- * rep.pm, which contains another representation of merges
+      //--- In our example we have:
+      //--- * P=[3,4,0,2,1]
+      //--- * PZ=[[0,0,1,1,0,0],[3,3,4,4,0,0],[2,2,3,4,0,1],[0,1,2,4,1,2]]
+      //--- Permutation array P tells us that P0 should be moved to position 3,
+      //--- P1 moved to position 4, P2 moved to position 0 and so on:
+      //---   (P0 P1 P2 P3 P4) => (P2 P4 P3 P0 P1)
+      //--- Merges array PZ tells us how to perform merges on the sorted dataset.
+      //--- One row of PZ corresponds to one merge operations, with first pair of
+      //--- elements denoting first of the clusters to merge (start index, end
+      //--- index) and next pair of elements denoting second of the clusters to
+      //--- merge. Clusters being merged are always adjacent, with first one on
+      //--- the left and second one on the right.
+      //--- For example, first row of PZ tells us that clusters [0,0] and [1,1] are
+      //--- merged (single-point clusters, with first one containing P2 and second
+      //--- one containing P4). Third row of PZ tells us that we merge one single-
+      //--- point cluster [2,2] with one two-point cluster [3,4].
+      //--- There are two more elements in each row of PZ. These are the helper
+      //--- elements, which denote HEIGHT (not size) of left and right subdendrograms.
+      //--- For example, according to PZ, first two merges are performed on clusterization
+      //--- trees of height 0, while next two merges are performed on 0-1 and 1-2
+      //--- pairs of trees correspondingly.
+        {
+         int check1[]={3,4,0,2,1};
+         _TestResult=_TestResult && Doc_Test_Int_Vector(rep.m_p,check1);
+        }
+      check.Resize(4,6);
+      check.Set(0,0,0);
+      check.Set(0,1,0);
+      check.Set(0,2,1);
+      check.Set(0,3,1);
+      check.Set(0,4,0);
+      check.Set(0,5,0);
+      check.Set(1,0,3);
+      check.Set(1,1,3);
+      check.Set(1,2,4);
+      check.Set(1,3,4);
+      check.Set(1,4,0);
+      check.Set(1,5,0);
+      check.Set(2,0,2);
+      check.Set(2,1,2);
+      check.Set(2,2,3);
+      check.Set(2,3,4);
+      check.Set(2,4,0);
+      check.Set(2,5,1);
+      check.Set(3,0,0);
+      check.Set(3,1,1);
+      check.Set(3,2,2);
+      check.Set(3,3,4);
+      check.Set(3,4,1);
+      check.Set(3,5,2);
+      _TestResult=_TestResult && Doc_Test_Int_Matrix(rep.m_pm,check);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Simple k-means clusterization                                    |
+//+------------------------------------------------------------------+
+void TEST_Clst_KMeans(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<3; _spoil_scenario++)
+     {
+      //--- The very simple clusterization example
+      //--- We have a set of points in 2D space:
+      //---     (P0,P1,P2,P3,P4) = ((1,1),(1,2),(4,1),(2,3),(4,1.5))
+      //---  |
+      //---  |     P3
+      //---  |
+      //---  | P1
+      //---  |             P4
+      //---  | P0          P2
+      //---  |-------------------------
+      //--- We want to perform k-means++ clustering with K=2.
+      //--- In order to do that, we:
+      //--- * create clusterizer with ClusterizerCreate()
+      //--- * set points XY and metric (must be Euclidean, distype=2) with ClusterizerSetPoints()
+      //--- * (optional) set number of restarts from random positions to 5
+      //--- * run k-means algorithm with clusterizerrunkmeans()
+      //--- You may see that clusterization itself is a minor part of the example,
+      //--- most of which is dominated by comments :)
+      CClusterizerState s;
+      CKmeansReport rep;
+      matrix<double> XY={{1,1},{1,2},{4,1},{2,3},{4,1.5}};
+      CMatrixDouble xy=XY;
+      if(_spoil_scenario==0)
+         Spoil_Matrix_By_Value(xy,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Matrix_By_Value(xy,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Matrix_By_Value(xy,AL_NEGINF);
+      CAlglib::ClusterizerCreate(s);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::ClusterizerSetPoints(s,xy,2);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::ClusterizerSetKMeansLimits(s,5,0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::ClusterizerRunKMeans(s,2,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- We've performed clusterization, and it succeeded (completion code is +1).
+      //--- Now first center is stored in the first row of rep.c, second one is stored
+      //--- in the second row. rep.cidx can be used to determine which center is
+      //--- closest to some specific point of the dataset.
+      _TestResult=_TestResult && Doc_Test_Int(rep.m_terminationtype,1);
+      //--- We called ClusterizerSetPoints() with disttype=2 because k-means++
+      //--- algorithm does NOT support metrics other than Euclidean. But what if we
+      //--- try to use some other metric?
+      //--- We change metric type by calling ClusterizerSetPoints() one more time,
+      //--- and try to run k-means algo again. It fails.
+      CAlglib::ClusterizerSetPoints(s,xy,0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::ClusterizerRunKMeans(s,2,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Int(rep.m_terminationtype,-5);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Clusterization with different linkage types                      |
+//+------------------------------------------------------------------+
+void TEST_Clst_Linkage(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<3; _spoil_scenario++)
+     {
+      //--- We have a set of points in 1D space:
+      //---     (P0,P1,P2,P3,P4) = (1, 3, 10, 16, 20)
+      //--- We want to perform Agglomerative Hierarchic Clusterization (AHC),
+      //--- using either complete or single linkage and Euclidean distance
+      //--- (default metric).
+      //--- First two steps merge P0/P1 and P3/P4 independently of the linkage type.
+      //--- However, third step depends on linkage type being used:
+      //--- * in case of complete linkage P2=10 is merged with [P0,P1]
+      //--- * in case of single linkage P2=10 is merged with [P3,P4]
+      CClusterizerState s;
+      CAHCReport rep;
+      matrix<double> XY={{1},{3},{10},{16},{20}};
+      CMatrixDouble xy=XY;
+      if(_spoil_scenario==0)
+         Spoil_Matrix_By_Value(xy,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Matrix_By_Value(xy,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Matrix_By_Value(xy,AL_NEGINF);
+      CRowInt cidx;
+      CRowInt cz;
+      CAlglib::ClusterizerCreate(s);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::ClusterizerSetPoints(s,xy,2);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- use complete linkage, reduce set down to 2 clusters.
+      //--- print clusterization with ClusterizerGetKClusters(2).
+      //--- P2 must belong to [P0,P1]
+      CAlglib::ClusterizerSetAHCAlgo(s,0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::ClusterizerRunAHC(s,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::ClusterizerGetKClusters(rep,2,cidx,cz);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+        {
+         int check[]={1,1,1,0,0};
+         _TestResult=_TestResult && Doc_Test_Int_Vector(cidx,check);
+        }
+      //--- use single linkage, reduce set down to 2 clusters.
+      //--- print clusterization with ClusterizerGetKClusters(2).
+      //--- P2 must belong to [P2,P3]
+      CAlglib::ClusterizerSetAHCAlgo(s,1);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::ClusterizerRunAHC(s,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::ClusterizerGetKClusters(rep,2,cidx,cz);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      int check[]={0,0,1,1,1};
+      _TestResult=_TestResult && Doc_Test_Int_Vector(cidx,check);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Clusterization with different metric types                       |
+//+------------------------------------------------------------------+
+void TEST_Clst_Distance(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<3; _spoil_scenario++)
+     {
+      //--- We have three points in 4D space:
+      //---     (P0,P1,P2) = ((1, 2, 1, 2), (6, 7, 6, 7), (7, 6, 7, 6))
+      //--- We want to try clustering them with different distance functions.
+      //--- Distance function is chosen when we add dataset to the clusterizer.
+      //--- We can choose several distance types - Euclidean, city block, Chebyshev,
+      //--- several correlation measures or user-supplied distance matrix.
+      //--- Here we'll try three distances: Euclidean, Pearson correlation,
+      //--- user-supplied distance matrix. Different distance functions lead
+      //--- to different choices being made by algorithm during clustering.
+      CClusterizerState s;
+      CAHCReport rep;
+      int disttype;
+      matrix<double> XY={{1,2,1,2},{6,7,6,7},{7,6,7,6}};
+      CMatrixDouble xy=XY;
+      if(_spoil_scenario==0)
+         Spoil_Matrix_By_Value(xy,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Matrix_By_Value(xy,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Matrix_By_Value(xy,AL_NEGINF);
+      CAlglib::ClusterizerCreate(s);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- With Euclidean distance function (disttype=2) two closest points
+      //--- are P1 and P2, thus:
+      //--- * first, we merge P1 and P2 to form C3=[P1,P2]
+      //--- * second, we merge P0 and C3 to form C4=[P0,P1,P2]
+      disttype=2;
+      CAlglib::ClusterizerSetPoints(s,xy,disttype);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::ClusterizerRunAHC(s,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CMatrixInt check;
+      check.Resize(2,2);
+      check.Set(0,0,1);
+      check.Set(0,1,2);
+      check.Set(1,0,0);
+      check.Set(1,1,3);
+      _TestResult=_TestResult && Doc_Test_Int_Matrix(rep.m_z,check);
+      //--- With Pearson correlation distance function (disttype=10) situation
+      //--- is different - distance between P0 and P1 is zero, thus:
+      //--- * first, we merge P0 and P1 to form C3=[P0,P1]
+      //--- * second, we merge P2 and C3 to form C4=[P0,P1,P2]
+      disttype=10;
+      CAlglib::ClusterizerSetPoints(s,xy,disttype);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::ClusterizerRunAHC(s,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      check.Set(0,0,0);
+      check.Set(0,1,1);
+      check.Set(1,0,2);
+      check.Set(1,1,3);
+      _TestResult=_TestResult && Doc_Test_Int_Matrix(rep.m_z,check);
+      //--- Finally, we try clustering with user-supplied distance matrix:
+      //---     [ 0 3 1 ]
+      //--- P = [ 3 0 3 ], where P[i,j] = dist(Pi,Pj)
+      //---     [ 1 3 0 ]
+      //--- * first, we merge P0 and P2 to form C3=[P0,P2]
+      //--- * second, we merge P1 and C3 to form C4=[P0,P1,P2]
+      CMatrixDouble d;
+      matrix<double> D={{0,3,1},{3,0,3},{1,3,0}};
+      d=D;
+      CAlglib::ClusterizerSetDistances(s,d,true);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::ClusterizerRunAHC(s,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      check.Set(0,0,0);
+      check.Set(0,1,2);
+      check.Set(1,0,1);
+      check.Set(1,1,3);
+      _TestResult=_TestResult && Doc_Test_Int_Matrix(rep.m_z,check);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Obtaining K top clusters from clusterization tree                |
+//+------------------------------------------------------------------+
+void TEST_Clst_KClusters(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<3; _spoil_scenario++)
+     {
+      //--- We have a set of points in 2D space:
+      //---     (P0,P1,P2,P3,P4) = ((1,1),(1,2),(4,1),(2,3),(4,1.5))
+      //---  |
+      //---  |     P3
+      //---  |
+      //---  | P1
+      //---  |             P4
+      //---  | P0          P2
+      //---  |-------------------------
+      //--- We perform Agglomerative Hierarchic Clusterization (AHC) and we want
+      //--- to get top K clusters from clusterization tree for different K.
+      CClusterizerState s;
+      CAHCReport rep;
+      matrix<double> XY={{1,1},{1,2},{4,1},{2,3},{4,1.5}};
+      CMatrixDouble xy=XY;
+      if(_spoil_scenario==0)
+         Spoil_Matrix_By_Value(xy,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Matrix_By_Value(xy,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Matrix_By_Value(xy,AL_NEGINF);
+      CRowInt cidx;
+      CRowInt cz;
+      CAlglib::ClusterizerCreate(s);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::ClusterizerSetPoints(s,xy,2);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::ClusterizerRunAHC(s,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- with K=5, every points is assigned to its own cluster:
+      //--- C0=P0, C1=P1 and so on...
+      CAlglib::ClusterizerGetKClusters(rep,5,cidx,cz);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+        {
+         int check[]={0,1,2,3,4};
+         _TestResult=_TestResult && Doc_Test_Int_Vector(cidx,check);
+        }
+      //--- with K=1 we have one large cluster C0=[P0,P1,P2,P3,P4,P5]
+      CAlglib::ClusterizerGetKClusters(rep,1,cidx,cz);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+        {
+         int check[]={0,0,0,0,0};
+         _TestResult=_TestResult && Doc_Test_Int_Vector(cidx,check);
+        }
+      //--- with K=3 we have three clusters C0=[P3], C1=[P2,P4], C2=[P0,P1]
+      CAlglib::ClusterizerGetKClusters(rep,3,cidx,cz);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      int check[]={2,2,1,0,1};
+      _TestResult=_TestResult && Doc_Test_Int_Vector(cidx,check);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Simple classification with random forests                        |
+//+------------------------------------------------------------------+
+void TEST_RandomForest_CLS(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<3; _spoil_scenario++)
+     {
+      //--- The very simple classification example: classify points (x,y) in 2D space
+      //--- as ones with x>=0 and ones with x<0 (y is ignored, but our classifier
+      //--- has to find it).
+      //--- First, we have to create decision forest builder object, load dataset and
+      //--- specify training settings. Our dataset is specified as matrix, which has
+      //--- following format:
+      //---     x0 y0 class0
+      //---     x1 y1 class1
+      //---     x2 y2 class2
+      //---     ....
+      //--- Here xi and yi can be any values (and in fact you can have any number of
+      //--- independent variables), and classi MUST be integer number in [0,NClasses)
+      //--- range. In our example we denote points with x>=0 as class #0, and
+      //--- ones with negative xi as class #1.
+      //--- NOTE: if you want to solve regression problem, specify NClasses=1. In
+      //---       this case last column of xy can be any numeric value.
+      //--- For the sake of simplicity, our example includes only 4-point dataset.
+      //--- However, random forests are able to cope with extremely large datasets
+      //--- having millions of examples.
+      CDecisionForestBuilder builder;
+      int nvars=2;
+      int nclasses=2;
+      int npoints=4;
+      matrix<double> XY={{1,1,0},{1,-1,0},{-1,1,1},{-1,-1,1}};
+      CMatrixDouble xy=XY;
+      if(_spoil_scenario==0)
+         Spoil_Matrix_By_Value(xy,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Matrix_By_Value(xy,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Matrix_By_Value(xy,AL_NEGINF);
+      CAlglib::DFBuilderCreate(builder);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::DFBuilderSetDataset(builder,xy,npoints,nvars,nclasses);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- in our example we train decision forest using full sample - it allows us
+      //--- to get zero classification error. However, in practical applications smaller
+      //--- values are used: 50%, 25%, 5% or even less.
+      CAlglib::DFBuilderSetSubsampleRatio(builder,1.0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- we train random forest with just one tree; again, in real life situations
+      //--- you typically need from 50 to 500 trees.
+      int ntrees=1;
+      CDecisionForestShell forest;
+      CDFReportShell rep;
+      CAlglib::DFBuilderBuildRandomForest(builder,ntrees,forest,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- with such settings (100% of the training set is used) you can expect
+      //--- zero classification error. Beautiful results, but remember - in real life
+      //--- you do not need zero TRAINING SET error, you need good generalization.
+      _TestResult=_TestResult && Doc_Test_Real(rep.GetRelClsError(),0.0000,0.00005);
+      //--- now, let's perform some simple processing with dfprocess()
+      double x[]={+1,0};
+      double y[];
+      CAlglib::DFProcess(forest,x,y);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+        {
+         double check[]={+1,0};
+         _TestResult=_TestResult && Doc_Test_Real_Vector(y,check,0.0005);
+        }
+      //--- another option is to use dfprocess0() which returns just first component
+      //--- of the output vector y. ideal for regression problems and binary classifiers.
+      double y0=CAlglib::DFProcess0(forest,x);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Real(y0,1.000,0.0005);
+      //--- finally, you can use dfclassify() which returns most probable class index (i.e. argmax y[i]).
+      int i=CAlglib::DFClassify(forest,x);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Int(i,0);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Simple regression with decision forest                           |
+//+------------------------------------------------------------------+
+void TEST_RandomForest_Reg(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<3; _spoil_scenario++)
+     {
+      //--- The very simple regression example: model f(x,y)=x+y
+      //--- First, we have to create DF builder object, load dataset and specify
+      //--- training settings. Our dataset is specified as matrix, which has following
+      //--- format:
+      //---     x0 y0 f0
+      //---     x1 y1 f1
+      //---     x2 y2 f2
+      //---     ....
+      //--- Here xi and yi can be any values, and fi is a dependent function value.
+      //--- NOTE: you can also solve classification problems with DF models, see
+      //---       another example for this unit.
+      CDecisionForestBuilder builder;
+      int nvars=2;
+      int nclasses=1;
+      int npoints=4;
+      matrix<double> XY={{1,1,+2},{1,-1,0},{-1,1,0},{-1,-1,-2}};
+      CMatrixDouble xy=XY;
+      if(_spoil_scenario==0)
+         Spoil_Matrix_By_Value(xy,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Matrix_By_Value(xy,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Matrix_By_Value(xy,AL_NEGINF);
+      CAlglib::DFBuilderCreate(builder);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::DFBuilderSetDataset(builder,xy,npoints,nvars,nclasses);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- in our example we train decision forest using full sample - it allows us
+      //--- to get zero classification error. However, in practical applications smaller
+      //--- values are used: 50%, 25%, 5% or even less.
+      CAlglib::DFBuilderSetSubsampleRatio(builder,1.0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- we train random forest with just one tree; again, in real life situations
+      //--- you typically need from 50 to 500 trees.
+      int ntrees=1;
+      CDecisionForestShell model;
+      CDFReportShell rep;
+      CAlglib::DFBuilderBuildRandomForest(builder,ntrees,model,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- with such settings (full sample is used) you can expect zero RMS error on the
+      //--- training set. Beautiful results, but remember - in real life you do not
+      //--- need zero TRAINING SET error, you need good generalization.
+      _TestResult=_TestResult && Doc_Test_Real(rep.GetRMSError(),0.0000,0.00005);
+      //--- now, let's perform some simple processing with dfprocess()
+      double x[]={+1,+1};
+      double y[];
+      CAlglib::DFProcess(model,x,y);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+        {
+         double check[]={+2};
+         _TestResult=_TestResult && Doc_Test_Real_Vector(y,check,0.0005);
+        }
+      //--- another option is to use dfprocess0() which returns just first component
+      //--- of the output vector y. ideal for regression problems and binary classifiers.
+      double y0=CAlglib::DFProcess0(model,x);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Real(y0,2.000,0.0005);
+      //--- there also exist another convenience function, dfclassify(),
+      //--- but it does not work for regression problems - it always returns -1.
+      int i=CAlglib::DFClassify(model,x);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Int(i,-1);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Linear regression used to build the very basic model and unpack  |
+//| coefficients                                                     |
+//+------------------------------------------------------------------+
+void TEST_LinReg_D_Basic(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+//--- In this example we demonstrate linear fitting by f(x|a) = a*exp(0.5*x).
+//--- We have:
+//--- * xy - matrix of basic function values (exp(0.5*x)) and expected values
+   matrix<double> XY={{0.606531,1.133719},{0.670320,1.306522},{0.740818,1.504604},{0.818731,1.554663},{0.904837,1.884638},{1.000000,2.072436},{1.105171,2.257285},{1.221403,2.534068},{1.349859,2.622017},{1.491825,2.897713},{1.648721,3.219371}};
+   CMatrixDouble xy=XY;
+   int info;
+   int nvars;
+   CLinearModelShell model;
+   CLRReportShell rep;
+   CRowDouble c;
+   CAlglib::LRBuildZ(xy,11,1,info,model,rep);
+//--- handling exceptions
+   if(Func_spoil_scenario(-1,_TestResult))
+      _TestResult=_TestResult && Doc_Test_Int(info,1);
+   CAlglib::LRUnpack(model,c,nvars);
+//--- handling exceptions
+   if(Func_spoil_scenario(-1,_TestResult))
+     {
+      double check[]={1.98650,0.00000};
+      _TestResult=_TestResult && Doc_Test_Real_Vector(c,check,0.00005);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| SMA(k) filter                                                    |
+//+------------------------------------------------------------------+
+void TEST_Filters_D_SMA(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<3; _spoil_scenario++)
+     {
+      //--- Here we demonstrate SMA(k) filtering for time series.
+      double X[]={5,6,7,8};
+      CRowDouble x=X;
+      if(_spoil_scenario==0)
+         Spoil_Vector_By_Value(x,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Vector_By_Value(x,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Vector_By_Value(x,AL_NEGINF);
+      //--- Apply filter.
+      //--- We should get [5, 5.5, 6.5, 7.5] as result
+      CAlglib::FilterSMA(x,2);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      double check[]={5,5.5,6.5,7.5};
+      _TestResult=_TestResult && Doc_Test_Real_Vector(x,check,0.00005);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| EMA(alpha) filter                                                |
+//+------------------------------------------------------------------+
+void TEST_Filters_D_EMA(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<3; _spoil_scenario++)
+     {
+      //--- Here we demonstrate EMA(0.5) filtering for time series.
+      double X[]={5,6,7,8};
+      CRowDouble x=X;
+      if(_spoil_scenario==0)
+         Spoil_Vector_By_Value(x,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Vector_By_Value(x,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Vector_By_Value(x,AL_NEGINF);
+      //--- Apply filter.
+      //--- We should get [5, 5.5, 6.25, 7.125] as result
+      CAlglib::FilterEMA(x,0.5);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      double check[]={5,5.5,6.25,7.125};
+      _TestResult=_TestResult && Doc_Test_Real_Vector(x,check,0.00005);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| LRMA(k) filter                                                   |
+//+------------------------------------------------------------------+
+void TEST_Filters_D_LRMA(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<3; _spoil_scenario++)
+     {
+      //--- Here we demonstrate LRMA(3) filtering for time series.
+      double X[]={7,8,8,9,12,12};
+      CRowDouble x=X;
+      if(_spoil_scenario==0)
+         Spoil_Vector_By_Value(x,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Vector_By_Value(x,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Vector_By_Value(x,AL_NEGINF);
+      //--- Apply filter.
+      //--- We should get [7.0000, 8.0000, 8.1667, 8.8333, 11.6667, 12.5000] as result
+      CAlglib::FilterLRMA(x,3);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      double check[]={7.0000,8.0000,8.1667,8.8333,11.6667,12.5000};
+      _TestResult=_TestResult && Doc_Test_Real_Vector(x,check,0.00005);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Simple SSA analysis demo                                         |
+//+------------------------------------------------------------------+
+void TEST_SSA_D_Basic(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<3; _spoil_scenario++)
+     {
+      //--- Here we demonstrate SSA trend/noise separation for some toy problem:
+      //--- small monotonically growing series X are analyzed with 3-tick window
+      //--- and "top-K" version of SSA, which selects K largest singular vectors
+      //--- for analysis, with K=1.
+      CSSAModel s;
+      double X[]={0,0.5,1,1,1.5,2};
+      CRowDouble x=X;
+      if(_spoil_scenario==0)
+         Spoil_Vector_By_Value(x,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Vector_By_Value(x,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Vector_By_Value(x,AL_NEGINF);
+      //--- First, we create SSA model, set its properties and add dataset.
+      //--- We use window with width=3 and configure model to use direct SSA
+      //--- algorithm - one which runs exact O(N*W^2) analysis - to extract
+      //--- one top singular vector. Well, it is toy problem :)
+      //--- NOTE: SSA model may store and analyze more than one sequence
+      //---       (say, different sequences may correspond to data collected
+      //---       from different devices)
+      CAlglib::SSACreate(s);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SSASetWindow(s,3);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SSAAddSequence(s,x);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SSASetAlgoTopKDirect(s,1);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Now we begin analysis. Internally SSA model stores everything it needs:
+      //--- data, settings, solvers and so on. Right after first call to analysis-
+      //--- related function it will analyze dataset, build basis and perform analysis.
+      //--- Subsequent calls to analysis functions will reuse previously computed
+      //--- basis, unless you invalidate it by changing model settings (or dataset).
+      CRowDouble trend;
+      CRowDouble noise;
+      CAlglib::SSAAnalyzeSequence(s,x,trend,noise);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      double check[]={0.3815,0.5582,0.7810,1.0794,1.5041,2.0105};
+      _TestResult=_TestResult && Doc_Test_Real_Vector(trend,check,0.005);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Simple SSA forecasting demo                                      |
+//+------------------------------------------------------------------+
+void TEST_SSA_D_Forecast(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<3; _spoil_scenario++)
+     {
+      //--- Here we demonstrate SSA forecasting on some toy problem with clearly
+      //--- visible linear trend and small amount of noise.
+      CSSAModel s;
+      double X[]={0.05,0.96,2.04,3.11,3.97,5.03,5.98,7.02,8.02};
+      CRowDouble x=X;
+      if(_spoil_scenario==0)
+         Spoil_Vector_By_Value(x,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Vector_By_Value(x,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Vector_By_Value(x,AL_NEGINF);
+      //--- First, we create SSA model, set its properties and add dataset.
+      //--- We use window with width=3 and configure model to use direct SSA
+      //--- algorithm - one which runs exact O(N*W^2) analysis - to extract
+      //--- two top singular vectors. Well, it is toy problem :)
+      //--- NOTE: SSA model may store and analyze more than one sequence
+      //---       (say, different sequences may correspond to data collected
+      //---       from different devices)
+      CAlglib::SSACreate(s);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SSASetWindow(s,3);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SSAAddSequence(s,x);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SSASetAlgoTopKDirect(s,2);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Now we begin analysis. Internally SSA model stores everything it needs:
+      //--- data, settings, solvers and so on. Right after first call to analysis-
+      //--- related function it will analyze dataset, build basis and perform analysis.
+      //--- Subsequent calls to analysis functions will reuse previously computed
+      //--- basis, unless you invalidate it by changing model settings (or dataset).
+      //--- In this example we show how to use SSAForecastLast() function, which
+      //--- predicts changed in the last sequence of the dataset. If you want to
+      //--- perform prediction for some other sequence, use ssaforecastsequence().
+      CRowDouble trend;
+      CAlglib::SSAForecastLast(s,3,trend);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Well, we expected it to be [9,10,11]. There exists some difference,
+      //--- which can be explained by the artificial noise in the dataset.
+      double check[]={9.0005,9.9322,10.8051};
+      _TestResult=_TestResult && Doc_Test_Real_Vector(trend,check,0.005);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Real-time SSA algorithm with fast incremental updates            |
+//+------------------------------------------------------------------+
+void TEST_SSA_D_Realtime(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<9; _spoil_scenario++)
+     {
+      //--- Suppose that you have a constant stream of incoming data, and you want
+      //--- to regularly perform singular spectral analysis of this stream.
+      //--- One full run of direct algorithm costs O(N*Width^2) operations, so
+      //--- the more points you have, the more it costs to rebuild basis from
+      //--- scratch.
+      //--- Luckily we have incremental SSA algorithm which can perform quick
+      //--- updates of already computed basis in O(K*Width^2) ops, where K
+      //--- is a number of singular vectors extracted. Usually it is orders of
+      //--- magnitude faster than full update of the basis.
+      //--- In this example we start from some initial dataset x0. Then we
+      //--- start appending elements one by one to the end of the last sequence.
+      //--- NOTE: direct algorithm also supports incremental updates, but
+      //---       with O(Width^3) cost. Typically K<<Width, so specialized
+      //---       incremental algorithm is still faster.
+      CSSAModel s1;
+      CMatrixDouble a1;
+      CRowDouble sv1;
+      int w;
+      int k;
+      double X0[]={0.009,0.976,1.999,2.984,3.977,5.002};
+      CRowDouble x0=X0;
+      if(_spoil_scenario==0)
+         Spoil_Vector_By_Value(x0,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Vector_By_Value(x0,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Vector_By_Value(x0,AL_NEGINF);
+      CAlglib::SSACreate(s1);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SSASetWindow(s1,3);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SSAAddSequence(s1,x0);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- set algorithm to the real-time version of top-K, K=2
+      CAlglib::SSASetAlgoTopKRealtime(s1,2);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- one more interesting feature of the incremental algorithm is "power-up" cycle.
+      //--- even with incremental algorithm initial basis calculation costs O(N*Width^2) ops.
+      //--- if such startup cost is too high for your real-time app, then you may divide
+      //--- initial basis calculation across several model updates. It results in better
+      //--- latency at the price of somewhat lesser precision during first few updates.
+      CAlglib::SSASetPowerUpLength(s1,3);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- now, after we prepared everything, start to add incoming points one by one;
+      //--- in the real life, of course, we will perform some work between subsequent update
+      //--- (analyze something, predict, and so on).
+      //--- After each append we perform one iteration of the real-time solver. Usually
+      //--- one iteration is more than enough to update basis. If you have REALLY tight
+      //--- performance constraints, you may specify fractional amount of iterations,
+      //--- which means that iteration is performed with required probability.
+      double updateits=1.0;
+      if(_spoil_scenario==3)
+         updateits=AL_NaN;
+      if(_spoil_scenario==4)
+         updateits=AL_POSINF;
+      if(_spoil_scenario==5)
+         updateits=AL_NEGINF;
+      CAlglib::SSAAppendPointAndUpdate(s1,5.951,updateits);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SSAGetBasis(s1,a1,sv1,w,k);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SSAAppendPointAndUpdate(s1,7.074,updateits);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SSAGetBasis(s1,a1,sv1,w,k);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SSAAppendPointAndUpdate(s1,7.925,updateits);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SSAGetBasis(s1,a1,sv1,w,k);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SSAAppendPointAndUpdate(s1,8.992,updateits);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SSAGetBasis(s1,a1,sv1,w,k);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SSAAppendPointAndUpdate(s1,9.942,updateits);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SSAGetBasis(s1,a1,sv1,w,k);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SSAAppendPointAndUpdate(s1,11.051,updateits);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SSAGetBasis(s1,a1,sv1,w,k);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SSAAppendPointAndUpdate(s1,11.965,updateits);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SSAGetBasis(s1,a1,sv1,w,k);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SSAAppendPointAndUpdate(s1,13.047,updateits);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SSAGetBasis(s1,a1,sv1,w,k);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SSAAppendPointAndUpdate(s1,13.970,updateits);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SSAGetBasis(s1,a1,sv1,w,k);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Ok, we have our basis in a1[] and singular values at sv1[].
+      //--- But is it good enough? Let's print it.
+        {
+         matrix<double> check={{0.510607,0.753611},{0.575201,0.058445},{0.639081,-0.654717}};
+         _TestResult=_TestResult && Doc_Test_Real_Matrix(a1,check,0.0005);
+        }
+      //--- Ok, two vectors with 3 components each.
+      //--- But how to understand that is it really good basis?
+      //--- Let's compare it with direct SSA algorithm on the entire sequence.
+      CSSAModel s2;
+      CMatrixDouble a2;
+      CRowDouble sv2;
+      double X2[]={0.009,0.976,1.999,2.984,3.977,5.002,5.951,7.074,7.925,8.992,9.942,11.051,11.965,13.047,13.970};
+      CRowDouble x2=X2;
+      if(_spoil_scenario==6)
+         Spoil_Vector_By_Value(x2,AL_NaN);
+      if(_spoil_scenario==7)
+         Spoil_Vector_By_Value(x2,AL_POSINF);
+      if(_spoil_scenario==8)
+         Spoil_Vector_By_Value(x2,AL_NEGINF);
+      //---
+      CAlglib::SSACreate(s2);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SSASetWindow(s2,3);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SSAAddSequence(s2,x2);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SSASetAlgoTopKDirect(s2,2);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::SSAGetBasis(s2,a2,sv2,w,k);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- it is exactly the same as one calculated with incremental approach!
+        {
+         matrix<double> check={{0.510607,0.753611},{0.575201,0.058445},{0.639081,-0.654717}};
+         _TestResult=_TestResult && Doc_Test_Real_Matrix(a2,check,0.0005);
+        }
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Simple classification with KNN model                             |
+//+------------------------------------------------------------------+
+void TEST_KNN_Cls(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<3; _spoil_scenario++)
+     {
+      //--- The very simple classification example: classify points (x,y) in 2D space
+      //--- as ones with x>=0 and ones with x<0 (y is ignored, but our classifier
+      //--- has to find it).
+      //--- First, we have to create KNN builder object, load dataset and specify
+      //--- training settings. Our dataset is specified as matrix, which has following
+      //--- format:
+      //---     x0 y0 class0
+      //---     x1 y1 class1
+      //---     x2 y2 class2
+      //---     ....
+      //--- Here xi and yi can be any values (and in fact you can have any number of
+      //--- independent variables), and classi MUST be integer number in [0,NClasses)
+      //--- range. In our example we denote points with x>=0 as class #0, and
+      //--- ones with negative xi as class #1.
+      //--- NOTE: if you want to solve regression problem, specify dataset in similar
+      //---       format, but with dependent variable(s) instead of class labels. You
+      //---       can have dataset with multiple dependent variables, by the way!
+      //--- For the sake of simplicity, our example includes only 4-point dataset and
+      //--- really simple K=1 nearest neighbor search. Industrial problems typically
+      //--- need larger values of K.
+      CKNNBuilder builder;
+      int nvars=2;
+      int nclasses=2;
+      int npoints=4;
+      matrix<double> XY={{1,1,0},{1,-1,0},{-1,1,1},{-1,-1,1}};
+      CMatrixDouble xy=XY;
+      if(_spoil_scenario==0)
+         Spoil_Matrix_By_Value(xy,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Matrix_By_Value(xy,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Matrix_By_Value(xy,AL_NEGINF);
+      CAlglib::KNNBuilderCreate(builder);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::KNNBuilderSetDatasetCLS(builder,xy,npoints,nvars,nclasses);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- we build KNN model with k=1 and eps=0 (exact k-nn search is performed)
+      int k=1;
+      double eps=0;
+      CKNNModel model;
+      CKNNReport rep;
+      CAlglib::KNNBuilderBuildKNNModel(builder,k,eps,model,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- with such settings (k=1 is used) you can expect zero classification
+      //--- error on training set. Beautiful results, but remember - in real life
+      //--- you do not need zero TRAINING SET error, you need good generalization.
+      _TestResult=_TestResult && Doc_Test_Real(rep.m_RelCLSError,0.0000,0.00005);
+      //--- now, let's perform some simple processing with knnprocess()
+      double X[]={+1,0};
+      CRowDouble x=X;
+      CRowDouble y;
+      CAlglib::KNNProcess(model,x,y);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+        {
+         double check[]={+1,0};
+         _TestResult=_TestResult && Doc_Test_Real_Vector(y,check,0.0005);
+        }
+      //--- another option is to use knnprocess0() which returns just first component
+      //--- of the output vector y. ideal for regression problems and binary classifiers.
+      double y0=CAlglib::KNNProcess0(model,x);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Real(y0,1.000,0.0005);
+      //--- finally, you can use knnclassify() which returns most probable class index (i.e. argmax y[i]).
+      int i=CAlglib::KNNClassify(model,x);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Int(i,0);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Simple classification with KNN model                             |
+//+------------------------------------------------------------------+
+void TEST_KNN_Reg(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<3; _spoil_scenario++)
+     {
+      //--- The very simple regression example: model f(x,y)=x+y
+      //--- First, we have to create KNN builder object, load dataset and specify
+      //--- training settings. Our dataset is specified as matrix, which has following
+      //--- format:
+      //---     x0 y0 f0
+      //---     x1 y1 f1
+      //---     x2 y2 f2
+      //---     ....
+      //--- Here xi and yi can be any values, and fi is a dependent function value.
+      //--- By the way, with KNN algorithm you can even model functions with multiple
+      //--- dependent variables!
+      //--- NOTE: you can also solve classification problems with KNN models, see
+      //---       another example for this unit.
+      //--- For the sake of simplicity, our example includes only 4-point dataset and
+      //--- really simple K=1 nearest neighbor search. Industrial problems typically
+      //--- need larger values of K.
+      CKNNBuilder builder;
+      int nvars=2;
+      int nout=1;
+      int npoints=4;
+      matrix<double> XY={{1,1,+2},{1,-1,0},{-1,1,0},{-1,-1,-2}};
+      CMatrixDouble xy=XY;
+      if(_spoil_scenario==0)
+         Spoil_Matrix_By_Value(xy,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Matrix_By_Value(xy,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Matrix_By_Value(xy,AL_NEGINF);
+      CAlglib::KNNBuilderCreate(builder);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::KNNBuilderSetDatasetReg(builder,xy,npoints,nvars,nout);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- we build KNN model with k=1 and eps=0 (exact k-nn search is performed)
+      int k=1;
+      double eps=0;
+      CKNNModel model;
+      CKNNReport rep;
+      CAlglib::KNNBuilderBuildKNNModel(builder,k,eps,model,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- with such settings (k=1 is used) you can expect zero RMS error on the
+      //--- training set. Beautiful results, but remember - in real life you do not
+      //--- need zero TRAINING SET error, you need good generalization.
+      _TestResult=_TestResult && Doc_Test_Real(rep.m_RMSError,0.0000,0.00005);
+      //--- now, let's perform some simple processing with knnprocess()
+      double X[]={+1,+1};
+      CRowDouble x=X;
+      CRowDouble y;
+      CAlglib::KNNProcess(model,x,y);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+        {
+         double check[]={+2};
+         _TestResult=_TestResult && Doc_Test_Real_Vector(y,check,0.0005);
+        }
+      //--- another option is to use knnprocess0() which returns just first component
+      //--- of the output vector y. ideal for regression problems and binary classifiers.
+      double y0=CAlglib::KNNProcess0(model,x);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Real(y0,2.000,0.0005);
+      //--- there also exist another convenience function, knnclassify(),
+      //--- but it does not work for regression problems - it always returns -1.
+      int i=CAlglib::KNNClassify(model,x);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Int(i,-1);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Regression problem with one output (2=>1)                        |
+//+------------------------------------------------------------------+
+void TEST_NN_Regr(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<3; _spoil_scenario++)
+     {
+      //--- The very simple example on neural network: network is trained to reproduce
+      //--- small 2x2 multiplication table.
+      //--- NOTE: we use network with excessive amount of neurons, which guarantees
+      //---       almost exact reproduction of the training set. Generalization ability
+      //---       of such network is rather low, but we are not concerned with such
+      //---       questions in this basic demo.
+      CMLPTrainer trn;
+      CMultilayerPerceptronShell network;
+      CMLPReportShell rep;
+      //--- Training set:
+      //--- * one row corresponds to one record A*B=C in the multiplication table
+      //--- * first two columns store A and B, last column stores C
+      //--- [1 * 1 = 1]
+      //--- [1 * 2 = 2]
+      //--- [2 * 1 = 2]
+      //--- [2 * 2 = 4]
+      matrix<double> XY={{1,1,1},{1,2,2},{2,1,2},{2,2,4}};
+      CMatrixDouble xy=XY;
+      if(_spoil_scenario==0)
+         Spoil_Matrix_By_Value(xy,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Matrix_By_Value(xy,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Matrix_By_Value(xy,AL_NEGINF);
+      //--- Network is created.
+      //--- Trainer object is created.
+      //--- Dataset is attached to trainer object.
+      CAlglib::MLPCreateTrainer(2,1,trn);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MLPCreate1(2,5,1,network);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MLPSetDataset(trn,xy,4);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Network is trained with 5 restarts from random positions
+      CAlglib::MLPTrainNetwork(trn,network,5,rep);
+      //--- 2*2=?
+      double x[]={2,2};
+      double y[]={0};
+      CAlglib::MLPProcess(network,x,y);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      double check[]={4.000};
+      _TestResult=_TestResult && Doc_Test_Real_Vector(y,check,0.05);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Regression problem with multiple outputs (2=>2)                  |
+//+------------------------------------------------------------------+
+void TEST_NN_Regr_N(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<3; _spoil_scenario++)
+     {
+      //--- Network with 2 inputs and 2 outputs is trained to reproduce vector function:
+      //---     (x0,x1) => (x0+x1, x0*x1)
+      //--- Informally speaking, we want neural network to simultaneously calculate
+      //--- both sum of two numbers and their product.
+      //--- NOTE: we use network with excessive amount of neurons, which guarantees
+      //---       almost exact reproduction of the training set. Generalization ability
+      //---       of such network is rather low, but we are not concerned with such
+      //---       questions in this basic demo.
+      CMLPTrainer trn;
+      CMultilayerPerceptronShell network;
+      CMLPReportShell rep;
+      //--- Training set. One row corresponds to one record [A,B,A+B,A*B].
+      //--- [ 1   1  1+1  1*1 ]
+      //--- [ 1   2  1+2  1*2 ]
+      //--- [ 2   1  2+1  2*1 ]
+      //--- [ 2   2  2+2  2*2 ]
+      matrix<double> XY={{1,1,2,1},{1,2,3,2},{2,1,3,2},{2,2,4,4}};
+      CMatrixDouble xy=XY;
+      if(_spoil_scenario==0)
+         Spoil_Matrix_By_Value(xy,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Matrix_By_Value(xy,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Matrix_By_Value(xy,AL_NEGINF);
+      //--- Network is created.
+      //--- Trainer object is created.
+      //--- Dataset is attached to trainer object.
+      CAlglib::MLPCreateTrainer(2,2,trn);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MLPCreate1(2,5,2,network);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MLPSetDataset(trn,xy,4);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Network is trained with 5 restarts from random positions
+      CAlglib::MLPTrainNetwork(trn,network,5,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- 2+1=?
+      //--- 2*1=?
+      double x[]={2,1};
+      double y[]={0,0};
+      CAlglib::MLPProcess(network,x,y);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      double check[]={3.000,2.000};
+      _TestResult=_TestResult && Doc_Test_Real_Vector(y,check,0.05);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Binary classification problem                                    |
+//+------------------------------------------------------------------+
+void TEST_NN_Cls2(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<3; _spoil_scenario++)
+     {
+      //--- Suppose that we want to classify numbers as positive (class 0) and negative
+      //--- (class 1). We have training set which includes several strictly positive
+      //--- or negative numbers - and zero.
+      //--- The problem is that we are not sure how to classify zero, so from time to
+      //--- time we mark it as positive or negative (with equal probability). Other
+      //--- numbers are marked in pure deterministic setting. How will neural network
+      //--- cope with such classification task?
+      //--- NOTE: we use network with excessive amount of neurons, which guarantees
+      //---       almost exact reproduction of the training set. Generalization ability
+      //---       of such network is rather low, but we are not concerned with such
+      //---       questions in this basic demo.
+      CMLPTrainer trn;
+      CMultilayerPerceptronShell network;
+      CMLPReportShell rep;
+      double x[]={0};
+      double y[]={0,0};
+      //--- Training set. One row corresponds to one record [A => class(A)].
+      //--- Classes are denoted by numbers from 0 to 1, where 0 corresponds to positive
+      //--- numbers and 1 to negative numbers.
+      //--- [ +1  0]
+      //--- [ +2  0]
+      //--- [ -1  1]
+      //--- [ -2  1]
+      //--- [  0  0]   !! sometimes we classify 0 as positive, sometimes as negative
+      //--- [  0  1]   !!
+      matrix<double> XY={{+1,0},{+2,0},{-1,1},{-2,1},{0,0},{0,1}};
+      CMatrixDouble xy=XY;
+      if(_spoil_scenario==0)
+         Spoil_Matrix_By_Value(xy,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Matrix_By_Value(xy,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Matrix_By_Value(xy,AL_NEGINF);
+      //--- When we solve classification problems, everything is slightly different from
+      //--- the regression ones:
+      //--- 1. Network is created. Because we solve classification problem, we use
+      //---    mlpcreatec1() function instead of mlpcreate1(). This function creates
+      //---    classifier network with SOFTMAX-normalized outputs. This network returns
+      //---    vector of class membership probabilities which are normalized to be
+      //---    non-negative and sum to 1.0
+      //--- 2. We use mlpcreatetrainercls() function instead of mlpcreatetrainer() to
+      //---    create trainer object. Trainer object process dataset and neural network
+      //---    slightly differently to account for specifics of the classification
+      //---    problems.
+      //--- 3. Dataset is attached to trainer object. Note that dataset format is slightly
+      //---    different from one used for regression.
+      CAlglib::MLPCreateTrainerCls(1,2,trn);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MLPCreateC1(1,5,2,network);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MLPSetDataset(trn,xy,6);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Network is trained with 5 restarts from random positions
+      CAlglib::MLPTrainNetwork(trn,network,5,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Test our neural network on strictly positive and strictly negative numbers.
+      //--- IMPORTANT! Classifier network returns class membership probabilities instead
+      //--- of class indexes. Network returns two values (probabilities) instead of one
+      //--- (class index).
+      //--- Thus, for +1 we expect to get [P0,P1] = [1,0], where P0 is probability that
+      //--- number is positive (belongs to class 0), and P1 is probability that number
+      //--- is negative (belongs to class 1).
+      //--- For -1 we expect to get [P0,P1] = [0,1]
+      //--- Following properties are guaranteed by network architecture:
+      //--- * P0>=0, P1>=0   non-negativity
+      //--- * P0+P1=1        normalization
+      x[0]=1;
+      CAlglib::MLPProcess(network,x,y);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+        {
+         double check[]={1.000,0.000};
+         _TestResult=_TestResult && Doc_Test_Real_Vector(y,check,0.05);
+        }
+      x[0]=-1;
+      CAlglib::MLPProcess(network,x,y);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+        {
+         double check[]={0.000,1.000};
+         _TestResult=_TestResult && Doc_Test_Real_Vector(y,check,0.05);
+        }
+      //--- But what our network will return for 0, which is between classes 0 and 1?
+      //--- In our dataset it has two different marks assigned (class 0 AND class 1).
+      //--- So network will return something average between class 0 and class 1:
+      //---     0 => [0.5, 0.5]
+      x[0]=0;
+      CAlglib::MLPProcess(network,x,y);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      double check[]={0.500,0.500};
+      _TestResult=_TestResult && Doc_Test_Real_Vector(y,check,0.05);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Multiclass classification problem                                |
+//+------------------------------------------------------------------+
+void TEST_NN_Cls3(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<3; _spoil_scenario++)
+     {
+      //--- Suppose that we want to classify numbers as positive (class 0) and negative
+      //--- (class 1). We also have one more class for zero (class 2).
+      //--- NOTE: we use network with excessive amount of neurons, which guarantees
+      //---       almost exact reproduction of the training set. Generalization ability
+      //---       of such network is rather low, but we are not concerned with such
+      //---       questions in this basic demo.
+      CMLPTrainer trn;
+      CMultilayerPerceptronShell network;
+      CMLPReportShell rep;
+      double x[]={0};
+      double y[]={0,0,0};
+      //--- Training set. One row corresponds to one record [A => class(A)].
+      //--- Classes are denoted by numbers from 0 to 2, where 0 corresponds to positive
+      //--- numbers, 1 to negative numbers, 2 to zero
+      //--- [ +1  0]
+      //--- [ +2  0]
+      //--- [ -1  1]
+      //--- [ -2  1]
+      //--- [  0  2]
+      matrix<double> XY={{+1,0},{+2,0},{-1,1},{-2,1},{0,2}};
+      CMatrixDouble xy=XY;
+      if(_spoil_scenario==0)
+         Spoil_Matrix_By_Value(xy,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Matrix_By_Value(xy,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Matrix_By_Value(xy,AL_NEGINF);
+      //--- When we solve classification problems, everything is slightly different from
+      //--- the regression ones:
+      //--- 1. Network is created. Because we solve classification problem, we use
+      //---    mlpcreatec1() function instead of mlpcreate1(). This function creates
+      //---    classifier network with SOFTMAX-normalized outputs. This network returns
+      //---    vector of class membership probabilities which are normalized to be
+      //---    non-negative and sum to 1.0
+      //--- 2. We use mlpcreatetrainercls() function instead of mlpcreatetrainer() to
+      //---    create trainer object. Trainer object process dataset and neural network
+      //---    slightly differently to account for specifics of the classification
+      //---    problems.
+      //--- 3. Dataset is attached to trainer object. Note that dataset format is slightly
+      //---    different from one used for regression.
+      CAlglib::MLPCreateTrainerCls(1,3,trn);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MLPCreateC1(1,5,3,network);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MLPSetDataset(trn,xy,5);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Network is trained with 5 restarts from random positions
+      CAlglib::MLPTrainNetwork(trn,network,5,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Test our neural network on strictly positive and strictly negative numbers.
+      //--- IMPORTANT! Classifier network returns class membership probabilities instead
+      //--- of class indexes. Network returns three values (probabilities) instead of one
+      //--- (class index).
+      //--- Thus, for +1 we expect to get [P0,P1,P2] = [1,0,0],
+      //--- for -1 we expect to get [P0,P1,P2] = [0,1,0],
+      //--- and for 0 we will get [P0,P1,P2] = [0,0,1].
+      //--- Following properties are guaranteed by network architecture:
+      //--- * P0>=0, P1>=0, P2>=0    non-negativity
+      //--- * P0+P1+P2=1             normalization
+      x[0]=1;
+      CAlglib::MLPProcess(network,x,y);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+        {
+         double check[]={1.000,0.000,0.000};
+         _TestResult=_TestResult && Doc_Test_Real_Vector(y,check,0.05);
+        }
+      x[0]=-1;
+      CAlglib::MLPProcess(network,x,y);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+        {
+         double check[]={0.000,1.000,0.000};
+         _TestResult=_TestResult && Doc_Test_Real_Vector(y,check,0.05);
+        }
+      x[0]=0;
+      CAlglib::MLPProcess(network,x,y);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      double check[]={0.000,0.000,1.000};
+      _TestResult=_TestResult && Doc_Test_Real_Vector(y,check,0.05);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Advanced example on trainer object                               |
+//+------------------------------------------------------------------+
+void TEST_NN_TrainerObject(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<6; _spoil_scenario++)
+     {
+      //--- Trainer object is used to train network. It stores dataset, training settings,
+      //--- and other information which is NOT part of neural network. You should use
+      //--- trainer object as follows:
+      //--- (1) you create trainer object and specify task type (classification/regression)
+      //---     and number of inputs/outputs
+      //--- (2) you add dataset to the trainer object
+      //--- (3) you may change training settings (stopping criteria or weight decay)
+      //--- (4) finally, you may train one or more networks
+      //--- You may interleave stages 2...4 and repeat them many times. Trainer object
+      //--- remembers its internal state and can be used several times after its creation
+      //--- and initialization.
+      CMLPTrainer trn;
+      //--- Stage 1: object creation.
+      //--- We have to specify number of inputs and outputs. Trainer object can be used
+      //--- only for problems with same number of inputs/outputs as was specified during
+      //--- its creation.
+      //--- In case you want to train SOFTMAX-normalized network which solves classification
+      //--- problems,  you  must  use  another  function  to  create  trainer  object:
+      //--- mlpcreatetrainercls().
+      //--- Below we create trainer object which can be used to train regression networks
+      //--- with 2 inputs and 1 output.
+      CAlglib::MLPCreateTrainer(2,1,trn);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Stage 2: specification of the training set
+      //--- By default trainer object stores empty dataset. So to solve your non-empty problem
+      //--- you have to set dataset by passing to trainer dense or sparse matrix.
+      //--- One row of the matrix corresponds to one record A*B=C in the multiplication table.
+      //--- First two columns store A and B, last column stores C
+      //---     [1 * 1 = 1]   [ 1 1 1 ]
+      //---     [1 * 2 = 2]   [ 1 2 2 ]
+      //---     [2 * 1 = 2] = [ 2 1 2 ]
+      //---     [2 * 2 = 4]   [ 2 2 4 ]
+      matrix<double> XY={{1,1,1},{1,2,2},{2,1,2},{2,2,4}};
+      CMatrixDouble xy=XY;
+      if(_spoil_scenario==0)
+         Spoil_Matrix_By_Value(xy,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Matrix_By_Value(xy,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Matrix_By_Value(xy,AL_NEGINF);
+      CAlglib::MLPSetDataset(trn,xy,4);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Stage 3: modification of the training parameters.
+      //--- You may modify parameters like weights decay or stopping criteria:
+      //--- * we set moderate weight decay
+      //--- * we choose iterations limit as stopping condition (another condition - step size -
+      //---   is zero, which means than this condition is not active)
+      double wstep=0.000;
+      if(_spoil_scenario==3)
+         wstep=AL_NaN;
+      if(_spoil_scenario==4)
+         wstep=AL_POSINF;
+      if(_spoil_scenario==5)
+         wstep=AL_NEGINF;
+      int maxits=100;
+      CAlglib::MLPSetDecay(trn,0.01);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MLPSetCond(trn,wstep,maxits);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Stage 4: training.
+      //--- We will train several networks with different architecture using same trainer object.
+      //--- We may change training parameters or even dataset, so different networks are trained
+      //--- differently. But in this simple example we will train all networks with same settings.
+      //--- We create and train three networks:
+      //--- * network 1 has 2x1 architecture     (2 inputs, no hidden neurons, 1 output)
+      //--- * network 2 has 2x5x1 architecture   (2 inputs, 5 hidden neurons, 1 output)
+      //--- * network 3 has 2x5x5x1 architecture (2 inputs, two hidden layers, 1 output)
+      //--- NOTE: these networks solve regression problems. For classification problems you
+      //---       should use mlpcreatec0/c1/c2 to create neural networks which have SOFTMAX-
+      //---       normalized outputs.
+      CMultilayerPerceptronShell net1;
+      CMultilayerPerceptronShell net2;
+      CMultilayerPerceptronShell net3;
+      CMLPReportShell rep;
+      CAlglib::MLPCreate0(2,1,net1);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MLPCreate1(2,5,1,net2);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MLPCreate2(2,5,5,1,net3);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MLPTrainNetwork(trn,net1,5,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MLPTrainNetwork(trn,net2,5,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MLPTrainNetwork(trn,net3,5,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Early stopping ensembles                                         |
+//+------------------------------------------------------------------+
+void TEST_NN_Ensembles_ES(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<3; _spoil_scenario++)
+     {
+      //--- This example shows how to train early stopping ensebles.
+      CMLPTrainer trn;
+      CMLPEnsembleShell ensemble;
+      CMLPReportShell rep;
+      //--- Training set: f(x)=1/(x^2+1)
+      //--- One row corresponds to one record [x,f(x)]
+      matrix<double> XY={{-2.0,0.2},{-1.6,0.3},{-1.3,0.4},{-1,0.5},{-0.6,0.7},{-0.3,0.9},{0,1},{2.0,0.2},{1.6,0.3},{1.3,0.4},{1,0.5},{0.6,0.7},{0.3,0.9}};
+      CMatrixDouble xy=XY;
+      if(_spoil_scenario==0)
+         Spoil_Matrix_By_Value(xy,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Matrix_By_Value(xy,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Matrix_By_Value(xy,AL_NEGINF);
+      //--- Trainer object is created.
+      //--- Dataset is attached to trainer object.
+      //--- NOTE: it is not good idea to use early stopping ensemble on sample
+      //---       as small as ours (13 examples). It is done for demonstration
+      //---       purposes only. Ensemble training algorithm won't find good
+      //---       solution on such small sample.
+      CAlglib::MLPCreateTrainer(1,1,trn);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MLPSetDataset(trn,xy,13);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- Ensemble is created and trained. Each of 50 network is trained
+      //--- with 5 restarts.
+      CAlglib::MLPECreate1(1,4,1,50,ensemble);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      CAlglib::MLPTrainEnsembleES(trn,ensemble,5,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| Monotone interpolation                                           |
+//+------------------------------------------------------------------+
+void TEST_Spline1D_D_Monotone(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<10; _spoil_scenario++)
+     {
+      //--- Spline built witn spline1dbuildcubic() can be non-monotone even when
+      //--- Y-values form monotone sequence. Say, for x=[0,1,2] and y=[0,1,1]
+      //--- cubic spline will monotonically grow until x=1.5 and then start
+      //--- decreasing.
+      //--- That's why ALGLIB provides special spline construction function
+      //--- which builds spline which preserves monotonicity of the original
+      //--- dataset.
+      //--- NOTE: in case original dataset is non-monotonic, ALGLIB splits it
+      //--- into monotone subsequences and builds piecewise monotonic spline.
+      //
+      vector<double> X={ 0,1,2 };
+      CRowDouble x=X;
+      if(_spoil_scenario==0)
+         Spoil_Vector_By_Value(x,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Vector_By_Value(x,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Vector_By_Value(x,AL_NEGINF);
+      if(_spoil_scenario==3)
+         Spoil_Vector_By_Adding_Element(x);
+      if(_spoil_scenario==4)
+         Spoil_Vector_By_Deleting_Element(x);
+      vector<double> Y={ 0,1,1 };
+      CRowDouble y=Y;
+      if(_spoil_scenario==5)
+         Spoil_Vector_By_Value(y,AL_NaN);
+      if(_spoil_scenario==6)
+         Spoil_Vector_By_Value(y,AL_POSINF);
+      if(_spoil_scenario==7)
+         Spoil_Vector_By_Value(y,AL_NEGINF);
+      if(_spoil_scenario==8)
+         Spoil_Vector_By_Adding_Element(y);
+      if(_spoil_scenario==9)
+         Spoil_Vector_By_Deleting_Element(y);
+      CSpline1DInterpolantShell s;
+      //--- build spline
+      CAlglib::Spline1DBuildMonotone(x,y,s);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      //--- calculate S at x = [-0.5, 0.0, 0.5, 1.0, 1.5, 2.0]
+      //--- you may see that spline is really monotonic
+      double v=CAlglib::Spline1DCalc(s,-0.5);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Real(v,0.0000,0.00005);
+      v=CAlglib::Spline1DCalc(s,0.0);
+      _TestResult=_TestResult && Doc_Test_Real(v,0.0000,0.00005);
+      v=CAlglib::Spline1DCalc(s,+0.5);
+      _TestResult=_TestResult && Doc_Test_Real(v,0.5000,0.00005);
+      v=CAlglib::Spline1DCalc(s,1.0);
+      _TestResult=_TestResult && Doc_Test_Real(v,1.0000,0.00005);
+      v=CAlglib::Spline1DCalc(s,1.5);
+      _TestResult=_TestResult && Doc_Test_Real(v,1.0000,0.00005);
+      v=CAlglib::Spline1DCalc(s,2.0);
+      _TestResult=_TestResult && Doc_Test_Real(v,1.0000,0.00005);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| 4-parameter logistic fitting                                     |
+//+------------------------------------------------------------------+
+void TEST_LSFit_T_4pl(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<8; _spoil_scenario++)
+     {
+      vector<double> X={ 1,2,3,4,5,6,7,8 };
+      CRowDouble x=X;
+      if(_spoil_scenario==0)
+         Spoil_Vector_By_Value(x,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Vector_By_Value(x,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Vector_By_Value(x,AL_NEGINF);
+      if(_spoil_scenario==3)
+         Spoil_Vector_By_Deleting_Element(x);
+      vector<double> Y={ 0.06313223,0.44552624,0.61838364,0.71385108,0.77345838,0.81383140,0.84280033,0.86449822 };
+      CRowDouble y=Y;
+      if(_spoil_scenario==4)
+         Spoil_Vector_By_Value(y,AL_NaN);
+      if(_spoil_scenario==5)
+         Spoil_Vector_By_Value(y,AL_POSINF);
+      if(_spoil_scenario==6)
+         Spoil_Vector_By_Value(y,AL_NEGINF);
+      if(_spoil_scenario==7)
+         Spoil_Vector_By_Deleting_Element(y);
+      int n=8;
+      double a;
+      double b;
+      double c;
+      double d;
+      CLSFitReportShell rep;
+      //--- Test logisticfit4() on carefully designed data with a priori known answer.
+      CAlglib::LogisticFit4(x,y,n,a,b,c,d,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Real(a,-1.000,0.01);
+      _TestResult=_TestResult && Doc_Test_Real(b,1.200,0.01);
+      _TestResult=_TestResult && Doc_Test_Real(c,0.900,0.01);
+      _TestResult=_TestResult && Doc_Test_Real(d,1.000,0.01);
+      //--- Evaluate model at point x=0.5
+      double v;
+      v=CAlglib::LogisticCalc4(0.5,a,b,c,d);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Real(v,-0.33874308,0.001);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
+   _TotalResult=_TotalResult && _TestResult;
+  }
+//+------------------------------------------------------------------+
+//| 5-parameter logistic fitting                                     |
+//+------------------------------------------------------------------+
+void TEST_LSFit_T_5pl(int &_spoil_scenario,bool &_TestResult,bool &_TotalResult)
+  {
+   _TestResult=true;
+   for(_spoil_scenario=-1; _spoil_scenario<8; _spoil_scenario++)
+     {
+      vector<double> X={ 1,2,3,4,5,6,7,8 };
+      CRowDouble x=X;
+      if(_spoil_scenario==0)
+         Spoil_Vector_By_Value(x,AL_NaN);
+      if(_spoil_scenario==1)
+         Spoil_Vector_By_Value(x,AL_POSINF);
+      if(_spoil_scenario==2)
+         Spoil_Vector_By_Value(x,AL_NEGINF);
+      if(_spoil_scenario==3)
+         Spoil_Vector_By_Deleting_Element(x);
+      vector<double> Y={ 0.1949776139,0.5710060208,0.726002637,0.8060434158,0.8534547965,0.8842071579,0.9054773317,0.9209088299 };
+      CRowDouble y=Y;
+      if(_spoil_scenario==4)
+         Spoil_Vector_By_Value(y,AL_NaN);
+      if(_spoil_scenario==5)
+         Spoil_Vector_By_Value(y,AL_POSINF);
+      if(_spoil_scenario==6)
+         Spoil_Vector_By_Value(y,AL_NEGINF);
+      if(_spoil_scenario==7)
+         Spoil_Vector_By_Deleting_Element(y);
+      int n=8;
+      double a;
+      double b;
+      double c;
+      double d;
+      double g;
+      CLSFitReportShell rep;
+      //--- Test logisticfit5() on carefully designed data with a priori known answer.
+      CAlglib::LogisticFit5(x,y,n,a,b,c,d,g,rep);
+      //--- handling exceptions
+      if(!Func_spoil_scenario(_spoil_scenario,_TestResult))
+         continue;
+      _TestResult=_TestResult && Doc_Test_Real(a,-1.000,0.01);
+      _TestResult=_TestResult && Doc_Test_Real(b,1.200,0.01);
+      _TestResult=_TestResult && Doc_Test_Real(c,0.900,0.01);
+      _TestResult=_TestResult && Doc_Test_Real(d,1.000,0.01);
+      _TestResult=_TestResult && Doc_Test_Real(g,1.200,0.01);
+      //--- Evaluate model at point x=0.5
+      double v;
+      v=CAlglib::LogisticCalc5(0.5,a,b,c,d,g);
+      _TestResult=_TestResult && Doc_Test_Real(v,-0.2354656824,0.001);
+      _TestResult=_TestResult && (_spoil_scenario==-1);
+     }
+   if(!_TestResult)
+      PrintFormat("%-32s FAILED",__FUNCTION__);
    _TotalResult=_TotalResult && _TestResult;
   }
 //+------------------------------------------------------------------+

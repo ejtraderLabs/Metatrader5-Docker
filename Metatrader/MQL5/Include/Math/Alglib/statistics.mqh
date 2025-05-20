@@ -1,7 +1,7 @@
 //+------------------------------------------------------------------+
 //|                                                   statistics.mqh |
-//|            Copyright 2003-2012 Sergey Bochkanov (ALGLIB project) |
-//|                   Copyright 2012-2017, MetaQuotes Software Corp. |
+//|            Copyright 2003-2022 Sergey Bochkanov (ALGLIB project) |
+//|                             Copyright 2012-2023, MetaQuotes Ltd. |
 //|                                             https://www.mql5.com |
 //+------------------------------------------------------------------+
 //| Implementation of ALGLIB library in MetaQuotes Language 5        |
@@ -41,41 +41,44 @@
 class CBaseStat
   {
 public:
-                     CBaseStat(void);
-                    ~CBaseStat(void);
    //--- basic parameters
    static bool       SampleMoments(const double &cx[],const int n,double &mean,double &variance,double &skewness,double &kurtosis);
+   static bool       SampleMoments(const CRowDouble &cx,const int n,double &mean,double &variance,double &skewness,double &kurtosis);
+   static double     SampleMean(CRowDouble &x,int n);
+   static double     SampleVariance(CRowDouble &x,int n);
+   static double     SampleSkewness(CRowDouble &x,int n);
+   static double     SampleKurtosis(CRowDouble &x,int n);
    static bool       SampleAdev(const double &cx[],const int n,double &adev);
+   static bool       SampleAdev(const CRowDouble &cx,const int n,double &adev);
    static bool       SampleMedian(const double &cx[],const int n,double &median);
+   static bool       SampleMedian(const CRowDouble &cx,const int n,double &median);
    static bool       SamplePercentile(const double &cx[],const int n,const double p,double &v);
+   static bool       SamplePercentile(const CRowDouble &cx,const int n,const double p,double &v);
    //--- covariance and correlation
    static double     Cov2(const double &cx[],const double &cy[],const int n);
+   static double     Cov2(const CRowDouble &cx,const CRowDouble &cy,const int n);
    static double     PearsonCorr2(const double &cx[],const double &cy[],const int n);
+   static double     PearsonCorr2(const CRowDouble &cx,const CRowDouble &cy,const int n);
    static double     SpearmanCorr2(const double &cx[],const double &cy[],const int n);
+   static double     SpearmanCorr2(const CRowDouble &cx,const CRowDouble &cy,const int n);
    static bool       CovM(const CMatrixDouble &cx,const int n,const int m,CMatrixDouble &c);
    static bool       PearsonCorrM(const CMatrixDouble &cx,const int n,const int m,CMatrixDouble &c);
    static bool       SpearmanCorrM(const CMatrixDouble &cx,const int n,const int m,CMatrixDouble &c);
    static bool       CovM2(const CMatrixDouble &cx,const CMatrixDouble &cy,const int n,const int m1,const int m2,CMatrixDouble &c);
    static bool       PearsonCorrM2(const CMatrixDouble &cx,const CMatrixDouble &cy,const int n,const int m1,const int m2,CMatrixDouble &c);
    static bool       SpearmanCorrM2(const CMatrixDouble &cx,const CMatrixDouble &cy,const int n,const int m1,const int m2,CMatrixDouble &c);
+   static void       RankData(CMatrixDouble &xy,int npoints,int nfeatures);
+   static void       RankDataCentered(CMatrixDouble &xy,int npoints,int nfeatures);
    //--- obsolete functions
    static double     PearsonCorrelation(const double &x[],const double &y[],const int n);
+   static double     PearsonCorrelation(const CRowDouble &x,const CRowDouble &y,const int n);
    static double     SpearmanRankCorrelation(const double &x[],const double &y[],const int n);
+   static double     SpearmanRankCorrelation(const CRowDouble &x,const CRowDouble &y,const int n);
+
+private:
+   static void       RankDataRec(CMatrixDouble &xy,int i0,int i1,int nfeatures,bool iscentered,int basecasecost);
+   static void       RankDataBaseCase(CMatrixDouble &xy,int i0,int i1,int nfeatures,bool iscentered,CApBuff &buf0,CApBuff &buf1);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CBaseStat::CBaseStat(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CBaseStat::~CBaseStat(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| Calculation of the distribution moments: mean, variance,         |
 //| skewness, kurtosis.                                              |
@@ -92,14 +95,23 @@ CBaseStat::~CBaseStat(void)
 //|     Skewness-   skewness (if variance<>0; zero otherwise).       |
 //|     Kurtosis-   kurtosis (if variance<>0; zero otherwise).       |
 //+------------------------------------------------------------------+
-static bool CBaseStat::SampleMoments(const double &cx[],const int n,double &mean,
-                                     double &variance,double &skewness,double &kurtosis)
+bool CBaseStat::SampleMoments(const double &cx[],const int n,double &mean,
+                              double &variance,double &skewness,double &kurtosis)
+  {
+   CRowDouble CX=cx;
+   return(SampleMoments(CX,n,mean,variance,skewness,kurtosis));
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+bool CBaseStat::SampleMoments(const CRowDouble &cx,const int n,double &mean,
+                              double &variance,double &skewness,double &kurtosis)
   {
 //--- check
    if(!CAp::Assert(n>=0,__FUNCTION__+": the error variable"))
       return(false);
 //--- check
-   if(!CAp::Assert(CAp::Len(cx)>=n,__FUNCTION__+": length(x)<n"))
+   if(!CAp::Assert(cx.Size()>=n,__FUNCTION__+": length(x)<n"))
       return(false);
 //--- check
    if(!CAp::Assert(CApServ::IsFiniteVector(cx,n),__FUNCTION__+": x is not finite vector"))
@@ -118,16 +130,16 @@ static bool CBaseStat::SampleMoments(const double &cx[],const int n,double &mean
    if(n<=0)
       return(true);
 //--- Mean
-   for(int i=0;i<n;i++)
+   for(int i=0; i<n; i++)
       mean+=cx[i];
    mean/=n;
 //--- Variance (using corrected two-pass algorithm)
    if(n!=1)
      {
       //--- calculation
-      for(int i=0;i<n;i++)
+      for(int i=0; i<n; i++)
          v1+=CMath::Sqr(cx[i]-mean);
-      for(int i=0;i<n;i++)
+      for(int i=0; i<n; i++)
          v2+=cx[i]-mean;
       v2=CMath::Sqr(v2)/n;
       variance=(v1-v2)/(n-1);
@@ -140,7 +152,7 @@ static bool CBaseStat::SampleMoments(const double &cx[],const int n,double &mean
    if(stddev!=0)
      {
       //--- calculation
-      for(int i=0;i<n;i++)
+      for(int i=0; i<n; i++)
         {
          v=(cx[i]-mean)/stddev;
          v2=CMath::Sqr(v);
@@ -155,6 +167,97 @@ static bool CBaseStat::SampleMoments(const double &cx[],const int n,double &mean
    return(true);
   }
 //+------------------------------------------------------------------+
+//| Calculation of the mean.                                         |
+//| INPUT PARAMETERS:                                                |
+//|   X        -  sample                                             |
+//|   N        -  N>=0, sample size:                                 |
+//|         * if given, only leading N elements of X are processed   |
+//|         * if not given, automatically determined from size of X  |
+//| NOTE: This function return result which calculated by            |
+//|       'SampleMoments' function and stored at 'Mean' variable.    |
+//+------------------------------------------------------------------+
+double CBaseStat::SampleMean(CRowDouble &x,int n)
+  {
+//--- create variables
+   double mean=0;
+   double tmp0=0;
+   double tmp1=0;
+   double tmp2=0;
+//--- function call
+   if(!SampleMoments(x,n,mean,tmp0,tmp1,tmp2))
+      return(EMPTY_VALUE);
+//--- return result
+   return(mean);
+  }
+//+------------------------------------------------------------------+
+//| Calculation of the variance.                                     |
+//| INPUT PARAMETERS:                                                |
+//|   X        -  sample                                             |
+//|   N        -  N>=0, sample size:                                 |
+//|         * if given, only leading N elements of X are processed   |
+//|         * if not given, automatically determined from size of X  |
+//| NOTE: This function return result which calculated by            |
+//|       'SampleMoments' function and stored at 'Variance' variable.|
+//+------------------------------------------------------------------+
+double CBaseStat::SampleVariance(CRowDouble &x,int n)
+  {
+//--- create variables
+   double variance=0;
+   double tmp0=0;
+   double tmp1=0;
+   double tmp2=0;
+//--- function call
+   if(!SampleMoments(x,n,tmp0,variance,tmp1,tmp2))
+      return(EMPTY_VALUE);
+//--- return result
+   return(variance);
+  }
+//+------------------------------------------------------------------+
+//| Calculation of the skewness.                                     |
+//| INPUT PARAMETERS:                                                |
+//|   X        -  sample                                             |
+//|   N        -  N>=0, sample size:                                 |
+//|         * if given, only leading N elements of X are processed   |
+//|         * if not given, automatically determined from size of X  |
+//| NOTE: This function return result which calculated by            |
+//|       'SampleMoments' function and stored at 'Skewness' variable.|
+//+------------------------------------------------------------------+
+double CBaseStat::SampleSkewness(CRowDouble &x,int n)
+  {
+//--- create variables
+   double skewness=0;
+   double tmp0=0;
+   double tmp1=0;
+   double tmp2=0;
+//--- function call
+   if(!SampleMoments(x,n,tmp0,tmp1,skewness,tmp2))
+      return(EMPTY_VALUE);
+//--- return result
+   return(skewness);
+  }
+//+------------------------------------------------------------------+
+//| Calculation of the kurtosis.                                     |
+//| INPUT PARAMETERS:                                                |
+//|   X        -  sample                                             |
+//|   N        -  N>=0, sample size:                                 |
+//|         * if given, only leading N elements of X are processed   |
+//|         * if not given, automatically determined from size of X  |
+//| NOTE: This function return result  which calculated by           |
+//|       'SampleMoments' function and stored at 'Kurtosis' variable.|
+//+------------------------------------------------------------------+
+double CBaseStat::SampleKurtosis(CRowDouble &x,int n)
+  {
+//--- create variables
+   double kurtosis=0;
+   double tmp0=0;
+   double tmp1=0;
+   double tmp2=0;
+//--- function call
+   SampleMoments(x,n,tmp0,tmp1,tmp2,kurtosis);
+//--- return result
+   return(kurtosis);
+  }
+//+------------------------------------------------------------------+
 //| ADev                                                             |
 //| Input parameters:                                                |
 //|     X   -   sample                                               |
@@ -166,8 +269,17 @@ static bool CBaseStat::SampleMoments(const double &cx[],const int n,double &mean
 //| Output parameters:                                               |
 //|     ADev-   ADev                                                 |
 //+------------------------------------------------------------------+
-static bool CBaseStat::SampleAdev(const double &cx[],const int n,
-                                  double &adev)
+bool CBaseStat::SampleAdev(const double &cx[],const int n,
+                           double &adev)
+  {
+   CRowDouble CX=cx;
+   return(SampleAdev(CX,n,adev));
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+bool CBaseStat::SampleAdev(const CRowDouble &cx,const int n,
+                           double &adev)
   {
 //--- check
    if(!CAp::Assert(n>=0,__FUNCTION__+": the error variable"))
@@ -185,11 +297,11 @@ static bool CBaseStat::SampleAdev(const double &cx[],const int n,
    if(n<=0)
       return(true);
 //--- Mean
-   for(int i=0;i<n;i++)
+   for(int i=0; i<n; i++)
       mean+=cx[i];
    mean/=n;
 //--- ADev
-   for(int i=0;i<n;i++)
+   for(int i=0; i<n; i++)
       adev+=MathAbs(cx[i]-mean);
    adev/=n;
 //--- successful execution
@@ -207,8 +319,17 @@ static bool CBaseStat::SampleAdev(const double &cx[],const int n,
 //| Output parameters:                                               |
 //|     Median                                                       |
 //+------------------------------------------------------------------+
-static bool CBaseStat::SampleMedian(const double &cx[],const int n,
-                                    double &median)
+bool CBaseStat::SampleMedian(const double &cx[],const int n,
+                             double &median)
+  {
+   CRowDouble X=cx;
+   return(SampleMedian(X,n,median));
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+bool CBaseStat::SampleMedian(const CRowDouble &cx,const int n,
+                             double &median)
   {
 //--- check
    if(!CAp::Assert(n>=0,__FUNCTION__+": the error variable"))
@@ -248,8 +369,8 @@ static bool CBaseStat::SampleMedian(const double &cx[],const int n,
    double tval=0;
 //--- create copy
    double x[];
-   ArrayResizeAL(x,n);
-   for(int ii=0;ii<n;ii++)
+   ArrayResize(x,n);
+   for(int ii=0; ii<n; ii++)
       x[ii]=cx[ii];
 //--- if n>=3
    while(true)
@@ -340,7 +461,7 @@ static bool CBaseStat::SampleMedian(const double &cx[],const int n,
       return(true);
      }
    a=x[n-1];
-   for(i=k+1;i<n;i++)
+   for(i=k+1; i<n; i++)
       if(x[i]<a)
          a=x[i];
    median=0.5*(x[k]+a);
@@ -360,8 +481,17 @@ static bool CBaseStat::SampleMedian(const double &cx[],const int n,
 //| Output parameters:                                               |
 //|     V   -   percentile                                           |
 //+------------------------------------------------------------------+
-static bool CBaseStat::SamplePercentile(const double &cx[],const int n,
-                                        const double p,double &v)
+bool CBaseStat::SamplePercentile(const double &cx[],const int n,
+                                 const double p,double &v)
+  {
+   CRowDouble X=cx;
+   return(SamplePercentile(X,n,p,v));
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+bool CBaseStat::SamplePercentile(const CRowDouble &cx,const int n,
+                                 const double p,double &v)
   {
 //--- check
    if(!CAp::Assert(n>=0,__FUNCTION__+": the error variable"))
@@ -393,13 +523,10 @@ static bool CBaseStat::SamplePercentile(const double &cx[],const int n,
 //--- initialization
    int    i1=0;
    double t=0;
-   double rbuf[];
+   CRowDouble rbuf;
    v=0;
 //--- create copy
-   double x[];
-   ArrayResizeAL(x,n);
-   for(int ii=0;ii<n;ii++)
-      x[ii]=cx[ii];
+   CRowDouble x=cx;
 //--- sort
    CTSort::TagSortFast(x,rbuf,n);
 //--- calculation
@@ -423,8 +550,18 @@ static bool CBaseStat::SamplePercentile(const double &cx[],const int n,
 //| Result:                                                          |
 //|     covariance (zero for N=0 or N=1)                             |
 //+------------------------------------------------------------------+
-static double CBaseStat::Cov2(const double &cx[],const double &cy[],
-                              const int n)
+double CBaseStat::Cov2(const double &cx[],const double &cy[],
+                       const int n)
+  {
+   CRowDouble X=cx;
+   CRowDouble Y=cy;
+   return(Cov2(X,Y,n));
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+double CBaseStat::Cov2(const CRowDouble &cx,const CRowDouble &cy,
+                       const int n)
   {
 //--- check
    if(!CAp::Assert(n>=0,__FUNCTION__+": the error variable"))
@@ -460,7 +597,7 @@ static double CBaseStat::Cov2(const double &cx[],const double &cy[],
 //--- If at least one of them is True, we return zero
 //--- (othwerwise we risk to get nonzero covariation
 //--- because of roundoff).
-   for(int i=0;i<n;i++)
+   for(int i=0; i<n; i++)
      {
       s=cx[i];
       samex=samex && s==x0;
@@ -474,7 +611,7 @@ static double CBaseStat::Cov2(const double &cx[],const double &cy[],
       return(0);
 //--- covariance
    v=1.0/(double)(n-1);
-   for(int i=0;i<n;i++)
+   for(int i=0; i<n; i++)
       result+=v*(cx[i]-xmean)*(cy[i]-ymean);
 //--- return result
    return(result);
@@ -493,8 +630,18 @@ static double CBaseStat::Cov2(const double &cx[],const double &cy[],
 //|     Pearson product-moment correlation coefficient               |
 //|     (zero for N=0 or N=1)                                        |
 //+------------------------------------------------------------------+
-static double CBaseStat::PearsonCorr2(const double &cx[],const double &cy[],
-                                      const int n)
+double CBaseStat::PearsonCorr2(const double &cx[],const double &cy[],
+                               const int n)
+  {
+   CRowDouble X=cx;
+   CRowDouble Y=cy;
+   return(PearsonCorr2(X,Y,n));
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+double CBaseStat::PearsonCorr2(const CRowDouble &cx,const CRowDouble &cy,
+                               const int n)
   {
 //--- check
    if(!CAp::Assert(n>=0,__FUNCTION__+": the error variable"))
@@ -533,7 +680,7 @@ static double CBaseStat::PearsonCorr2(const double &cx[],const double &cy[],
 //--- If at least one of them is True, we return zero
 //--- (othwerwise we risk to get nonzero correlation
 //--- because of roundoff).
-   for(int i=0;i<n;i++)
+   for(int i=0; i<n; i++)
      {
       s=cx[i];
       samex=samex && s==x0;
@@ -547,7 +694,7 @@ static double CBaseStat::PearsonCorr2(const double &cx[],const double &cy[],
       return(0);
 //--- calculation
    s=0;
-   for(int i=0;i<n;i++)
+   for(int i=0; i<n; i++)
      {
       t1=cx[i]-xmean;
       t2=cy[i]-ymean;
@@ -575,8 +722,18 @@ static double CBaseStat::PearsonCorr2(const double &cx[],const double &cy[],
 //|     Spearman's rank correlation coefficient                      |
 //|     (zero for N=0 or N=1)                                        |
 //+------------------------------------------------------------------+
-static double CBaseStat::SpearmanCorr2(const double &cx[],const double &cy[],
-                                       const int n)
+double CBaseStat::SpearmanCorr2(const double &cx[],const double &cy[],
+                                const int n)
+  {
+   CRowDouble X=cx;
+   CRowDouble Y=cy;
+   return(SpearmanCorr2(X,Y,n));
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+double CBaseStat::SpearmanCorr2(const CRowDouble &cx,const CRowDouble &cy,
+                                const int n)
   {
 //--- check
    if(!CAp::Assert(n>=0,__FUNCTION__+": the error variable"))
@@ -597,19 +754,12 @@ static double CBaseStat::SpearmanCorr2(const double &cx[],const double &cy[],
    if(n<=1)
       return(0);
 //--- create copy
-   double x[];
-   double y[];
-   ArrayResizeAL(x,n);
-   ArrayResizeAL(y,n);
-   for(int i=0;i<n;i++)
-     {
-      x[i]=cx[i];
-      y[i]=cy[i];
-     }
+   CRowDouble x=cx;
+   CRowDouble y=cy;
    CApBuff buf;
 //--- change x and y
-   CBasicStatOps::RankX(x,n,buf);
-   CBasicStatOps::RankX(y,n,buf);
+   CBasicStatOps::RankX(x,n,false,buf);
+   CBasicStatOps::RankX(y,n,false,buf);
 //--- return result
    return(PearsonCorr2(x,y,n));
   }
@@ -630,8 +780,8 @@ static double CBaseStat::SpearmanCorr2(const double &cx[],const double &cy[],
 //| OUTPUT PARAMETERS:                                               |
 //|     C   -   array[M,M], covariance matrix (zero if N=0 or N=1)   |
 //+------------------------------------------------------------------+
-static bool CBaseStat::CovM(const CMatrixDouble &cx,const int n,const int m,
-                            CMatrixDouble &c)
+bool CBaseStat::CovM(const CMatrixDouble &cx,const int n,const int m,
+                     CMatrixDouble &c)
   {
 //--- check
    if(!CAp::Assert(n>=0,__FUNCTION__+": the error variable"))
@@ -640,69 +790,53 @@ static bool CBaseStat::CovM(const CMatrixDouble &cx,const int n,const int m,
    if(!CAp::Assert(m>=1,__FUNCTION__+": the error variable"))
       return(false);
 //--- check
-   if(!CAp::Assert(CAp::Rows(cx)>=n,__FUNCTION__+": rows(x)<n"))
+   if(!CAp::Assert(cx.Rows()>=n,__FUNCTION__+": rows(x)<n"))
       return(false);
 //--- check
-   if(!CAp::Assert(CAp::Cols(cx)>=m || n==0,__FUNCTION__+": cols(x)<m"))
+   if(!CAp::Assert(cx.Cols()>=m || n==0,__FUNCTION__+": cols(x)<m"))
       return(false);
 //--- check
    if(!CAp::Assert(CApServ::IsFiniteMatrix(cx,n,m),__FUNCTION__+": x contains infinite/NAN elements"))
       return(false);
 //--- create copy
-   CMatrixDouble x;
-   x=cx;
+   CMatrixDouble x=cx;
+   x.Resize(n,m);
 //--- N<=1, return zero
    if(n<=1)
      {
-      c.Resize(m,m);
-      for(int i=0;i<m;i++)
-         for(int j=0;j<m;j++)
-            c[i].Set(j,0);
+      c=matrix<double>::Zeros(m,m);
       return(true);
      }
 //--- create variables
-   double v=1.0/(double)n;
-   double t[];
-   double x0[];
+   CRowDouble t=x.Mean(0)+0;
+   CRowDouble x0=x[0]+0;
    bool   same[];
 //--- Calculate means,
 //--- check for constant columns
-   ArrayResizeAL(t,m);
-   ArrayResizeAL(x0,m);
-   ArrayResizeAL(same,m);
+   CAblasF::BSetAllocV(m,true,same);
    c.Resize(m,m);
-//--- prepare arrays
-   for(int i=0;i<m;i++)
-     {
-      t[i]=0;
-      same[i]=true;
-      x0[i]=x[0][i];
-     }
 //--- calculation
-   for(int i=0;i<n;i++)
-      for(int j=0;j<m;j++)
-        {
-         t[j]+=v*x[i][j];
-         same[j]=same[j] && x[i][j]==x0[j];
-        }
+   for(int i=0; i<n; i++)
+      for(int j=0; j<m; j++)
+         same[j]=same[j] && x.Get(i,j)==x0[j];
 //--- * center variables;
 //--- * if we have constant columns, these columns are
 //---   artificially zeroed (they must be zero in exact arithmetics,
 //---   but unfortunately floating point ops are not exact).
 //--- * calculate upper half of symmetric covariance matrix
-   for(int i=0;i<n;i++)
-      for(int j=0;j<m;j++)
+   for(int i=0; i<n; i++)
+      for(int j=0; j<m; j++)
         {
          //--- check
-         if(same[j]) x[i].Set(j,0);
-         else        x[i].Set(j,x[i][j]-t[j]);
+         if(same[j])
+            x.Set(i,j,0);
+         else
+            x.Set(i,j,x.Get(i,j)-t[j]);
         }
 //--- calculation
    CAblas::RMatrixSyrk(m,n,1.0/(double)(n-1),x,0,0,1,0.0,c,0,0,true);
 //--- force symmetricity
-   for(int i=0;i<m-1;i++)
-      for(int j=i+1;j<m;j++)
-         c[j].Set(i,c[i][j]);
+   CAblas::RMatrixEnforceSymmetricity(c,m,true);
 //--- successful execution
    return(true);
   }
@@ -723,8 +857,8 @@ static bool CBaseStat::CovM(const CMatrixDouble &cx,const int n,const int m,
 //| OUTPUT PARAMETERS:                                               |
 //|     C   -   array[M,M], correlation matrix (zero if N=0 or N=1)  |
 //+------------------------------------------------------------------+
-static bool CBaseStat::PearsonCorrM(const CMatrixDouble &cx,const int n,
-                                    const int m,CMatrixDouble &c)
+bool CBaseStat::PearsonCorrM(const CMatrixDouble &cx,const int n,
+                             const int m,CMatrixDouble &c)
   {
 //--- check
    if(!CAp::Assert(n>=0,__FUNCTION__+": the error variable"))
@@ -733,30 +867,28 @@ static bool CBaseStat::PearsonCorrM(const CMatrixDouble &cx,const int n,
    if(!CAp::Assert(m>=1,__FUNCTION__+": the error variable"))
       return(false);
 //--- check
-   if(!CAp::Assert(CAp::Rows(cx)>=n,__FUNCTION__+": rows(x)<n"))
+   if(!CAp::Assert(cx.Rows()>=n,__FUNCTION__+": rows(x)<n"))
       return(false);
 //--- check
-   if(!CAp::Assert(CAp::Cols(cx)>=m || n==0,__FUNCTION__+": cols(x)<m"))
+   if(!CAp::Assert(cx.Cols()>=m || n==0,__FUNCTION__+": cols(x)<m"))
       return(false);
 //--- check
    if(!CAp::Assert(CApServ::IsFiniteMatrix(cx,n,m),__FUNCTION__+": x contains infinite/NAN elements"))
       return(false);
-//--- allocation
-   c.Resize(m,m);
 //--- calculation
    CovM(cx,n,m,c);
 //--- create array
-   double t[];
-   ArrayResizeAL(t,m);
-   for(int i=0;i<m;i++)
-      t[i]=MathSqrt(c[i][i]);
+   vector<double> t=c.Diag(0);
+   t=MathSqrt(t);
 //--- calculation
-   for(int i=0;i<m;i++)
-      for(int j=0;j<m;j++)
+   for(int i=0; i<m; i++)
+      for(int j=0; j<m; j++)
         {
          //--- check
-         if(t[i]!=0 && t[j]!=0) c[i].Set(j,c[i][j]/(t[i]*t[j]));
-         else                   c[i].Set(j,0);
+         if(t[i]!=0 && t[j]!=0)
+            c.Set(i,j,c.Get(i,j)/(t[i]*t[j]));
+         else
+            c.Set(i,j,0);
         }
 //--- successful execution
    return(true);
@@ -778,8 +910,8 @@ static bool CBaseStat::PearsonCorrM(const CMatrixDouble &cx,const int n,
 //| OUTPUT PARAMETERS:                                               |
 //|     C   -   array[M,M], correlation matrix (zero if N=0 or N=1)  |
 //+------------------------------------------------------------------+
-static bool CBaseStat::SpearmanCorrM(const CMatrixDouble &cx,const int n,
-                                     const int m,CMatrixDouble &c)
+bool CBaseStat::SpearmanCorrM(const CMatrixDouble &cx,const int n,
+                              const int m,CMatrixDouble &c)
   {
 //--- check
    if(!CAp::Assert(n>=0,__FUNCTION__+": the error variable"))
@@ -788,88 +920,56 @@ static bool CBaseStat::SpearmanCorrM(const CMatrixDouble &cx,const int n,
    if(!CAp::Assert(m>=1,__FUNCTION__+": the error variable"))
       return(false);
 //--- check
-   if(!CAp::Assert(CAp::Rows(cx)>=n,__FUNCTION__+": rows(x)<n"))
+   if(!CAp::Assert(cx.Rows()>=n,__FUNCTION__+": rows(x)<n"))
       return(false);
 //--- check
-   if(!CAp::Assert(CAp::Cols(cx)>=m || n==0,__FUNCTION__+": cols(x)<m"))
+   if(!CAp::Assert(cx.Cols()>=m || n==0,__FUNCTION__+": cols(x)<m"))
       return(false);
 //--- check
    if(!CAp::Assert(CApServ::IsFiniteMatrix(cx,n,m),__FUNCTION__+": x contains infinite/NAN elements"))
       return(false);
-//--- create copy
-   CMatrixDouble x;
-   x=cx;
 //--- N<=1, return zero
    if(n<=1)
      {
-      c.Resize(m,m);
-      for(int i=0;i<m;i++)
-         for(int j=0;j<m;j++)
-            c[i].Set(j,0);
+      c=matrix<double>::Zeros(m,m);
       return(true);
      }
+//--- create copy
+   CMatrixDouble x;
+   x=cx.Transpose()+0;
+//--- Replace data with ranks
+   x.Resize(m,n);
+   RankData(x,m,n);
 //--- create variables and arrays
    CApBuff buf;
-   double  t[];
-   double  v=1.0/(double)n;
-   double  x0[];
-   bool    same[];
+   vector<double> t;
 //--- Allocate
-   ArrayResizeAL(t,MathMax(n,m));
-   ArrayResizeAL(x0,m);
-   ArrayResizeAL(same,m);
    c.Resize(m,m);
-//--- Replace data with ranks
-   for(int j=0;j<m;j++)
-     {
-      for(int i=0;i<n;i++)
-         t[i]=x[i][j];
-      CBasicStatOps::RankX(t,n,buf);
-      for(int i=0;i<n;i++)
-         x[i].Set(j,t[i]);
-     }
 //--- prepare
-   for(int i=0;i<m;i++)
-     {
-      t[i]=0;
-      same[i]=true;
-      x0[i]=x[0][i];
-     }
 //--- Calculate means,
-//--- check for constant columns
-   for(int i=0;i<n;i++)
-      for(int j=0;j<m;j++)
-        {
-         t[j]+=v*x[i][j];
-         same[j]=same[j] && x[i][j]==x0[j];
-        }
+   t=x.Mean(1);
 //--- * center variables;
 //--- * if we have constant columns, these columns are
 //---   artificialy zeroed (they must be zero in exact arithmetics,
 //---   but unfortunately floating point is not exact).
 //--- * calculate upper half of symmetric covariance matrix
-   for(int i=0;i<n;i++)
-      for(int j=0;j<m;j++)
-        {
-         if(same[j]) x[i].Set(j,0);
-         else        x[i].Set(j,x[i][j]-t[j]);
-        }
+   for(int i=0; i<m; i++)
+      x.Row(i,x[i]-t[i]);
 //--- calculation
-   CAblas::RMatrixSyrk(m,n,1.0/(double)(n-1),x,0,0,1,0.0,c,0,0,true);
-//--- force symmetricity
-   for(int i=0;i<m-1;i++)
-      for(int j=i+1;j<m;j++)
-         c[j].Set(i,c[i][j]);
+   CAblas::RMatrixSyrk(m,n,1.0/(double)(n-1),x,0,0,0,0.0,c,0,0,true);
 //--- Calculate Pearson coefficients
-   for(int i=0;i<m;i++)
-      t[i]=MathSqrt(c[i][i]);
-   for(int i=0;i<m;i++)
-      for(int j=0;j<m;j++)
+   t=MathSqrt(c.Diag()+0);
+   for(int i=0; i<m; i++)
+      for(int j=i; j<m; j++)
         {
          //--- check
-         if(t[i]!=0 && t[j]!=0) c[i].Set(j,c[i][j]/(t[i]*t[j]));
-         else                   c[i].Set(j,0);
+         if(t[i]!=0 && t[j]!=0)
+            c.Mul(i,j,1.0/(t[i]*t[j]));
+         else
+            c.Set(i,j,0.0);
         }
+//--- force symmetricity
+   CAblas::RMatrixEnforceSymmetricity(c,m,true);
 //--- successful execution
    return(true);
   }
@@ -898,9 +998,9 @@ static bool CBaseStat::SpearmanCorrM(const CMatrixDouble &cx,const int n,
 //|     C   -   array[M1,M2], cross-covariance matrix (zero if N=0 or|
 //|             N=1)                                                 |
 //+------------------------------------------------------------------+
-static bool CBaseStat::CovM2(const CMatrixDouble &cx,const CMatrixDouble &cy,
-                             const int n,const int m1,const int m2,
-                             CMatrixDouble &c)
+bool CBaseStat::CovM2(const CMatrixDouble &cx,const CMatrixDouble &cy,
+                      const int n,const int m1,const int m2,
+                      CMatrixDouble &c)
   {
 //--- check
    if(!CAp::Assert(n>=0,__FUNCTION__+": the error variable"))
@@ -912,19 +1012,19 @@ static bool CBaseStat::CovM2(const CMatrixDouble &cx,const CMatrixDouble &cy,
    if(!CAp::Assert(m2>=1,__FUNCTION__+": the error variable"))
       return(false);
 //--- check
-   if(!CAp::Assert(CAp::Rows(cx)>=n,__FUNCTION__+": rows(x)<n"))
+   if(!CAp::Assert(cx.Rows()>=n,__FUNCTION__+": rows(x)<n"))
       return(false);
 //--- check
-   if(!CAp::Assert(CAp::Cols(cx)>=m1 || n==0,__FUNCTION__+": cols(x)<m1"))
+   if(!CAp::Assert(cx.Cols()>=m1 || n==0,__FUNCTION__+": cols(x)<m1"))
       return(false);
 //--- check
    if(!CAp::Assert(CApServ::IsFiniteMatrix(cx,n,m1),__FUNCTION__+": x contains infinite/NAN elements"))
       return(false);
 //--- check
-   if(!CAp::Assert(CAp::Rows(cy)>=n,__FUNCTION__+": rows(y)<n"))
+   if(!CAp::Assert(cy.Rows()>=n,__FUNCTION__+": rows(y)<n"))
       return(false);
 //--- check
-   if(!CAp::Assert(CAp::Cols(cy)>=m2 || n==0,__FUNCTION__+": cols(y)<m2"))
+   if(!CAp::Assert(cy.Cols()>=m2 || n==0,__FUNCTION__+": cols(y)<m2"))
       return(false);
 //--- check
    if(!CAp::Assert(CApServ::IsFiniteMatrix(cy,n,m2),__FUNCTION__+": y contains infinite/NAN elements"))
@@ -932,79 +1032,43 @@ static bool CBaseStat::CovM2(const CMatrixDouble &cx,const CMatrixDouble &cy,
 //--- N<=1, return zero
    if(n<=1)
      {
-      c.Resize(m1,m2);
-      for(int i=0;i<m1;i++)
-         for(int j=0;j<m2;j++)
-            c[i].Set(j,0);
+      c=matrix<double>::Zeros(m1,m2);
       return(true);
      }
 //--- create copy
-   CMatrixDouble x;
-   CMatrixDouble y;
-   x=cx;
-   y=cy;
-//--- create variables and arrays
-   double v=1.0/(double)n;
-   double t[];
-   double x0[];
-   double y0[];
-   bool   samex[];
-   bool   samey[];
+   CMatrixDouble x=cx;
+   CMatrixDouble y=cy;
+   x.Resize(n,m1);
+   y.Resize(n,m2);
 //--- Allocate
-   ArrayResizeAL(t,MathMax(m1,m2));
-   ArrayResizeAL(x0,m1);
-   ArrayResizeAL(y0,m2);
-   ArrayResizeAL(samex,m1);
-   ArrayResizeAL(samey,m2);
    c.Resize(m1,m2);
-//--- * calculate means of X
-//--- * center X
-//--- * if we have constant columns, these columns are
-//---   artificially zeroed (they must be zero in exact arithmetics,
-//---   but unfortunately floating point ops are not exact).
-   for(int i=0;i<m1;i++)
+//--- check sames colume values
+   bool samex[],samey[];
+   ArrayResize(samex,m1);
+   ArrayResize(samey,m2);
+   ArrayInitialize(samex,true);
+   ArrayInitialize(samey,true);
+   for(int i=1; i<n; i++)
      {
-      t[i]=0;
-      samex[i]=true;
-      x0[i]=x[0][i];
+      for(int ix=0; ix<m1; ix++)
+         samex[ix]=samex[ix] && x.Get(i,ix)==x.Get(0,ix);
+      for(int iy=0; iy<m2; iy++)
+         samey[iy]=samey[iy] && y.Get(i,iy)==y.Get(0,iy);
      }
-   for(int i=0;i<n;i++)
-      for(int j=0;j<m1;j++)
-        {
-         t[j]+=v*x[i][j];
-         samex[j]=samex[j] && x[i][j]==x0[j];
-        }
-   for(int i=0;i<n;i++)
-      for(int j=0;j<m1;j++)
-        {
-         //--- check
-         if(samex[j]) x[i].Set(j,0);
-         else         x[i].Set(j,x[i][j]-t[j]);
-        }
-
-//--- Repeat same steps for Y
-   for(int i=0;i<m2;i++)
-     {
-      t[i]=0;
-      samey[i]=true;
-      y0[i]=y[0][i];
-     }
-   v=1.0/(double)n;
-   for(int i=0;i<n;i++)
-      for(int j=0;j<m2;j++)
-        {
-         t[j]+=v*y[i][j];
-         samey[j]=samey[j] && y[i][j]==y0[j];
-        }
-   for(int i=0;i<n;i++)
-     {
-      for(int j=0;j<m2;j++)
-        {
-         //--- check
-         if(samey[j]) y[i].Set(j,0);
-         else         y[i].Set(j,y[i][j]-t[j]);
-        }
-     }
+//--- * calculate means
+   vector<double> mx=x.Mean(0);
+   vector<double> my=y.Mean(0);
+//--- * center
+   for(int j=0; j<m1; j++)
+      if(samex[j])
+         x.Col(j,vector<double>::Zeros(n));
+      else
+         x.Col(j,x.Col(j)-mx[j]);
+   for(int j=0; j<m2; j++)
+      if(samey[j])
+         y.Col(j,vector<double>::Zeros(n));
+      else
+         y.Col(j,y.Col(j)-my[j]);
 //--- calculate cross-covariance matrix
    CAblas::RMatrixGemm(m1,m2,n,1.0/(double)(n-1),x,0,0,1,y,0,0,0,0.0,c,0,0);
 //--- successful execution
@@ -1035,9 +1099,9 @@ static bool CBaseStat::CovM2(const CMatrixDouble &cx,const CMatrixDouble &cy,
 //|     C   -   array[M1,M2], cross-correlation matrix (zero if N=0  |
 //|             or N=1)                                              |
 //+------------------------------------------------------------------+
-static bool CBaseStat::PearsonCorrM2(const CMatrixDouble &cx,const CMatrixDouble &cy,
-                                     const int n,const int m1,const int m2,
-                                     CMatrixDouble &c)
+bool CBaseStat::PearsonCorrM2(const CMatrixDouble &cx,const CMatrixDouble &cy,
+                              const int n,const int m1,const int m2,
+                              CMatrixDouble &C)
   {
 //--- check
    if(!CAp::Assert(n>=0,__FUNCTION__+": the error variable"))
@@ -1049,19 +1113,19 @@ static bool CBaseStat::PearsonCorrM2(const CMatrixDouble &cx,const CMatrixDouble
    if(!CAp::Assert(m2>=1,__FUNCTION__+": the error variable"))
       return(false);
 //--- check
-   if(!CAp::Assert(CAp::Rows(cx)>=n,__FUNCTION__+": rows(x)<n"))
+   if(!CAp::Assert(cx.Rows()>=n,__FUNCTION__+": rows(x)<n"))
       return(false);
 //--- check
-   if(!CAp::Assert(CAp::Cols(cx)>=m1 || n==0,__FUNCTION__+": cols(x)<m1"))
+   if(!CAp::Assert(cx.Cols()>=m1 || n==0,__FUNCTION__+": cols(x)<m1"))
       return(false);
 //--- check
    if(!CAp::Assert(CApServ::IsFiniteMatrix(cx,n,m1),__FUNCTION__+": x contains infinite/NAN elements"))
       return(false);
 //--- check
-   if(!CAp::Assert(CAp::Rows(cy)>=n,__FUNCTION__+": rows(y)<n"))
+   if(!CAp::Assert(cy.Rows()>=n,__FUNCTION__+": rows(y)<n"))
       return(false);
 //--- check
-   if(!CAp::Assert(CAp::Cols(cy)>=m2 || n==0,__FUNCTION__+": cols(y)<m2"))
+   if(!CAp::Assert(cy.Cols()>=m2 || n==0,__FUNCTION__+": cols(y)<m2"))
       return(false);
 //--- check
    if(!CAp::Assert(CApServ::IsFiniteMatrix(cy,n,m2),__FUNCTION__+": y contains infinite/NAN elements"))
@@ -1069,102 +1133,59 @@ static bool CBaseStat::PearsonCorrM2(const CMatrixDouble &cx,const CMatrixDouble
 //--- N<=1, return zero
    if(n<=1)
      {
-      c.Resize(m1,m2);
-      for(int i=0;i<m1;i++)
-         for(int j=0;j<m2;j++)
-            c[i].Set(j,0);
+      C=matrix<double>::Zeros(m1,m2);
       return(true);
      }
 //--- create copy
-   CMatrixDouble x;
-   CMatrixDouble y;
-   x=cx;
-   y=cy;
-//--- create variables and arrays
-   double v=1.0/(double)n;
-   double t[];
-   double x0[];
-   double y0[];
-   double sx[];
-   double sy[];
-   bool   samex[];
-   bool   samey[];
+   matrix<double> x=cx.ToMatrix();
+   matrix<double> y=cy.ToMatrix();
+   matrix<double> c=matrix<double>::Zeros(m1,m2);
 //--- Allocate
-   ArrayResizeAL(t,MathMax(m1,m2));
-   ArrayResizeAL(x0,m1);
-   ArrayResizeAL(y0,m2);
-   ArrayResizeAL(sx,m1);
-   ArrayResizeAL(sy,m2);
-   ArrayResizeAL(samex,m1);
-   ArrayResizeAL(samey,m2);
-   c.Resize(m1,m2);
-//--- * calculate means of X
-//--- * center X
+   C=matrix<double>::Zeros(m1,m2);
+   x.Resize(n,m1);
+   y.Resize(n,m2);
+//--- check sames colume values
+   bool samex[],samey[];
+   ArrayResize(samex,m1);
+   ArrayResize(samey,m2);
+   ArrayInitialize(samex,true);
+   ArrayInitialize(samey,true);
+   for(int i=1; i<n; i++)
+     {
+      for(int ix=0; ix<m1; ix++)
+         samex[ix]=samex[ix] && x[i,ix]==x[0,ix];
+      for(int iy=0; iy<m2; iy++)
+         samey[iy]=samey[iy] && y[i,iy]==y[0,iy];
+     }
+//--- * calculate means
+   vector<double> mx=x.Mean(0);
+   vector<double> my=y.Mean(0);
+//--- * center
+   for(int j=0; j<m1; j++)
+      if(samex[j])
+         x.Col(vector<double>::Zeros(n),j);
+      else
+         x.Col(x.Col(j)-mx[j],j);
+   for(int j=0; j<m2; j++)
+      if(samey[j])
+         y.Col(vector<double>::Zeros(n),j);
+      else
+         y.Col(y.Col(j)-my[j],j);
 //--- * if we have constant columns, these columns are
 //---   artificially zeroed (they must be zero in exact arithmetics,
 //---   but unfortunately floating point ops are not exact).
 //--- * calculate column variances
-   for(int i=0;i<m1;i++)
-     {
-      t[i]=0;
-      samex[i]=true;
-      sx[i]=0;
-      x0[i]=x[0][i];
-     }
-   for(int i=0;i<n;i++)
-      for(int j=0;j<m1;j++)
-        {
-         t[j]+=v*x[i][j];
-         samex[j]=samex[j] && x[i][j]==x0[j];
-        }
-   for(int i=0;i<n;i++)
-     {
-      for(int j=0;j<m1;j++)
-        {
-         //--- check
-         if(samex[j]) x[i].Set(j,0);
-         else         x[i].Set(j,x[i][j]-t[j]);
-         //--- calculation
-         sx[j]+=x[i][j]*x[i][j];
-        }
-     }
-   for(int j=0;j<m1;j++)
-      sx[j]=MathSqrt(sx[j]/(n-1));
-//--- Repeat same steps for Y
-   for(int i=0;i<m2;i++)
-     {
-      t[i]=0;
-      samey[i]=true;
-      sy[i]=0;
-      y0[i]=y[0][i];
-     }
-   v=1.0/(double)n;
-   for(int i=0;i<n;i++)
-      for(int j=0;j<m2;j++)
-        {
-         t[j]+=v*y[i][j];
-         samey[j]=samey[j] && y[i][j]==y0[j];
-        }
-   for(int i=0;i<n;i++)
-      for(int j=0;j<m2;j++)
-        {
-         //--- check
-         if(samey[j]) y[i].Set(j,0);
-         else         y[i].Set(j,y[i][j]-t[j]);
-         //--- calculation
-         sy[j]+=y[i][j]*y[i][j];
-        }
-   for(int j=0;j<m2;j++)
-      sy[j]=MathSqrt(sy[j]/(n-1));
+   vector<double> sx=MathSqrt((x*x).Sum(0)/(double)(n-1));
+   vector<double> sy=MathSqrt((y*y).Sum(0)/(double)(n-1));
 //--- calculate cross-covariance matrix
-   CAblas::RMatrixGemm(m1,m2,n,1.0/(double)(n-1),x,0,0,1,y,0,0,0,0.0,c,0,0);
+   c.GeMM(x,y,1.0/(double)(n-1),0,TRANSP_A);
 //--- Divide by standard deviations
-   for(int i=0;i<m1;i++)
-      for(int j=0;j<m2;j++)
+   for(int i=0; i<m1; i++)
+      for(int j=0; j<m2; j++)
         {
          //--- check
-         if(sx[i]!=0 && sy[j]!=0) c[i].Set(j,c[i][j]/(sx[i]*sy[j]));
-         else                     c[i].Set(j,0);
+         if(!samex[i] && !samey[j])
+            C.Set(i,j,c[i,j]/(sx[i]*sy[j]));
         }
 //--- successful execution
    return(true);
@@ -1194,9 +1215,9 @@ static bool CBaseStat::PearsonCorrM2(const CMatrixDouble &cx,const CMatrixDouble
 //|     C   -   array[M1,M2], cross-correlation matrix (zero if N=0  |
 //|             or N=1)                                              |
 //+------------------------------------------------------------------+
-static bool CBaseStat::SpearmanCorrM2(const CMatrixDouble &cx,const CMatrixDouble &cy,
-                                      const int n,const int m1,const int m2,
-                                      CMatrixDouble &c)
+bool CBaseStat::SpearmanCorrM2(const CMatrixDouble &cx,const CMatrixDouble &cy,
+                               const int n,const int m1,const int m2,
+                               CMatrixDouble &c)
   {
 //--- check
    if(!CAp::Assert(n>=0,__FUNCTION__+": the error variable"))
@@ -1208,19 +1229,19 @@ static bool CBaseStat::SpearmanCorrM2(const CMatrixDouble &cx,const CMatrixDoubl
    if(!CAp::Assert(m2>=1,__FUNCTION__+": the error variable"))
       return(false);
 //--- check
-   if(!CAp::Assert(CAp::Rows(cx)>=n,__FUNCTION__+": rows(x)<n"))
+   if(!CAp::Assert(cx.Rows()>=n,__FUNCTION__+": rows(x)<n"))
       return(false);
 //--- check
-   if(!CAp::Assert(CAp::Cols(cx)>=m1 || n==0,__FUNCTION__+": cols(x)<m1"))
+   if(!CAp::Assert(cx.Cols()>=m1 || n==0,__FUNCTION__+": cols(x)<m1"))
       return(false);
 //--- check
    if(!CAp::Assert(CApServ::IsFiniteMatrix(cx,n,m1),__FUNCTION__+": x contains infinite/NAN elements"))
       return(false);
 //--- check
-   if(!CAp::Assert(CAp::Rows(cy)>=n,__FUNCTION__+": rows(y)<n"))
+   if(!CAp::Assert(cy.Rows()>=n,__FUNCTION__+": rows(y)<n"))
       return(false);
 //--- check
-   if(!CAp::Assert(CAp::Cols(cy)>=m2 || n==0,__FUNCTION__+": cols(y)<m2"))
+   if(!CAp::Assert(cy.Cols()>=m2 || n==0,__FUNCTION__+": cols(y)<m2"))
       return(false);
 //--- check
    if(!CAp::Assert(CApServ::IsFiniteMatrix(cy,n,m2),__FUNCTION__+": y contains infinite/NAN elements"))
@@ -1228,185 +1249,426 @@ static bool CBaseStat::SpearmanCorrM2(const CMatrixDouble &cx,const CMatrixDoubl
 //--- N<=1, return zero
    if(n<=1)
      {
-      c.Resize(m1,m2);
-      for(int i=0;i<m1;i++)
-         for(int j=0;j<m2;j++)
-            c[i].Set(j,0);
+      c=matrix<double>::Zeros(m1,m2);
       return(true);
      }
 //--- create copy
    CMatrixDouble x;
+   x=cx.Transpose()+0;
    CMatrixDouble y;
-   x=cx;
-   y=cy;
+   y=cy.Transpose()+0;
+   x.Resize(m1,n);
+   y.Resize(m2,n);
+//--- Replace data with ranks
+   RankData(x,m1,n);
+   RankData(y,m2,n);
 //--- create variables and arrays
-   double  v=1.0/(double)n;
-   double  t[];
-   double  x0[];
-   double  y0[];
-   double  sx[];
-   double  sy[];
-   bool    samex[];
-   bool    samey[];
+   vector<double> t=x.Mean(1);
+   vector<double> sx;
+   vector<double> sy;
    CApBuff buf;
 //--- Allocate
-   ArrayResizeAL(t,MathMax(MathMax(m1,m2),n));
-   ArrayResizeAL(x0,m1);
-   ArrayResizeAL(y0,m2);
-   ArrayResizeAL(sx,m1);
-   ArrayResizeAL(sy,m2);
-   ArrayResizeAL(samex,m1);
-   ArrayResizeAL(samey,m2);
    c.Resize(m1,m2);
-//--- Replace data with ranks
-   for(int j=0;j<m1;j++)
-     {
-      for(int i=0;i<n;i++)
-         t[i]=x[i][j];
-      //--- change
-      CBasicStatOps::RankX(t,n,buf);
-      for(int i=0;i<n;i++)
-         x[i].Set(j,t[i]);
-     }
-   for(int j=0;j<m2;j++)
-     {
-      for(int i=0;i<n;i++)
-         t[i]=y[i][j];
-      //--- change
-      CBasicStatOps::RankX(t,n,buf);
-      for(int i=0;i<n;i++)
-         y[i].Set(j,t[i]);
-     }
 //--- * calculate means of X
 //--- * center X
 //--- * if we have constant columns, these columns are
 //---   artificially zeroed (they must be zero in exact arithmetics,
 //---   but unfortunately floating point ops are not exact).
 //--- * calculate column variances
-   for(int i=0;i<m1;i++)
-     {
-      t[i]=0;
-      samex[i]=true;
-      sx[i]=0;
-      x0[i]=x[0][i];
-     }
-   for(int i=0;i<n;i++)
-      for(int j=0;j<m1;j++)
-        {
-         t[j]+=v*x[i][j];
-         samex[j]=samex[j] && x[i][j]==x0[j];
-        }
-   for(int i=0;i<n;i++)
-     {
-      for(int j=0;j<m1;j++)
-        {
-         //--- check
-         if(samex[j]) x[i].Set(j,0);
-         else         x[i].Set(j,x[i][j]-t[j]);
-         //--- calculation
-         sx[j]+=x[i][j]*x[i][j];
-        }
-     }
-   for(int j=0;j<m1;j++)
-      sx[j]=MathSqrt(sx[j]/(n-1));
+   for(int i=0; i<m1; i++)
+      x.Row(i,x[i]-t[i]);
+   sx=MathSqrt(MathPow(x.ToMatrix()+0,2.0).Sum(1)/(double)(n-1));
 //--- Repeat same steps for Y
-   for(int i=0;i<m2;i++)
-     {
-      t[i]=0;
-      samey[i]=true;
-      sy[i]=0;
-      y0[i]=y[0][i];
-     }
-   v=1.0/(double)n;
-   for(int i=0;i<n;i++)
-      for(int j=0;j<m2;j++)
-        {
-         t[j]+=v*y[i][j];
-         samey[j]=samey[j] && y[i][j]==y0[j];
-        }
-   for(int i=0;i<n;i++)
-      for(int j=0;j<m2;j++)
-        {
-         //--- check
-         if(samey[j]) y[i].Set(j,0);
-         else         y[i].Set(j,y[i][j]-t[j]);
-         //--- calculation
-         sy[j]+=y[i][j]*y[i][j];
-        }
-   for(int j=0;j<m2;j++)
-      sy[j]=MathSqrt(sy[j]/(n-1));
+   t=y.Mean(1);
+   for(int i=0; i<m2; i++)
+      y.Row(i,y[i]-t[i]);
+   sy=MathSqrt(MathPow(y.ToMatrix()+0,2.0).Sum(1)/(double)(n-1));
 //--- calculate cross-covariance matrix
-   CAblas::RMatrixGemm(m1,m2,n,1.0/(double)(n-1),x,0,0,1,y,0,0,0,0.0,c,0,0);
+   CAblas::RMatrixGemm(m1,m2,n,1.0/(double)(n-1),x,0,0,0,y,0,0,1,0.0,c,0,0);
 //--- Divide by standard deviations
-   for(int i=0;i<m1;i++)
-      for(int j=0;j<m2;j++)
+   for(int i=0; i<m1; i++)
+      for(int j=0; j<m2; j++)
         {
          //--- check
-         if(sx[i]!=0 && sy[j]!=0) c[i].Set(j,c[i][j]/(sx[i]*sy[j]));
-         else                     c[i].Set(j,0);
+         if(sx[i]!=0 && sy[j]!=0)
+            c.Mul(i,j,1/(sx[i]*sy[j]));
+         else
+            c.Set(i,j,0);
         }
 //--- successful execution
    return(true);
   }
 //+------------------------------------------------------------------+
+//| This function replaces data in XY by their ranks:                |
+//|      * XY is processed row-by-row                                |
+//|      * rows are processed separately                             |
+//|      * tied data are correctly handled (tied ranks               |
+//|        are calculated)                                           |
+//|      * ranking starts from 0, ends at NFeatures-1                |
+//|      * sum of within-row values is equal                         |
+//|        to (NFeatures-1)*NFeatures/2                              |
+//| INPUT PARAMETERS:                                                |
+//|   XY       -  array[NPoints,NFeatures], dataset                  |
+//|   NPoints  -  number of points                                   |
+//|   NFeatures-  number of features                                 |
+//| OUTPUT PARAMETERS:                                               |
+//|   XY       -  data are replaced by their within-row ranks;       |
+//|               ranking starts from 0, ends at NFeatures-1         |
+//+------------------------------------------------------------------+
+void CBaseStat::RankData(CMatrixDouble &xy,int npoints,int nfeatures)
+  {
+//--- create variables
+   CApBuff buf0;
+   CApBuff buf1;
+   int basecasecost=0;
+//--- check
+   if(!CAp::Assert(npoints>=0,__FUNCTION__": NPoints<0"))
+      return;
+   if(!CAp::Assert(nfeatures>=1,__FUNCTION__": NFeatures<1"))
+      return;
+   if(!CAp::Assert(xy.Rows()>=npoints,__FUNCTION__": Rows(XY)<NPoints"))
+      return;
+   if(!CAp::Assert(xy.Cols()>=nfeatures || npoints==0,__FUNCTION__": Cols(XY)<NFeatures"))
+      return;
+   if(!CAp::Assert(CApServ::IsFiniteMatrix(xy,npoints,nfeatures),__FUNCTION__": XY contains infinite/NAN elements"))
+      return;
+//--- Basecase cost is a maximum cost of basecase problems.
+//--- Problems harded than that cost will be split.
+//--- Problem cost is assumed to be NPoints*NFeatures*log2(NFeatures),
+//--- which is proportional, but NOT equal to number of FLOPs required
+//--- to solve problem.
+// Try to use serial code for basecase problems, no SMP functionality, no shared pools.
+//
+   basecasecost=10000;
+   if((double)(npoints*nfeatures*CApServ::LogBase2(nfeatures))<(double)(basecasecost))
+     {
+      RankDataBaseCase(xy,0,npoints,nfeatures,false,buf0,buf1);
+      return;
+     }
+   RankDataRec(xy,0,npoints,nfeatures,false,basecasecost);
+  }
+//+------------------------------------------------------------------+
+//| This function replaces data in XY by their CENTERED ranks:       |
+//|   * XY is processed row-by-row                                   |
+//|   * rows are processed separately                                |
+//|   * tied data are correctly handled (tied ranks are calculated)  |
+//|   * centered ranks are just usual ranks, but centered in such way|
+//|     that sum of within-row values is equal to 0.0.               |
+//|   * centering is performed by subtracting mean from each row,    |
+//|     i.e it changes mean value, but does NOT change higher moments|
+//| INPUT PARAMETERS:                                                |
+//|   XY       -  array[NPoints,NFeatures], dataset                  |
+//|   NPoints  -  number of points                                   |
+//|   NFeatures-  number of features                                 |
+//| OUTPUT PARAMETERS:                                               |
+//|   XY       -  data are replaced by their within-row ranks;       |
+//|               ranking starts from 0, ends at NFeatures-1         |
+//+------------------------------------------------------------------+
+void CBaseStat::RankDataCentered(CMatrixDouble &xy,int npoints,int nfeatures)
+  {
+//--- create variables
+   CApBuff buf0;
+   CApBuff buf1;
+   int basecasecost=0;
+//--- check
+   if(!CAp::Assert(npoints>=0,__FUNCTION__": NPoints<0"))
+      return;
+   if(!CAp::Assert(nfeatures>=1,__FUNCTION__": NFeatures<1"))
+      return;
+   if(!CAp::Assert(xy.Rows()>=npoints,__FUNCTION__": Rows(XY)<NPoints"))
+      return;
+   if(!CAp::Assert(xy.Cols()>=nfeatures || npoints==0,__FUNCTION__": Cols(XY)<NFeatures"))
+      return;
+   if(!CAp::Assert(CApServ::IsFiniteMatrix(xy,npoints,nfeatures),__FUNCTION__": XY contains infinite/NAN elements"))
+      return;
+//--- Basecase cost is a maximum cost of basecase problems.
+//--- Problems harded than that cost will be split.
+//--- Problem cost is assumed to be NPoints*NFeatures*log2(NFeatures),
+//--- which is proportional, but NOT equal to number of FLOPs required
+//--- to solve problem.
+//--- Try to use serial code, no SMP functionality, no shared pools.
+   basecasecost=10000;
+   if((double)(npoints*nfeatures*CApServ::LogBase2(nfeatures))<(double)(basecasecost))
+     {
+      RankDataBaseCase(xy,0,npoints,nfeatures,true,buf0,buf1);
+      return;
+     }
+   RankDataRec(xy,0,npoints,nfeatures,true,basecasecost);
+  }
+//+------------------------------------------------------------------+
 //| Obsolete function, we recommend to use PearsonCorr2().           |
 //+------------------------------------------------------------------+
-static double CBaseStat::PearsonCorrelation(const double &x[],
-                                            const double &y[],
-                                            const int n)
+double CBaseStat::PearsonCorrelation(const double &x[],
+                                     const double &y[],
+                                     const int n)
   {
-//--- return result
+   return(PearsonCorr2(x,y,n));
+  }
+//+------------------------------------------------------------------+
+//| Obsolete function, we recommend to use PearsonCorr2().           |
+//+------------------------------------------------------------------+
+double CBaseStat::PearsonCorrelation(const CRowDouble &x,
+                                     const CRowDouble &y,
+                                     const int n)
+  {
    return(PearsonCorr2(x,y,n));
   }
 //+------------------------------------------------------------------+
 //| Obsolete function, we recommend to use SpearmanCorr2().          |
 //+------------------------------------------------------------------+
-static double CBaseStat::SpearmanRankCorrelation(const double &x[],
-                                                 const double &y[],
-                                                 const int n)
+double CBaseStat::SpearmanRankCorrelation(const double &x[],
+                                          const double &y[],
+                                          const int n)
   {
-//--- return result
    return(SpearmanCorr2(x,y,n));
+  }
+//+------------------------------------------------------------------+
+//| Obsolete function, we recommend to use SpearmanCorr2().          |
+//+------------------------------------------------------------------+
+double CBaseStat::SpearmanRankCorrelation(const CRowDouble &x,
+                                          const CRowDouble &y,
+                                          const int n)
+  {
+   return(SpearmanCorr2(x,y,n));
+  }
+//+------------------------------------------------------------------+
+//| Recurrent code for RankData(), splits problem into  subproblems  |
+//| or calls basecase code (depending on problem complexity).        |
+//| INPUT PARAMETERS:                                                |
+//|   XY       -  array[NPoints,NFeatures], dataset                  |
+//|   I0       -  index of first row to process                      |
+//|   I1       -  index of past-the-last row to process; this        |
+//|               function processes half-interval [I0,I1).          |
+//|   NFeatures-  number of features                                 |
+//|   IsCentered- whether ranks are centered or not:                 |
+//|         * True   -  ranks are centered in such way that their    |
+//|                     within-row sum is zero                       |
+//|         * False  -  ranks are not centered                       |
+//|   BasecaseCost-minimum cost of the problem which will be split   |
+//| OUTPUT PARAMETERS:                                               |
+//|   XY       -  data in [I0,I1) are replaced by their within-row   |
+//|               ranks; ranking starts from 0, ends at NFeatures-1  |
+//+------------------------------------------------------------------+
+void CBaseStat::RankDataRec(CMatrixDouble &xy,int i0,int i1,
+                            int nfeatures,bool iscentered,
+                            int basecasecost)
+  {
+   CApBuff buf0;
+   CApBuff buf1;
+   int im=0;
+//--- check
+   if(!CAp::Assert(i1>=i0,__FUNCTION__": internal error"))
+      return;
+//--- Recursively split problem, if it is too large
+   double problemcost=(i1-i0)*nfeatures*CApServ::LogBase2(nfeatures);
+   if((i1-i0)>=2 && problemcost>CApServ::SpawnLevel())
+     {
+      im=(i1+i0)/2;
+      RankDataRec(xy,i0,im,nfeatures,iscentered,basecasecost);
+      RankDataRec(xy,im,i1,nfeatures,iscentered,basecasecost);
+      return;
+     }
+//--- Retrieve buffers from pool, call serial code, return buffers to pool
+   RankDataBaseCase(xy,i0,i1,nfeatures,iscentered,buf0,buf1);
+  }
+//+------------------------------------------------------------------+
+//| Basecase code for RankData(), performs actual work on subset     |
+//| of data using temporary buffer passed as parameter.              |
+//| INPUT PARAMETERS:                                                |
+//|   XY       -  array[NPoints,NFeatures], dataset                  |
+//|   I0       -  index of first row to process                      |
+//|   I1       -  index of past-the-last row to process;             |
+//|               this function processes half-interval [I0,I1).     |
+//|   NFeatures-  number of features                                 |
+//|   IsCentered- whether ranks are centered or not:                 |
+//|         * True   -  ranks are centered in such way that  their   |
+//|                     within-row sum is zero                       |
+//|         * False  -  ranks are not centered                       |
+//|   Buf0     -  temporary buffers, may be empty (this function     |
+//|               automatically allocates/reuses buffers).           |
+//|   Buf1     -  temporary buffers, may be empty (this function     |
+//|               automatically allocates/reuses buffers).           |
+//| OUTPUT PARAMETERS:                                               |
+//|   XY       -  data in [I0,I1) are replaced by their within-row   |
+//|               ranks; ranking starts from 0, ends at NFeatures-1  |
+//+------------------------------------------------------------------+
+void CBaseStat::RankDataBaseCase(CMatrixDouble &xy,int i0,int i1,
+                                 int nfeatures,bool iscentered,
+                                 CApBuff &buf0,CApBuff &buf1)
+  {
+//--- check
+   if(!CAp::Assert(i1>=i0,__FUNCTION__": internal error"))
+      return;
+   for(int i=i0; i<=i1-1; i++)
+     {
+      buf1.m_ra0=xy[i]+0;
+      CBasicStatOps::RankX(buf1.m_ra0,nfeatures,iscentered,buf0);
+      xy.Row(i,buf1.m_ra0);
+     }
   }
 //+------------------------------------------------------------------+
 //| Correlation tests                                                |
 //+------------------------------------------------------------------+
 class CCorrTests
   {
+public:
+   static void       PearsonCorrSignific(const double r,const int n,double &bothTails,double &leftTail,double &rightTail);
+   static void       SpearmanRankCorrSignific(const double r,const int n,double &bothTails,double &leftTail,double &rightTail);
+
 private:
-   //--- private methods
    static double     SpearmanTail5(const double s);
    static double     SpearmanTail6(const double s);
    static double     SpearmanTail7(const double s);
    static double     SpearmanTail8(const double s);
    static double     SpearmanTail9(const double s);
    static double     SpearmanTail(const double t,const int n);
-public:
-   //--- constructor, destructor
-                     CCorrTests(void);
-                    ~CCorrTests(void);
-   //--- check hypothesis
-   static void       PearsonCorrSignific(const double r,const int n,double &bothTails,double &leftTail,double &rightTail);
-   static void       SpearmanRankCorrSignific(const double r,const int n,double &bothTails,double &leftTail,double &rightTail);
   };
 //+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
+//| Pearson's correlation coefficient significance test              |
+//| This test checks hypotheses about whether X  and Y are samples of|
+//| two continuous distributions having zero correlation or whether  |
+//| their correlation is non-zero.                                   |
+//| The following tests are performed:                               |
+//|     * two-tailed test (null hypothesis - X and Y have zero       |
+//|       correlation)                                               |
+//|     * left-tailed test (null hypothesis - the correlation        |
+//|       coefficient is greater than or equal to 0)                 |
+//|     * right-tailed test (null hypothesis - the correlation       |
+//|       coefficient is less than or equal to 0).                   |
+//| Requirements:                                                    |
+//|     * the number of elements in each sample is not less than 5   |
+//|     * normality of distributions of X and Y.                     |
+//| Input parameters:                                                |
+//|     R   -   Pearson's correlation coefficient for X and Y        |
+//|     N   -   number of elements in samples, N>=5.                 |
+//| Output parameters:                                               |
+//|     BothTails   -   p-value for two-tailed test.                 |
+//|                     If BothTails is less than the given          |
+//|                     significance level the null hypothesis is    |
+//|                     rejected.                                    |
+//|     LeftTail    -   p-value for left-tailed test.                |
+//|                     If LeftTail is less than the given           |
+//|                     significance level, the null hypothesis is   |
+//|                     rejected.                                    |
+//|     RightTail   -   p-value for right-tailed test.               |
+//|                     If RightTail is less than the given          |
+//|                     significance level the null hypothesis is    |
+//|                     rejected.                                    |
 //+------------------------------------------------------------------+
-CCorrTests::CCorrTests(void)
+void CCorrTests::PearsonCorrSignific(const double r,const int n,
+                                     double &bothTails,double &leftTail,
+                                     double &rightTail)
   {
-
+//--- Some special cases
+   if(r>=1)
+     {
+      bothTails=0.0;
+      leftTail=1.0;
+      rightTail=0.0;
+      return;
+     }
+//--- check
+   if(r<=-1)
+     {
+      bothTails=0.0;
+      leftTail=0.0;
+      rightTail=1.0;
+      return;
+     }
+//--- check
+   if(n<5)
+     {
+      bothTails=1.0;
+      leftTail=1.0;
+      rightTail=1.0;
+      return;
+     }
+//--- calculation
+   double t=r*MathSqrt((n-2)/(1-CMath::Sqr(r)));
+   double p=CStudenttDistr::StudenttDistribution(n-2,t);
+   bothTails=2*MathMin(p,1-p);
+   leftTail=p;
+   rightTail=1-p;
   }
 //+------------------------------------------------------------------+
-//| Destructor                                                       |
+//| Spearman's rank correlation coefficient significance test        |
+//| This test checks hypotheses about whether X and Y are samples of |
+//| two continuous distributions having zero correlation or whether  |
+//| their correlation is non-zero.                                   |
+//| The following tests are performed:                               |
+//|     * two-tailed test (null hypothesis - X and Y have zero       |
+//|       correlation)                                               |
+//|     * left-tailed test (null hypothesis - the correlation        |
+//|       coefficient is greater than or equal to 0)                 |
+//|     * right-tailed test (null hypothesis - the correlation       |
+//|       coefficient is less than or equal to 0).                   |
+//| Requirements:                                                    |
+//|     * the number of elements in each sample is not less than 5.  |
+//| The test is non-parametric and doesn't require distributions X   |
+//| and Y to be normal.                                              |
+//| Input parameters:                                                |
+//|     R   -   Spearman's rank correlation coefficient for X and Y  |
+//|     N   -   number of elements in samples, N>=5.                 |
+//| Output parameters:                                               |
+//|     BothTails   -   p-value for two-tailed test.                 |
+//|                     If BothTails is less than the given          |
+//|                     significance level the null hypothesis is    |
+//|                     rejected.                                    |
+//|     LeftTail    -   p-value for left-tailed test.                |
+//|                     If LeftTail is less than the given           |
+//|                     significance level, the null hypothesis is   |
+//|                     rejected.                                    |
+//|     RightTail   -   p-value for right-tailed test.               |
+//|                     If RightTail is less than the given          |
+//|                     significance level the null hypothesis is    |
+//|                     rejected.                                    |
 //+------------------------------------------------------------------+
-CCorrTests::~CCorrTests(void)
+void CCorrTests::SpearmanRankCorrSignific(const double r,const int n,
+                                          double &bothTails,double &leftTail,
+                                          double &rightTail)
   {
-
+//--- Special case
+   if(n<5)
+     {
+      bothTails=1.0;
+      leftTail=1.0;
+      rightTail=1.0;
+      return;
+     }
+//--- create variables
+   double t;
+   double p;
+//--- General case
+   if(r>=1)
+      t=1.0E10;
+   else
+     {
+      //--- check
+      if(r<=-1)
+         t=-1.0E10;
+      else
+         t=r*MathSqrt((n-2)/(1-CMath::Sqr(r)));
+     }
+//--- check
+   if(t<0)
+     {
+      p=SpearmanTail(t,n);
+      bothTails=2*p;
+      leftTail=p;
+      rightTail=1-p;
+     }
+   else
+     {
+      p=SpearmanTail(-t,n);
+      bothTails=2*p;
+      leftTail=1-p;
+      rightTail=p;
+     }
   }
 //+------------------------------------------------------------------+
 //| Tail(T,N), accepts T<0                                           |
 //+------------------------------------------------------------------+
-static double CCorrTests::SpearmanTail(const double t,const int n)
+double CCorrTests::SpearmanTail(const double t,const int n)
   {
    if(!CAp::Assert(t<0,__FUNCTION__+": the error variable"))
       return(EMPTY_VALUE);
@@ -1431,7 +1693,7 @@ static double CCorrTests::SpearmanTail(const double t,const int n)
 //+------------------------------------------------------------------+
 //| Tail(S, 5)                                                       |
 //+------------------------------------------------------------------+
-static double CCorrTests::SpearmanTail5(const double s)
+double CCorrTests::SpearmanTail5(const double s)
   {
 //--- check
    if(s<0.000e+00)
@@ -1475,12 +1737,12 @@ static double CCorrTests::SpearmanTail5(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 6)                                                       |
 //+------------------------------------------------------------------+
-static double CCorrTests::SpearmanTail6(const double s)
+double CCorrTests::SpearmanTail6(const double s)
   {
 //--- check
    if(s<1.001e+00)
       return(CStudenttDistr::StudenttDistribution(4,-s));
-//--- check 
+//--- check
    if(s>=5.663e+00)
       return(1.366e-03);
 //--- check
@@ -1516,7 +1778,7 @@ static double CCorrTests::SpearmanTail6(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 7)                                                       |
 //+------------------------------------------------------------------+
-static double CCorrTests::SpearmanTail7(const double s)
+double CCorrTests::SpearmanTail7(const double s)
   {
 //--- check
    if(s<1.001e+00)
@@ -1578,7 +1840,7 @@ static double CCorrTests::SpearmanTail7(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 8)                                                       |
 //+------------------------------------------------------------------+
-static double CCorrTests::SpearmanTail8(const double s)
+double CCorrTests::SpearmanTail8(const double s)
   {
 //--- check
    if(s<2.001e+00)
@@ -1637,7 +1899,7 @@ static double CCorrTests::SpearmanTail8(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 9)                                                       |
 //+------------------------------------------------------------------+
-static double CCorrTests::SpearmanTail9(const double s)
+double CCorrTests::SpearmanTail9(const double s)
   {
 //--- check
    if(s<2.001e+00)
@@ -1715,157 +1977,16 @@ static double CCorrTests::SpearmanTail9(const double s)
    return(0);
   }
 //+------------------------------------------------------------------+
-//| Pearson's correlation coefficient significance test              |
-//| This test checks hypotheses about whether X  and Y are samples of|
-//| two continuous distributions having zero correlation or whether  |
-//| their correlation is non-zero.                                   |
-//| The following tests are performed:                               |
-//|     * two-tailed test (null hypothesis - X and Y have zero       |
-//|       correlation)                                               |
-//|     * left-tailed test (null hypothesis - the correlation        |
-//|       coefficient is greater than or equal to 0)                 |
-//|     * right-tailed test (null hypothesis - the correlation       |
-//|       coefficient is less than or equal to 0).                   |
-//| Requirements:                                                    |
-//|     * the number of elements in each sample is not less than 5   |
-//|     * normality of distributions of X and Y.                     |
-//| Input parameters:                                                |
-//|     R   -   Pearson's correlation coefficient for X and Y        |
-//|     N   -   number of elements in samples, N>=5.                 |
-//| Output parameters:                                               |
-//|     BothTails   -   p-value for two-tailed test.                 |
-//|                     If BothTails is less than the given          |
-//|                     significance level the null hypothesis is    |
-//|                     rejected.                                    |
-//|     LeftTail    -   p-value for left-tailed test.                |
-//|                     If LeftTail is less than the given           |
-//|                     significance level, the null hypothesis is   |
-//|                     rejected.                                    |
-//|     RightTail   -   p-value for right-tailed test.               |
-//|                     If RightTail is less than the given          |
-//|                     significance level the null hypothesis is    |
-//|                     rejected.                                    |
-//+------------------------------------------------------------------+
-static void CCorrTests::PearsonCorrSignific(const double r,const int n,
-                                            double &bothTails,double &leftTail,
-                                            double &rightTail)
-  {
-//--- Some special cases
-   if(r>=1)
-     {
-      bothTails=0.0;
-      leftTail=1.0;
-      rightTail=0.0;
-      return;
-     }
-//--- check
-   if(r<=-1)
-     {
-      bothTails=0.0;
-      leftTail=0.0;
-      rightTail=1.0;
-      return;
-     }
-//--- check
-   if(n<5)
-     {
-      bothTails=1.0;
-      leftTail=1.0;
-      rightTail=1.0;
-      return;
-     }
-//--- create variables
-   double t;
-   double p;
-//--- calculation
-   t=r*MathSqrt((n-2)/(1-CMath::Sqr(r)));
-   p=CStudenttDistr::StudenttDistribution(n-2,t);
-   bothTails=2*MathMin(p,1-p);
-   leftTail=p;
-   rightTail=1-p;
-  }
-//+------------------------------------------------------------------+
-//| Spearman's rank correlation coefficient significance test        |
-//| This test checks hypotheses about whether X and Y are samples of |
-//| two continuous distributions having zero correlation or whether  |
-//| their correlation is non-zero.                                   |
-//| The following tests are performed:                               |
-//|     * two-tailed test (null hypothesis - X and Y have zero       |
-//|       correlation)                                               |
-//|     * left-tailed test (null hypothesis - the correlation        |
-//|       coefficient is greater than or equal to 0)                 |
-//|     * right-tailed test (null hypothesis - the correlation       |
-//|       coefficient is less than or equal to 0).                   |
-//| Requirements:                                                    |
-//|     * the number of elements in each sample is not less than 5.  |
-//| The test is non-parametric and doesn't require distributions X   |
-//| and Y to be normal.                                              |
-//| Input parameters:                                                |
-//|     R   -   Spearman's rank correlation coefficient for X and Y  |
-//|     N   -   number of elements in samples, N>=5.                 |
-//| Output parameters:                                               |
-//|     BothTails   -   p-value for two-tailed test.                 |
-//|                     If BothTails is less than the given          |
-//|                     significance level the null hypothesis is    |
-//|                     rejected.                                    |
-//|     LeftTail    -   p-value for left-tailed test.                |
-//|                     If LeftTail is less than the given           |
-//|                     significance level, the null hypothesis is   |
-//|                     rejected.                                    |
-//|     RightTail   -   p-value for right-tailed test.               |
-//|                     If RightTail is less than the given          |
-//|                     significance level the null hypothesis is    |
-//|                     rejected.                                    |
-//+------------------------------------------------------------------+
-static void CCorrTests::SpearmanRankCorrSignific(const double r,const int n,
-                                                 double &bothTails,double &leftTail,
-                                                 double &rightTail)
-  {
-//--- Special case
-   if(n<5)
-     {
-      bothTails=1.0;
-      leftTail=1.0;
-      rightTail=1.0;
-      return;
-     }
-//--- create variables
-   double t;
-   double p;
-//--- General case
-   if(r>=1)
-      t=1.0E10;
-   else
-     {
-      //--- check
-      if(r<=-1)
-         t=-1.0E10;
-      else
-         t=r*MathSqrt((n-2)/(1-CMath::Sqr(r)));
-     }
-//--- check
-   if(t<0)
-     {
-      p=SpearmanTail(t,n);
-      bothTails=2*p;
-      leftTail=p;
-      rightTail=1-p;
-     }
-   else
-     {
-      p=SpearmanTail(-t,n);
-      bothTails=2*p;
-      leftTail=1-p;
-      rightTail=p;
-     }
-  }
-//+------------------------------------------------------------------+
 //| Jarque-Bera test                                                 |
 //+------------------------------------------------------------------+
 class CJarqueBera
   {
+public:
+   static bool       JarqueBeraTest(const double &x[],const int n,double &p);
+   static bool       JarqueBeraTest(const CRowDouble &x,const int n,double &p);
+
 private:
-   static bool       JarqueBeraStat(const double &x[],const int n,double &s);
+   static bool       JarqueBeraStat(const CRowDouble &x,const int n,double &s);
    static double     JarqueBeraApprox(const int n,const double s);
    static void       JBCheb(double x,double c,double &tj,double &tj1,double &r);
    static double     JBTbl5(const double s);
@@ -1894,27 +2015,7 @@ private:
    static double     JBTbl501(const double s);
    static double     JBTbl701(const double s);
    static double     JBTbl1401(const double s);
-public:
-   //--- constructor, destructor
-                     CJarqueBera(void);
-                    ~CJarqueBera(void);
-   //--- method
-   static bool       JarqueBeraTest(const double &x[],const int n,double &p);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CJarqueBera::CJarqueBera(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CJarqueBera::~CJarqueBera(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| Jarque-Bera test                                                 |
 //| This test checks hypotheses about the fact that a given sample X |
@@ -1938,7 +2039,7 @@ CJarqueBera::~CJarqueBera(void)
 //|                     significance level the null hypothesis is    |
 //|                     rejected.                                    |
 //| Accuracy of the approximation used (5<=N<=1951):                 |
-//| p-value  	    relative error (5<=N<=1951)                       |
+//| p-value       relative error (5<=N<=1951)                       |
 //| [1, 0.1]            < 1%                                         |
 //| [0.1, 0.01]         < 2%                                         |
 //| [0.01, 0.001]       < 6%                                         |
@@ -1946,8 +2047,17 @@ CJarqueBera::~CJarqueBera(void)
 //| For N>1951 accuracy wasn't measured but it shouldn't be sharply  |
 //| different from table values.                                     |
 //+------------------------------------------------------------------+
-static bool CJarqueBera::JarqueBeraTest(const double &x[],const int n,
-                                        double &p)
+bool CJarqueBera::JarqueBeraTest(const double &x[],const int n,
+                                 double &p)
+  {
+   CRowDouble X=x;
+   return(JarqueBeraTest(X,n,p));
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+bool CJarqueBera::JarqueBeraTest(const CRowDouble &x,const int n,
+                                 double &p)
   {
 //--- create a variable
    double s;
@@ -1967,56 +2077,28 @@ static bool CJarqueBera::JarqueBeraTest(const double &x[],const int n,
 //+------------------------------------------------------------------+
 //| Jarque-Bera statistics                                           |
 //+------------------------------------------------------------------+
-static bool CJarqueBera::JarqueBeraStat(const double &x[],const int n,
-                                        double &s)
+bool CJarqueBera::JarqueBeraStat(const CRowDouble &x,const int n,
+                                 double &s)
   {
 //--- check
    if(!CAp::Assert(n>1,__FUNCTION__+": the error variable"))
       return(false);
 //--- create variables
-   int    i=0;
-   double v=0;
-   double v1=0;
-   double v2=0;
    double stddev=0;
    double mean=0;
    double variance=0;
    double skewness=0;
    double kurtosis=0;
-//--- Mean
-   for(i=0;i<n;i++)
-      mean+=x[i];
-   mean/=n;
-//--- Variance (using corrected two-pass algorithm)
-   if(n!=1)
-     {
-      v1=0;
-      for(i=0;i<n;i++)
-        {
-         v1+=CMath::Sqr(x[i]-mean);
-         v2+=x[i]-mean;
-        }
-      v2=CMath::Sqr(v2)/n;
-      variance=(v1-v2)/(n-1);
-      //--- check
-      if(variance<0)
-         variance=0;
-      stddev=MathSqrt(variance);
-     }
+
+   if(!CBaseStat::SampleMoments(x,n,mean,variance,skewness,kurtosis))
+      return(false);
+//--- check
+   if(variance==EMPTY_VALUE)
+      variance=0;
+   stddev=MathSqrt(variance);
 //--- check
    if(stddev!=0)
      {
-      //--- Skewness and kurtosis
-      for(i=0;i<n;i++)
-        {
-         v=(x[i]-mean)/stddev;
-         v2=CMath::Sqr(v);
-         skewness+=v2*v;
-         kurtosis+=CMath::Sqr(v2);
-        }
-      //--- change values
-      skewness=skewness/n;
-      kurtosis=kurtosis/n-3;
       //--- Statistic
       s=(double)n/(double)6*(CMath::Sqr(skewness)+CMath::Sqr(kurtosis)/4);
      }
@@ -2028,7 +2110,7 @@ static bool CJarqueBera::JarqueBeraStat(const double &x[],const int n,
 //+------------------------------------------------------------------+
 //| Internal subroutine                                              |
 //+------------------------------------------------------------------+
-static double CJarqueBera::JarqueBeraApprox(const int n,const double s)
+double CJarqueBera::JarqueBeraApprox(const int n,const double s)
   {
 //--- create variables
    double result;
@@ -2223,10 +2305,9 @@ static double CJarqueBera::JarqueBeraApprox(const int n,const double s)
 //+------------------------------------------------------------------+
 //| Internal subroutine                                              |
 //+------------------------------------------------------------------+
-static void CJarqueBera::JBCheb(double x,double c,double &tj,double &tj1,
-                                double &r)
+void CJarqueBera::JBCheb(double x,double c,double &tj,double &tj1,
+                         double &r)
   {
-//--- create variables
    double t;
 //--- change values
    r+=c*tj;
@@ -2237,7 +2318,7 @@ static void CJarqueBera::JBCheb(double x,double c,double &tj,double &tj1,
 //+------------------------------------------------------------------+
 //| Tabulation at the size of the array is 5                         |
 //+------------------------------------------------------------------+
-static double CJarqueBera::JBTbl5(const double s)
+double CJarqueBera::JBTbl5(const double s)
   {
 //--- create variables
    double result=0;
@@ -2294,7 +2375,7 @@ static double CJarqueBera::JBTbl5(const double s)
 //+------------------------------------------------------------------+
 //| Tabulation at the size of the array is 6                         |
 //+------------------------------------------------------------------+
-static double CJarqueBera::JBTbl6(const double s)
+double CJarqueBera::JBTbl6(const double s)
   {
 //--- create variables
    double result=0;
@@ -2371,7 +2452,7 @@ static double CJarqueBera::JBTbl6(const double s)
 //+------------------------------------------------------------------+
 //| Tabulation at the size of the array is 7                         |
 //+------------------------------------------------------------------+
-static double CJarqueBera::JBTbl7(const double s)
+double CJarqueBera::JBTbl7(const double s)
   {
 //--- create variables
    double result=0;
@@ -2456,7 +2537,7 @@ static double CJarqueBera::JBTbl7(const double s)
 //+------------------------------------------------------------------+
 //| Tabulation at the size of the array is 8                         |
 //+------------------------------------------------------------------+
-static double CJarqueBera::JBTbl8(const double s)
+double CJarqueBera::JBTbl8(const double s)
   {
 //--- create variables
    double result=0;
@@ -2535,7 +2616,7 @@ static double CJarqueBera::JBTbl8(const double s)
 //+------------------------------------------------------------------+
 //| Tabulation at the size of the array is 9                         |
 //+------------------------------------------------------------------+
-static double CJarqueBera::JBTbl9(const double s)
+double CJarqueBera::JBTbl9(const double s)
   {
 //--- create variables
    double result=0;
@@ -2614,7 +2695,7 @@ static double CJarqueBera::JBTbl9(const double s)
 //+------------------------------------------------------------------+
 //| Tabulation at the size of the array is 10                        |
 //+------------------------------------------------------------------+
-static double CJarqueBera::JBTbl10(const double s)
+double CJarqueBera::JBTbl10(const double s)
   {
 //--- create variables
    double result=0;
@@ -2688,7 +2769,7 @@ static double CJarqueBera::JBTbl10(const double s)
 //+------------------------------------------------------------------+
 //| Tabulation at the size of the array is 11                        |
 //+------------------------------------------------------------------+
-static double CJarqueBera::JBTbl11(const double s)
+double CJarqueBera::JBTbl11(const double s)
   {
 //--- create variables
    double result=0;
@@ -2762,7 +2843,7 @@ static double CJarqueBera::JBTbl11(const double s)
 //+------------------------------------------------------------------+
 //| Tabulation at the size of the array is 12                        |
 //+------------------------------------------------------------------+
-static double CJarqueBera::JBTbl12(const double s)
+double CJarqueBera::JBTbl12(const double s)
   {
 //--- create variables
    double result=0;
@@ -2843,7 +2924,7 @@ static double CJarqueBera::JBTbl12(const double s)
 //+------------------------------------------------------------------+
 //| Tabulation at the size of the array is 13                        |
 //+------------------------------------------------------------------+
-static double CJarqueBera::JBTbl13(const double s)
+double CJarqueBera::JBTbl13(const double s)
   {
 //--- create variables
    double result=0;
@@ -2924,7 +3005,7 @@ static double CJarqueBera::JBTbl13(const double s)
 //+------------------------------------------------------------------+
 //| Tabulation at the size of the array is 14                        |
 //+------------------------------------------------------------------+
-static double CJarqueBera::JBTbl14(const double s)
+double CJarqueBera::JBTbl14(const double s)
   {
 //--- create variables
    double result=0;
@@ -3005,7 +3086,7 @@ static double CJarqueBera::JBTbl14(const double s)
 //+------------------------------------------------------------------+
 //| Tabulation at the size of the array is 15                        |
 //+------------------------------------------------------------------+
-static double CJarqueBera::JBTbl15(const double s)
+double CJarqueBera::JBTbl15(const double s)
   {
 //--- create variables
    double result=0;
@@ -3028,7 +3109,7 @@ static double CJarqueBera::JBTbl15(const double s)
       //--- check
       if(result>0)
          result=0;
-      //--- return result 
+      //--- return result
       return(result);
      }
 //--- check
@@ -3047,7 +3128,7 @@ static double CJarqueBera::JBTbl15(const double s)
       //--- check
       if(result>0)
          result=0;
-      //--- return result 
+      //--- return result
       return(result);
      }
 //--- check
@@ -3080,7 +3161,7 @@ static double CJarqueBera::JBTbl15(const double s)
 //+------------------------------------------------------------------+
 //| Tabulation at the size of the array is 16                        |
 //+------------------------------------------------------------------+
-static double CJarqueBera::JBTbl16(const double s)
+double CJarqueBera::JBTbl16(const double s)
   {
 //--- create variables
    double result=0;
@@ -3155,7 +3236,7 @@ static double CJarqueBera::JBTbl16(const double s)
 //+------------------------------------------------------------------+
 //| Tabulation at the size of the array is 17                        |
 //+------------------------------------------------------------------+
-static double CJarqueBera::JBTbl17(const double s)
+double CJarqueBera::JBTbl17(const double s)
   {
 //--- create variables
    double result=0;
@@ -3234,7 +3315,7 @@ static double CJarqueBera::JBTbl17(const double s)
 //+------------------------------------------------------------------+
 //| Tabulation at the size of the array is 18                        |
 //+------------------------------------------------------------------+
-static double CJarqueBera::JBTbl18(const double s)
+double CJarqueBera::JBTbl18(const double s)
   {
 //--- create variables
    double result=0;
@@ -3280,7 +3361,7 @@ static double CJarqueBera::JBTbl18(const double s)
       //--- check
       if(result>0)
          result=0;
-      //--- return result 
+      //--- return result
       return(result);
      }
 //--- check
@@ -3303,7 +3384,7 @@ static double CJarqueBera::JBTbl18(const double s)
       //--- check
       if(result>0)
          result=0;
-      //--- return result  
+      //--- return result
       return(result);
      }
    result=-(1.684623e-01*(s-2.000000e+01))-7.428883e+00;
@@ -3313,7 +3394,7 @@ static double CJarqueBera::JBTbl18(const double s)
 //+------------------------------------------------------------------+
 //| Tabulation at the size of the array is 19                        |
 //+------------------------------------------------------------------+
-static double CJarqueBera::JBTbl19(const double s)
+double CJarqueBera::JBTbl19(const double s)
   {
 //--- create variables
    double result=0;
@@ -3392,7 +3473,7 @@ static double CJarqueBera::JBTbl19(const double s)
 //+------------------------------------------------------------------+
 //| Tabulation at the size of the array is 20                        |
 //+------------------------------------------------------------------+
-static double CJarqueBera::JBTbl20(const double s)
+double CJarqueBera::JBTbl20(const double s)
   {
 //--- create variables
    double result=0;
@@ -3477,7 +3558,7 @@ static double CJarqueBera::JBTbl20(const double s)
 //+------------------------------------------------------------------+
 //| Tabulation at the size of the array is 30                        |
 //+------------------------------------------------------------------+
-static double CJarqueBera::JBTbl30(const double s)
+double CJarqueBera::JBTbl30(const double s)
   {
 //--- create variables
    double result=0;
@@ -3557,7 +3638,7 @@ static double CJarqueBera::JBTbl30(const double s)
 //+------------------------------------------------------------------+
 //| Tabulation at the size of the array is 50                        |
 //+------------------------------------------------------------------+
-static double CJarqueBera::JBTbl50(const double s)
+double CJarqueBera::JBTbl50(const double s)
   {
 //--- create variables
    double result=0;
@@ -3632,7 +3713,7 @@ static double CJarqueBera::JBTbl50(const double s)
 //+------------------------------------------------------------------+
 //| Tabulation at the size of the array is 65                        |
 //+------------------------------------------------------------------+
-static double CJarqueBera::JBTbl65(const double s)
+double CJarqueBera::JBTbl65(const double s)
   {
 //--- create variables
    double result=0;
@@ -3703,7 +3784,7 @@ static double CJarqueBera::JBTbl65(const double s)
 //+------------------------------------------------------------------+
 //| Tabulation at the size of the array is 100                       |
 //+------------------------------------------------------------------+
-static double CJarqueBera::JBTbl100(const double s)
+double CJarqueBera::JBTbl100(const double s)
   {
 //--- create variables
    double result=0;
@@ -3770,7 +3851,7 @@ static double CJarqueBera::JBTbl100(const double s)
 //+------------------------------------------------------------------+
 //| Tabulation at the size of the array is 130                       |
 //+------------------------------------------------------------------+
-static double CJarqueBera::JBTbl130(const double s)
+double CJarqueBera::JBTbl130(const double s)
   {
 //--- create variables
    double result=0;
@@ -3837,7 +3918,7 @@ static double CJarqueBera::JBTbl130(const double s)
 //+------------------------------------------------------------------+
 //| Tabulation at the size of the array is 200                       |
 //+------------------------------------------------------------------+
-static double CJarqueBera::JBTbl200(const double s)
+double CJarqueBera::JBTbl200(const double s)
   {
 //--- create variables
    double result=0;
@@ -3904,7 +3985,7 @@ static double CJarqueBera::JBTbl200(const double s)
 //+------------------------------------------------------------------+
 //| Tabulation at the size of the array is 301                       |
 //+------------------------------------------------------------------+
-static double CJarqueBera::JBTbl301(const double s)
+double CJarqueBera::JBTbl301(const double s)
   {
 //--- create variables
    double result=0;
@@ -3971,7 +4052,7 @@ static double CJarqueBera::JBTbl301(const double s)
 //+------------------------------------------------------------------+
 //| Tabulation at the size of the array is 501                       |
 //+------------------------------------------------------------------+
-static double CJarqueBera::JBTbl501(const double s)
+double CJarqueBera::JBTbl501(const double s)
   {
 //--- create variables
    double result=0;
@@ -4033,7 +4114,7 @@ static double CJarqueBera::JBTbl501(const double s)
 //+------------------------------------------------------------------+
 //| Tabulation at the size of the array is 701                       |
 //+------------------------------------------------------------------+
-static double CJarqueBera::JBTbl701(const double s)
+double CJarqueBera::JBTbl701(const double s)
   {
 //--- create variables
    double result=0;
@@ -4096,7 +4177,7 @@ static double CJarqueBera::JBTbl701(const double s)
 //+------------------------------------------------------------------+
 //| Tabulation at the size of the array is 1401                      |
 //+------------------------------------------------------------------+
-static double CJarqueBera::JBTbl1401(const double s)
+double CJarqueBera::JBTbl1401(const double s)
   {
 //--- create variables
    double result=0;
@@ -4116,7 +4197,7 @@ static double CJarqueBera::JBTbl1401(const double s)
       //--- check
       if(result>0)
          result=0;
-      //--- return result 
+      //--- return result
       return(result);
      }
 //--- check
@@ -4161,6 +4242,10 @@ static double CJarqueBera::JBTbl1401(const double s)
 //+------------------------------------------------------------------+
 class CMannWhitneyU
   {
+public:
+   static void       CMannWhitneyUTest(const double &x[],const int n,const double &y[],const int m,double &bothTails,double &leftTail,double &rightTail);
+   static void       CMannWhitneyUTest(const CRowDouble &x,const int n,const CRowDouble &y,const int m,double &bothTails,double &leftTail,double &rightTail);
+
 private:
    static void       UCheb(const double x,const double c,double &tj,double &tj1,double &r);
    static double     UThreePointInterpolate(const double p1,const double p2,const double p3,const int n);
@@ -4272,27 +4357,7 @@ private:
    static double     UTbln14n15(const double s);
    static double     UTbln14n30(const double s);
    static double     UTbln14n100(const double s);
-public:
-   //--- constructor, destructor
-                     CMannWhitneyU(void);
-                    ~CMannWhitneyU(void);
-   //--- method
-   static void       CMannWhitneyUTest(const double &x[],const int n,const double &y[],const int m,double &bothTails,double &leftTail,double &rightTail);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CMannWhitneyU::CMannWhitneyU(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CMannWhitneyU::~CMannWhitneyU(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| Mann-Whitney U-test                                              |
 //| This test checks hypotheses about whether X and Y are samples of |
@@ -4354,10 +4419,22 @@ CMannWhitneyU::~CMannWhitneyU(void)
 //| precision should not be sharply different from the values for    |
 //| interval [5, 100].                                               |
 //+------------------------------------------------------------------+
-static void CMannWhitneyU::CMannWhitneyUTest(const double &x[],const int n,
-                                             const double &y[],const int m,
-                                             double &bothTails,double &leftTail,
-                                             double &rightTail)
+void CMannWhitneyU::CMannWhitneyUTest(const double &x[],const int n,
+                                      const double &y[],const int m,
+                                      double &bothTails,double &leftTail,
+                                      double &rightTail)
+  {
+   CRowDouble X=x;
+   CRowDouble Y=y;
+   CMannWhitneyUTest(X,n,Y,m,bothTails,leftTail,rightTail);
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void CMannWhitneyU::CMannWhitneyUTest(const CRowDouble &x,const int n,
+                                      const CRowDouble &y,const int m,
+                                      double &bothTails,double &leftTail,
+                                      double &rightTail)
   {
 //--- Prepare
    if(n<=4 || m<=4)
@@ -4375,7 +4452,7 @@ static void CMannWhitneyU::CMannWhitneyUTest(const double &x[],const int n,
    double tmp=0;
    int    tmpi=0;
    int    ns=n+m;
-   double r[];
+   vector<double> r;
    int    c[];
    double u=0;
    double p=0;
@@ -4386,19 +4463,14 @@ static void CMannWhitneyU::CMannWhitneyUTest(const double &x[],const int n,
    int    tiecount=0;
    int    tiesize[];
 //--- allocation
-   ArrayResizeAL(r,ns);
-   ArrayResizeAL(c,ns);
+   r=x.ToVector();
+   r.Resize(ns);
+   ArrayResize(c,ns);
+   ArrayInitialize(c,0);
 //--- fiiling arrays
-   for(i=0;i<n;i++)
-     {
-      r[i]=x[i];
-      c[i]=0;
-     }
-   for(i=0;i<m;i++)
-     {
+   for(i=0; i<m; i++)
       r[n+i]=y[i];
-      c[n+i]=1;
-     }
+   ArrayFill(c,n,m,1);
 //--- sort {R, C}
    if(ns!=1)
      {
@@ -4477,7 +4549,7 @@ static void CMannWhitneyU::CMannWhitneyUTest(const double &x[],const int n,
 //--- compute tied ranks
    i=0;
    tiecount=0;
-   ArrayResizeAL(tiesize,ns-1+1);
+   ArrayResizeAL(tiesize,ns);
 //--- cycle
    while(i<ns)
      {
@@ -4489,7 +4561,7 @@ static void CMannWhitneyU::CMannWhitneyUTest(const double &x[],const int n,
             break;
          j++;
         }
-      for(k=i;k<j;k++)
+      for(k=i; k<j; k++)
          r[k]=1+(double)(i+j-1)/2.0;
       //--- change values
       tiesize[tiecount]=j-i;
@@ -4498,17 +4570,17 @@ static void CMannWhitneyU::CMannWhitneyUTest(const double &x[],const int n,
      }
 //--- Compute U
    u=0;
-   for(i=0;i<ns;i++)
+   for(i=0; i<ns; i++)
      {
       if(c[i]==0)
          u+=r[i];
      }
-   u=n*m+n*(n+1)/2-u;
+   u=n*(m+(n+1)/2.0)-u;
 //--- Result
    mu=n*m/2.0;
-   tmp=ns*(CMath::Sqr(ns)-1)/12;
-   for(i=0;i<tiecount;i++)
-      tmp-=tiesize[i]*(CMath::Sqr(tiesize[i])-1)/12;
+   tmp=ns*(CMath::Sqr(ns)-1)/12.0;
+   for(i=0; i<tiecount; i++)
+      tmp-=tiesize[i]*(CMath::Sqr(tiesize[i])-1)/12.0;
 //--- calculation sigma
    sigma=MathSqrt((double)(m*n)/(double)ns/(ns-1)*tmp);
    s=(u-mu)/sigma;
@@ -4524,17 +4596,16 @@ static void CMannWhitneyU::CMannWhitneyUTest(const double &x[],const int n,
       p=1-MathExp(USigma((u+1-mu)/sigma,n,m));
      }
 //--- get parameters
-   bothTails=MathMax(2*MathMin(p,mp),1.0E-4);
-   leftTail=MathMax(mp,1.0E-4);
-   rightTail=MathMax(p,1.0E-4);
+   leftTail=CApServ::BoundVal(MathMax(mp,1.0E-4),0.0001,0.2500);
+   rightTail=CApServ::BoundVal(MathMax(p,1.0E-4),0.0001,0.2500);
+   bothTails=2*MathMin(leftTail,rightTail);
   }
 //+------------------------------------------------------------------+
 //| Sequential Chebyshev interpolation.                              |
 //+------------------------------------------------------------------+
-static void CMannWhitneyU::UCheb(const double x,const double c,double &tj,
-                                 double &tj1,double &r)
+void CMannWhitneyU::UCheb(const double x,const double c,double &tj,
+                          double &tj1,double &r)
   {
-//--- create variables
    double t;
 //--- change values
    r=r+c*tj;
@@ -4545,170 +4616,127 @@ static void CMannWhitneyU::UCheb(const double x,const double c,double &tj,
 //+------------------------------------------------------------------+
 //| Three-point polynomial interpolation.                            |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UThreePointInterpolate(const double p1,
-                                                    const double p2,
-                                                    const double p3,
-                                                    const int n)
+double CMannWhitneyU::UThreePointInterpolate(const double p1,
+                                             const double p2,
+                                             const double p3,
+                                             const int n)
   {
-//--- create variables
-   double t1;
-   double t2;
-   double t3;
-   double t;
-   double p12;
-   double p23;
 //--- interpolating
-   t1=1.0/15.0;
-   t2=1.0/30.0;
-   t3=1.0/100.0;
-   t=1.0/n;
-   p12=((t-t2)*p1+(t1-t)*p2)/(t1-t2);
-   p23=((t-t3)*p2+(t2-t)*p3)/(t2-t3);
+   double t1=1.0/15.0;
+   double t2=1.0/30.0;
+   double t3=1.0/100.0;
+   double t=1.0/n;
+   double p12=((t-t2)*p1+(t1-t)*p2)/(t1-t2);
+   double p23=((t-t3)*p2+(t2-t)*p3)/(t2-t3);
 //--- return result
    return(((t-t3)*p12+(t1-t)*p23)/(t1-t3));
   }
 //+------------------------------------------------------------------+
 //| Tail(0, N1, N2)                                                  |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::USigma000(const int n1,const int n2)
+double CMannWhitneyU::USigma000(const int n1,const int n2)
   {
-//--- create variables
-   double p1;
-   double p2;
-   double p3;
 //--- interpolating
-   p1=UThreePointInterpolate(-6.76984e-01,-6.83700e-01,-6.89873e-01,n2);
-   p2=UThreePointInterpolate(-6.83700e-01,-6.87311e-01,-6.90957e-01,n2);
-   p3=UThreePointInterpolate(-6.89873e-01,-6.90957e-01,-6.92175e-01,n2);
+   double p1=UThreePointInterpolate(-6.76984e-01,-6.83700e-01,-6.89873e-01,n2);
+   double p2=UThreePointInterpolate(-6.83700e-01,-6.87311e-01,-6.90957e-01,n2);
+   double p3=UThreePointInterpolate(-6.89873e-01,-6.90957e-01,-6.92175e-01,n2);
 //--- return result
    return(UThreePointInterpolate(p1,p2,p3,n1));
   }
 //+------------------------------------------------------------------+
 //| Tail(0.75, N1, N2)                                               |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::USigma075(const int n1,const int n2)
+double CMannWhitneyU::USigma075(const int n1,const int n2)
   {
-//--- create variables
-   double p1;
-   double p2;
-   double p3;
 //--- interpolating
-   p1=UThreePointInterpolate(-1.44500e+00,-1.45906e+00,-1.47063e+00,n2);
-   p2=UThreePointInterpolate(-1.45906e+00,-1.46856e+00,-1.47644e+00,n2);
-   p3=UThreePointInterpolate(-1.47063e+00,-1.47644e+00,-1.48100e+00,n2);
+   double p1=UThreePointInterpolate(-1.44500e+00,-1.45906e+00,-1.47063e+00,n2);
+   double p2=UThreePointInterpolate(-1.45906e+00,-1.46856e+00,-1.47644e+00,n2);
+   double p3=UThreePointInterpolate(-1.47063e+00,-1.47644e+00,-1.48100e+00,n2);
 //--- return result
    return(UThreePointInterpolate(p1,p2,p3,n1));
   }
 //+------------------------------------------------------------------+
 //| Tail(1.5, N1, N2)                                                |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::USigma150(const int n1,const int n2)
+double CMannWhitneyU::USigma150(const int n1,const int n2)
   {
-//--- create variables
-   double p1;
-   double p2;
-   double p3;
 //--- interpolating
-   p1=UThreePointInterpolate(-2.65380e+00,-2.67352e+00,-2.69011e+00,n2);
-   p2=UThreePointInterpolate(-2.67352e+00,-2.68591e+00,-2.69659e+00,n2);
-   p3=UThreePointInterpolate(-2.69011e+00,-2.69659e+00,-2.70192e+00,n2);
+   double p1=UThreePointInterpolate(-2.65380e+00,-2.67352e+00,-2.69011e+00,n2);
+   double p2=UThreePointInterpolate(-2.67352e+00,-2.68591e+00,-2.69659e+00,n2);
+   double p3=UThreePointInterpolate(-2.69011e+00,-2.69659e+00,-2.70192e+00,n2);
 //--- return result
    return(UThreePointInterpolate(p1,p2,p3,n1));
   }
 //+------------------------------------------------------------------+
 //| Tail(2.25, N1, N2)                                               |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::USigma225(const int n1,const int n2)
+double CMannWhitneyU::USigma225(const int n1,const int n2)
   {
-//--- create variables
-   double p1;
-   double p2;
-   double p3;
 //--- interpolating
-   p1=UThreePointInterpolate(-4.41465e+00,-4.42260e+00,-4.43702e+00,n2);
-   p2=UThreePointInterpolate(-4.42260e+00,-4.41639e+00,-4.41928e+00,n2);
-   p3=UThreePointInterpolate(-4.43702e+00,-4.41928e+00,-4.41030e+00,n2);
+   double p1=UThreePointInterpolate(-4.41465e+00,-4.42260e+00,-4.43702e+00,n2);
+   double p2=UThreePointInterpolate(-4.42260e+00,-4.41639e+00,-4.41928e+00,n2);
+   double p3=UThreePointInterpolate(-4.43702e+00,-4.41928e+00,-4.41030e+00,n2);
 //--- return result
    return(UThreePointInterpolate(p1,p2,p3,n1));
   }
 //+------------------------------------------------------------------+
 //| Tail(3.0, N1, N2)                                                |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::USigma300(const int n1,const int n2)
+double CMannWhitneyU::USigma300(const int n1,const int n2)
   {
-//--- create variables
-   double p1;
-   double p2;
-   double p3;
 //--- interpolating
-   p1=UThreePointInterpolate(-6.89839e+00,-6.83477e+00,-6.82340e+00,n2);
-   p2=UThreePointInterpolate(-6.83477e+00,-6.74559e+00,-6.71117e+00,n2);
-   p3=UThreePointInterpolate(-6.82340e+00,-6.71117e+00,-6.64929e+00,n2);
+   double p1=UThreePointInterpolate(-6.89839e+00,-6.83477e+00,-6.82340e+00,n2);
+   double p2=UThreePointInterpolate(-6.83477e+00,-6.74559e+00,-6.71117e+00,n2);
+   double p3=UThreePointInterpolate(-6.82340e+00,-6.71117e+00,-6.64929e+00,n2);
 //--- return result
    return(UThreePointInterpolate(p1,p2,p3,n1));
   }
 //+------------------------------------------------------------------+
 //| Tail(3.33, N1, N2)                                               |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::USigma333(const int n1,const int n2)
+double CMannWhitneyU::USigma333(const int n1,const int n2)
   {
-//--- create variables
-   double p1;
-   double p2;
-   double p3;
 //--- interpolating
-   p1=UThreePointInterpolate(-8.31272e+00,-8.17096e+00,-8.13125e+00,n2);
-   p2=UThreePointInterpolate(-8.17096e+00,-8.00156e+00,-7.93245e+00,n2);
-   p3=UThreePointInterpolate(-8.13125e+00,-7.93245e+00,-7.82502e+00,n2);
+   double p1=UThreePointInterpolate(-8.31272e+00,-8.17096e+00,-8.13125e+00,n2);
+   double p2=UThreePointInterpolate(-8.17096e+00,-8.00156e+00,-7.93245e+00,n2);
+   double p3=UThreePointInterpolate(-8.13125e+00,-7.93245e+00,-7.82502e+00,n2);
 //--- return result
    return(UThreePointInterpolate(p1,p2,p3,n1));
   }
 //+------------------------------------------------------------------+
 //| Tail(3.66, N1, N2)                                               |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::USigma367(const int n1,const int n2)
+double CMannWhitneyU::USigma367(const int n1,const int n2)
   {
-//--- create variables
-   double p1;
-   double p2;
-   double p3;
 //--- interpolating
-   p1=UThreePointInterpolate(-9.98837e+00,-9.70844e+00,-9.62087e+00,n2);
-   p2=UThreePointInterpolate(-9.70844e+00,-9.41156e+00,-9.28998e+00,n2);
-   p3=UThreePointInterpolate(-9.62087e+00,-9.28998e+00,-9.11686e+00,n2);
+   double p1=UThreePointInterpolate(-9.98837e+00,-9.70844e+00,-9.62087e+00,n2);
+   double p2=UThreePointInterpolate(-9.70844e+00,-9.41156e+00,-9.28998e+00,n2);
+   double p3=UThreePointInterpolate(-9.62087e+00,-9.28998e+00,-9.11686e+00,n2);
 //--- return result
    return(UThreePointInterpolate(p1,p2,p3,n1));
   }
 //+------------------------------------------------------------------+
 //| Tail(4.0, N1, N2)                                                |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::USigma400(const int n1,const int n2)
+double CMannWhitneyU::USigma400(const int n1,const int n2)
   {
-//--- create variables
-   double p1;
-   double p2;
-   double p3;
 //--- interpolating
-   p1=UThreePointInterpolate(-1.20250e+01,-1.14911e+01,-1.13231e+01,n2);
-   p2=UThreePointInterpolate(-1.14911e+01,-1.09927e+01,-1.07937e+01,n2);
-   p3=UThreePointInterpolate(-1.13231e+01,-1.07937e+01,-1.05285e+01,n2);
+   double p1=UThreePointInterpolate(-1.20250e+01,-1.14911e+01,-1.13231e+01,n2);
+   double p2=UThreePointInterpolate(-1.14911e+01,-1.09927e+01,-1.07937e+01,n2);
+   double p3=UThreePointInterpolate(-1.13231e+01,-1.07937e+01,-1.05285e+01,n2);
 //--- return result
    return(UThreePointInterpolate(p1,p2,p3,n1));
   }
 //+------------------------------------------------------------------+
 //| Tail(S, 5, 5)                                                    |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln5n5(const double s)
+double CMannWhitneyU::UTbln5n5(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/2.611165e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/2.611165e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-2.596264e+00,tj,tj1,result);
    UCheb(x,-2.412086e+00,tj,tj1,result);
@@ -4732,17 +4760,13 @@ static double CMannWhitneyU::UTbln5n5(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 5, 6)                                                    |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln5n6(const double s)
+double CMannWhitneyU::UTbln5n6(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/2.738613e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/2.738613e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-2.810459e+00,tj,tj1,result);
    UCheb(x,-2.684429e+00,tj,tj1,result);
@@ -4766,17 +4790,13 @@ static double CMannWhitneyU::UTbln5n6(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 5, 7)                                                    |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln5n7(const double s)
+double CMannWhitneyU::UTbln5n7(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/2.841993e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/2.841993e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-2.994677e+00,tj,tj1,result);
    UCheb(x,-2.923264e+00,tj,tj1,result);
@@ -4800,17 +4820,13 @@ static double CMannWhitneyU::UTbln5n7(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 5, 8)                                                    |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln5n8(const double s)
+double CMannWhitneyU::UTbln5n8(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/2.927700e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/2.927700e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-3.155727e+00,tj,tj1,result);
    UCheb(x,-3.135078e+00,tj,tj1,result);
@@ -4834,17 +4850,13 @@ static double CMannWhitneyU::UTbln5n8(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 5, 9)                                                    |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln5n9(const double s)
+double CMannWhitneyU::UTbln5n9(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.000000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.000000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-3.298162e+00,tj,tj1,result);
    UCheb(x,-3.325016e+00,tj,tj1,result);
@@ -4868,17 +4880,13 @@ static double CMannWhitneyU::UTbln5n9(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 5, 10)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln5n10(const double s)
+double CMannWhitneyU::UTbln5n10(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.061862e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.061862e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-3.425360e+00,tj,tj1,result);
    UCheb(x,-3.496710e+00,tj,tj1,result);
@@ -4902,17 +4910,13 @@ static double CMannWhitneyU::UTbln5n10(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 5, 11)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln5n11(const double s)
+double CMannWhitneyU::UTbln5n11(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.115427e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.115427e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-3.539959e+00,tj,tj1,result);
    UCheb(x,-3.652998e+00,tj,tj1,result);
@@ -4936,17 +4940,13 @@ static double CMannWhitneyU::UTbln5n11(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 5, 12)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln5n12(const double s)
+double CMannWhitneyU::UTbln5n12(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.162278e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.162278e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-3.644007e+00,tj,tj1,result);
    UCheb(x,-3.796173e+00,tj,tj1,result);
@@ -4970,17 +4970,13 @@ static double CMannWhitneyU::UTbln5n12(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 5, 13)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln5n13(const double s)
+double CMannWhitneyU::UTbln5n13(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.203616e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.203616e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-3.739120e+00,tj,tj1,result);
    UCheb(x,-3.928117e+00,tj,tj1,result);
@@ -5004,17 +5000,13 @@ static double CMannWhitneyU::UTbln5n13(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 5, 14)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln5n14(const double s)
+double CMannWhitneyU::UTbln5n14(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.240370e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.240370e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-3.826559e+00,tj,tj1,result);
    UCheb(x,-4.050370e+00,tj,tj1,result);
@@ -5038,17 +5030,13 @@ static double CMannWhitneyU::UTbln5n14(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 5, 15)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln5n15(const double s)
+double CMannWhitneyU::UTbln5n15(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.250000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.250000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-3.851572e+00,tj,tj1,result);
    UCheb(x,-4.082033e+00,tj,tj1,result);
@@ -5072,17 +5060,13 @@ static double CMannWhitneyU::UTbln5n15(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 5, 16)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln5n16(const double s)
+double CMannWhitneyU::UTbln5n16(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.250000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.250000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-3.852210e+00,tj,tj1,result);
    UCheb(x,-4.077482e+00,tj,tj1,result);
@@ -5106,17 +5090,13 @@ static double CMannWhitneyU::UTbln5n16(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 5, 17)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln5n17(const double s)
+double CMannWhitneyU::UTbln5n17(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.250000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.250000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-3.851752e+00,tj,tj1,result);
    UCheb(x,-4.071259e+00,tj,tj1,result);
@@ -5140,17 +5120,13 @@ static double CMannWhitneyU::UTbln5n17(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 5, 18)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln5n18(const double s)
+double CMannWhitneyU::UTbln5n18(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.250000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.250000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-3.850840e+00,tj,tj1,result);
    UCheb(x,-4.064799e+00,tj,tj1,result);
@@ -5174,17 +5150,13 @@ static double CMannWhitneyU::UTbln5n18(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 5, 19)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln5n19(const double s)
+double CMannWhitneyU::UTbln5n19(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.250000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.250000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-3.850027e+00,tj,tj1,result);
    UCheb(x,-4.059159e+00,tj,tj1,result);
@@ -5208,17 +5180,13 @@ static double CMannWhitneyU::UTbln5n19(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 5, 20)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln5n20(const double s)
+double CMannWhitneyU::UTbln5n20(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.250000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.250000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-3.849651e+00,tj,tj1,result);
    UCheb(x,-4.054729e+00,tj,tj1,result);
@@ -5242,17 +5210,13 @@ static double CMannWhitneyU::UTbln5n20(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 5, 21)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln5n21(const double s)
+double CMannWhitneyU::UTbln5n21(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.250000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.250000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-3.849649e+00,tj,tj1,result);
    UCheb(x,-4.051155e+00,tj,tj1,result);
@@ -5276,17 +5240,13 @@ static double CMannWhitneyU::UTbln5n21(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 5, 22)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln5n22(const double s)
+double CMannWhitneyU::UTbln5n22(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.250000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.250000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-3.849598e+00,tj,tj1,result);
    UCheb(x,-4.047605e+00,tj,tj1,result);
@@ -5310,17 +5270,13 @@ static double CMannWhitneyU::UTbln5n22(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 5, 23)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln5n23(const double s)
+double CMannWhitneyU::UTbln5n23(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.250000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.250000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-3.849269e+00,tj,tj1,result);
    UCheb(x,-4.043761e+00,tj,tj1,result);
@@ -5344,17 +5300,13 @@ static double CMannWhitneyU::UTbln5n23(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 5, 24)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln5n24(const double s)
+double CMannWhitneyU::UTbln5n24(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.250000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.250000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-3.848925e+00,tj,tj1,result);
    UCheb(x,-4.040178e+00,tj,tj1,result);
@@ -5378,17 +5330,13 @@ static double CMannWhitneyU::UTbln5n24(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 5, 25)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln5n25(const double s)
+double CMannWhitneyU::UTbln5n25(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.250000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.250000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-3.848937e+00,tj,tj1,result);
    UCheb(x,-4.037512e+00,tj,tj1,result);
@@ -5412,17 +5360,13 @@ static double CMannWhitneyU::UTbln5n25(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 5, 26)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln5n26(const double s)
+double CMannWhitneyU::UTbln5n26(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.250000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.250000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-3.849416e+00,tj,tj1,result);
    UCheb(x,-4.035915e+00,tj,tj1,result);
@@ -5446,17 +5390,13 @@ static double CMannWhitneyU::UTbln5n26(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 5, 27)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln5n27(const double s)
+double CMannWhitneyU::UTbln5n27(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.250000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.250000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-3.850070e+00,tj,tj1,result);
    UCheb(x,-4.034815e+00,tj,tj1,result);
@@ -5480,17 +5420,13 @@ static double CMannWhitneyU::UTbln5n27(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 5, 28)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln5n28(const double s)
+double CMannWhitneyU::UTbln5n28(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.250000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.250000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-3.850668e+00,tj,tj1,result);
    UCheb(x,-4.033786e+00,tj,tj1,result);
@@ -5514,17 +5450,13 @@ static double CMannWhitneyU::UTbln5n28(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 5, 29)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln5n29(const double s)
+double CMannWhitneyU::UTbln5n29(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.250000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.250000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-3.851217e+00,tj,tj1,result);
    UCheb(x,-4.032834e+00,tj,tj1,result);
@@ -5548,17 +5480,13 @@ static double CMannWhitneyU::UTbln5n29(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 5, 30)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln5n30(const double s)
+double CMannWhitneyU::UTbln5n30(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.250000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.250000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-3.851845e+00,tj,tj1,result);
    UCheb(x,-4.032148e+00,tj,tj1,result);
@@ -5582,17 +5510,13 @@ static double CMannWhitneyU::UTbln5n30(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 5, 100)                                                  |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln5n100(const double s)
+double CMannWhitneyU::UTbln5n100(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.250000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.250000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-3.877940e+00,tj,tj1,result);
    UCheb(x,-4.039324e+00,tj,tj1,result);
@@ -5616,17 +5540,13 @@ static double CMannWhitneyU::UTbln5n100(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 6, 6)                                                    |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln6n6(const double s)
+double CMannWhitneyU::UTbln6n6(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/2.882307e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/2.882307e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-3.054075e+00,tj,tj1,result);
    UCheb(x,-2.998804e+00,tj,tj1,result);
@@ -5650,17 +5570,13 @@ static double CMannWhitneyU::UTbln6n6(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 6, 7)                                                    |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln6n7(const double s)
+double CMannWhitneyU::UTbln6n7(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.000000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.000000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-3.265287e+00,tj,tj1,result);
    UCheb(x,-3.274613e+00,tj,tj1,result);
@@ -5684,17 +5600,13 @@ static double CMannWhitneyU::UTbln6n7(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 6, 8)                                                    |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln6n8(const double s)
+double CMannWhitneyU::UTbln6n8(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.098387e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.098387e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-3.450954e+00,tj,tj1,result);
    UCheb(x,-3.520462e+00,tj,tj1,result);
@@ -5718,17 +5630,13 @@ static double CMannWhitneyU::UTbln6n8(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 6, 9)                                                    |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln6n9(const double s)
+double CMannWhitneyU::UTbln6n9(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.181981e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.181981e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-3.616113e+00,tj,tj1,result);
    UCheb(x,-3.741650e+00,tj,tj1,result);
@@ -5752,17 +5660,13 @@ static double CMannWhitneyU::UTbln6n9(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 6, 10)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln6n10(const double s)
+double CMannWhitneyU::UTbln6n10(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.253957e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.253957e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-3.764382e+00,tj,tj1,result);
    UCheb(x,-3.942366e+00,tj,tj1,result);
@@ -5786,17 +5690,13 @@ static double CMannWhitneyU::UTbln6n10(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 6, 11)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln6n11(const double s)
+double CMannWhitneyU::UTbln6n11(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.316625e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.316625e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-3.898597e+00,tj,tj1,result);
    UCheb(x,-4.125710e+00,tj,tj1,result);
@@ -5820,17 +5720,13 @@ static double CMannWhitneyU::UTbln6n11(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 6, 12)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln6n12(const double s)
+double CMannWhitneyU::UTbln6n12(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.371709e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.371709e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.020941e+00,tj,tj1,result);
    UCheb(x,-4.294250e+00,tj,tj1,result);
@@ -5854,17 +5750,13 @@ static double CMannWhitneyU::UTbln6n12(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 6, 13)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln6n13(const double s)
+double CMannWhitneyU::UTbln6n13(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.420526e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.420526e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.133167e+00,tj,tj1,result);
    UCheb(x,-4.450016e+00,tj,tj1,result);
@@ -5888,17 +5780,13 @@ static double CMannWhitneyU::UTbln6n13(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 6, 14)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln6n14(const double s)
+double CMannWhitneyU::UTbln6n14(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.450000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.450000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.201268e+00,tj,tj1,result);
    UCheb(x,-4.542568e+00,tj,tj1,result);
@@ -5922,17 +5810,13 @@ static double CMannWhitneyU::UTbln6n14(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 6, 15)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln6n15(const double s)
+double CMannWhitneyU::UTbln6n15(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.450000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.450000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.195689e+00,tj,tj1,result);
    UCheb(x,-4.526567e+00,tj,tj1,result);
@@ -5956,17 +5840,13 @@ static double CMannWhitneyU::UTbln6n15(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 6, 30)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln6n30(const double s)
+double CMannWhitneyU::UTbln6n30(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.450000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.450000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.166269e+00,tj,tj1,result);
    UCheb(x,-4.427399e+00,tj,tj1,result);
@@ -5990,17 +5870,13 @@ static double CMannWhitneyU::UTbln6n30(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 6, 100)                                                  |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln6n100(const double s)
+double CMannWhitneyU::UTbln6n100(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.450000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.450000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.181350e+00,tj,tj1,result);
    UCheb(x,-4.417919e+00,tj,tj1,result);
@@ -6024,17 +5900,13 @@ static double CMannWhitneyU::UTbln6n100(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 7, 7)                                                    |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln7n7(const double s)
+double CMannWhitneyU::UTbln7n7(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.130495e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.130495e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-3.501264e+00,tj,tj1,result);
    UCheb(x,-3.584790e+00,tj,tj1,result);
@@ -6058,17 +5930,13 @@ static double CMannWhitneyU::UTbln7n7(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 7, 8)                                                    |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln7n8(const double s)
+double CMannWhitneyU::UTbln7n8(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.240370e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.240370e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-3.709965e+00,tj,tj1,result);
    UCheb(x,-3.862154e+00,tj,tj1,result);
@@ -6092,17 +5960,13 @@ static double CMannWhitneyU::UTbln7n8(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 7, 9)                                                    |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln7n9(const double s)
+double CMannWhitneyU::UTbln7n9(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.334314e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.334314e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-3.896550e+00,tj,tj1,result);
    UCheb(x,-4.112671e+00,tj,tj1,result);
@@ -6126,17 +5990,13 @@ static double CMannWhitneyU::UTbln7n9(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 7, 10)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln7n10(const double s)
+double CMannWhitneyU::UTbln7n10(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.415650e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.415650e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.064844e+00,tj,tj1,result);
    UCheb(x,-4.340749e+00,tj,tj1,result);
@@ -6160,17 +6020,13 @@ static double CMannWhitneyU::UTbln7n10(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 7, 11)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln7n11(const double s)
+double CMannWhitneyU::UTbln7n11(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.486817e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.486817e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.217795e+00,tj,tj1,result);
    UCheb(x,-4.549783e+00,tj,tj1,result);
@@ -6194,17 +6050,13 @@ static double CMannWhitneyU::UTbln7n11(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 7, 12)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln7n12(const double s)
+double CMannWhitneyU::UTbln7n12(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.500000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.500000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.235822e+00,tj,tj1,result);
    UCheb(x,-4.564100e+00,tj,tj1,result);
@@ -6228,17 +6080,13 @@ static double CMannWhitneyU::UTbln7n12(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 7, 13)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln7n13(const double s)
+double CMannWhitneyU::UTbln7n13(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.500000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.500000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.222204e+00,tj,tj1,result);
    UCheb(x,-4.532300e+00,tj,tj1,result);
@@ -6262,17 +6110,13 @@ static double CMannWhitneyU::UTbln7n13(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 7, 14)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln7n14(const double s)
+double CMannWhitneyU::UTbln7n14(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.500000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.500000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.211763e+00,tj,tj1,result);
    UCheb(x,-4.507542e+00,tj,tj1,result);
@@ -6296,17 +6140,13 @@ static double CMannWhitneyU::UTbln7n14(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 7, 15)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln7n15(const double s)
+double CMannWhitneyU::UTbln7n15(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.500000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.500000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.204898e+00,tj,tj1,result);
    UCheb(x,-4.489960e+00,tj,tj1,result);
@@ -6330,17 +6170,13 @@ static double CMannWhitneyU::UTbln7n15(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 7, 30)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln7n30(const double s)
+double CMannWhitneyU::UTbln7n30(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.500000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.500000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.176536e+00,tj,tj1,result);
    UCheb(x,-4.398705e+00,tj,tj1,result);
@@ -6364,17 +6200,13 @@ static double CMannWhitneyU::UTbln7n30(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 7, 100)                                                  |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln7n100(const double s)
+double CMannWhitneyU::UTbln7n100(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.500000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.500000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.188337e+00,tj,tj1,result);
    UCheb(x,-4.386949e+00,tj,tj1,result);
@@ -6398,17 +6230,13 @@ static double CMannWhitneyU::UTbln7n100(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 8, 8)                                                    |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln8n8(const double s)
+double CMannWhitneyU::UTbln8n8(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.360672e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.360672e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-3.940217e+00,tj,tj1,result);
    UCheb(x,-4.168913e+00,tj,tj1,result);
@@ -6432,17 +6260,13 @@ static double CMannWhitneyU::UTbln8n8(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 8, 9)                                                    |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln8n9(const double s)
+double CMannWhitneyU::UTbln8n9(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.464102e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.464102e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.147004e+00,tj,tj1,result);
    UCheb(x,-4.446939e+00,tj,tj1,result);
@@ -6466,17 +6290,13 @@ static double CMannWhitneyU::UTbln8n9(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 8, 10)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln8n10(const double s)
+double CMannWhitneyU::UTbln8n10(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.554093e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.554093e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.334282e+00,tj,tj1,result);
    UCheb(x,-4.700860e+00,tj,tj1,result);
@@ -6500,17 +6320,13 @@ static double CMannWhitneyU::UTbln8n10(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 8, 11)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln8n11(const double s)
+double CMannWhitneyU::UTbln8n11(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.600000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.600000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.421882e+00,tj,tj1,result);
    UCheb(x,-4.812457e+00,tj,tj1,result);
@@ -6534,17 +6350,13 @@ static double CMannWhitneyU::UTbln8n11(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 8, 12)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln8n12(const double s)
+double CMannWhitneyU::UTbln8n12(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.600000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.600000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.398211e+00,tj,tj1,result);
    UCheb(x,-4.762214e+00,tj,tj1,result);
@@ -6568,17 +6380,13 @@ static double CMannWhitneyU::UTbln8n12(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 8, 13)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln8n13(const double s)
+double CMannWhitneyU::UTbln8n13(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.600000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.600000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.380670e+00,tj,tj1,result);
    UCheb(x,-4.724511e+00,tj,tj1,result);
@@ -6602,17 +6410,13 @@ static double CMannWhitneyU::UTbln8n13(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 8, 14)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln8n14(const double s)
+double CMannWhitneyU::UTbln8n14(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.600000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.600000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.368494e+00,tj,tj1,result);
    UCheb(x,-4.697171e+00,tj,tj1,result);
@@ -6636,17 +6440,13 @@ static double CMannWhitneyU::UTbln8n14(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 8, 15)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln8n15(const double s)
+double CMannWhitneyU::UTbln8n15(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.600000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.600000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.358397e+00,tj,tj1,result);
    UCheb(x,-4.674485e+00,tj,tj1,result);
@@ -6670,17 +6470,13 @@ static double CMannWhitneyU::UTbln8n15(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 8, 30)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln8n30(const double s)
+double CMannWhitneyU::UTbln8n30(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.600000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.600000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.318823e+00,tj,tj1,result);
    UCheb(x,-4.567159e+00,tj,tj1,result);
@@ -6704,17 +6500,13 @@ static double CMannWhitneyU::UTbln8n30(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 8, 100)                                                  |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln8n100(const double s)
+double CMannWhitneyU::UTbln8n100(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.600000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.600000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.324531e+00,tj,tj1,result);
    UCheb(x,-4.547071e+00,tj,tj1,result);
@@ -6738,17 +6530,13 @@ static double CMannWhitneyU::UTbln8n100(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 9, 9)                                                    |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln9n9(const double s)
+double CMannWhitneyU::UTbln9n9(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.576237e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.576237e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.372857e+00,tj,tj1,result);
    UCheb(x,-4.750859e+00,tj,tj1,result);
@@ -6772,17 +6560,13 @@ static double CMannWhitneyU::UTbln9n9(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 9, 10)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln9n10(const double s)
+double CMannWhitneyU::UTbln9n10(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.650000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.650000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.516726e+00,tj,tj1,result);
    UCheb(x,-4.939333e+00,tj,tj1,result);
@@ -6806,17 +6590,13 @@ static double CMannWhitneyU::UTbln9n10(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 9, 11)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln9n11(const double s)
+double CMannWhitneyU::UTbln9n11(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.650000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.650000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.481308e+00,tj,tj1,result);
    UCheb(x,-4.867483e+00,tj,tj1,result);
@@ -6840,17 +6620,13 @@ static double CMannWhitneyU::UTbln9n11(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 9, 12)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln9n12(const double s)
+double CMannWhitneyU::UTbln9n12(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.650000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.650000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.456776e+00,tj,tj1,result);
    UCheb(x,-4.817037e+00,tj,tj1,result);
@@ -6874,17 +6650,13 @@ static double CMannWhitneyU::UTbln9n12(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 9, 13)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln9n13(const double s)
+double CMannWhitneyU::UTbln9n13(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.650000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.650000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.438840e+00,tj,tj1,result);
    UCheb(x,-4.779308e+00,tj,tj1,result);
@@ -6908,17 +6680,13 @@ static double CMannWhitneyU::UTbln9n13(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 9, 14)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln9n14(const double s)
+double CMannWhitneyU::UTbln9n14(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.650000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.650000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.425981e+00,tj,tj1,result);
    UCheb(x,-4.751545e+00,tj,tj1,result);
@@ -6942,17 +6710,13 @@ static double CMannWhitneyU::UTbln9n14(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 9, 15)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln9n15(const double s)
+double CMannWhitneyU::UTbln9n15(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.650000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.650000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.414952e+00,tj,tj1,result);
    UCheb(x,-4.727612e+00,tj,tj1,result);
@@ -6976,17 +6740,13 @@ static double CMannWhitneyU::UTbln9n15(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 9, 30)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln9n30(const double s)
+double CMannWhitneyU::UTbln9n30(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.650000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.650000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.370720e+00,tj,tj1,result);
    UCheb(x,-4.615712e+00,tj,tj1,result);
@@ -7010,17 +6770,13 @@ static double CMannWhitneyU::UTbln9n30(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 9, 100)                                                  |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln9n100(const double s)
+double CMannWhitneyU::UTbln9n100(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.650000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.650000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.372506e+00,tj,tj1,result);
    UCheb(x,-4.590966e+00,tj,tj1,result);
@@ -7044,17 +6800,13 @@ static double CMannWhitneyU::UTbln9n100(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 10, 10)                                                  |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln10n10(const double s)
+double CMannWhitneyU::UTbln10n10(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.650000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.650000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.468831e+00,tj,tj1,result);
    UCheb(x,-4.844398e+00,tj,tj1,result);
@@ -7078,17 +6830,13 @@ static double CMannWhitneyU::UTbln10n10(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 10, 11)                                                  |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln10n11(const double s)
+double CMannWhitneyU::UTbln10n11(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.650000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.650000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.437998e+00,tj,tj1,result);
    UCheb(x,-4.782296e+00,tj,tj1,result);
@@ -7112,17 +6860,13 @@ static double CMannWhitneyU::UTbln10n11(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 10, 12)                                                  |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln10n12(const double s)
+double CMannWhitneyU::UTbln10n12(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.650000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.650000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.416082e+00,tj,tj1,result);
    UCheb(x,-4.737458e+00,tj,tj1,result);
@@ -7146,17 +6890,13 @@ static double CMannWhitneyU::UTbln10n12(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 10, 13)                                                  |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln10n13(const double s)
+double CMannWhitneyU::UTbln10n13(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.650000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.650000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.399480e+00,tj,tj1,result);
    UCheb(x,-4.702863e+00,tj,tj1,result);
@@ -7180,17 +6920,13 @@ static double CMannWhitneyU::UTbln10n13(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 10, 14)                                                  |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln10n14(const double s)
+double CMannWhitneyU::UTbln10n14(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.650000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.650000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.386924e+00,tj,tj1,result);
    UCheb(x,-4.676124e+00,tj,tj1,result);
@@ -7214,17 +6950,13 @@ static double CMannWhitneyU::UTbln10n14(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 10, 15)                                                  |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln10n15(const double s)
+double CMannWhitneyU::UTbln10n15(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.650000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.650000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.376846e+00,tj,tj1,result);
    UCheb(x,-4.654247e+00,tj,tj1,result);
@@ -7248,17 +6980,13 @@ static double CMannWhitneyU::UTbln10n15(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 10, 30)                                                  |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln10n30(const double s)
+double CMannWhitneyU::UTbln10n30(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.650000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.650000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.333977e+00,tj,tj1,result);
    UCheb(x,-4.548099e+00,tj,tj1,result);
@@ -7282,17 +7010,13 @@ static double CMannWhitneyU::UTbln10n30(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 10, 100)                                                 |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln10n100(const double s)
+double CMannWhitneyU::UTbln10n100(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.650000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.650000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.334008e+00,tj,tj1,result);
    UCheb(x,-4.522316e+00,tj,tj1,result);
@@ -7316,17 +7040,13 @@ static double CMannWhitneyU::UTbln10n100(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 11, 11)                                                  |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln11n11(const double s)
+double CMannWhitneyU::UTbln11n11(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.700000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.700000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.519760e+00,tj,tj1,result);
    UCheb(x,-4.880694e+00,tj,tj1,result);
@@ -7350,17 +7070,13 @@ static double CMannWhitneyU::UTbln11n11(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 11, 12)                                                  |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln11n12(const double s)
+double CMannWhitneyU::UTbln11n12(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.700000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.700000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.495790e+00,tj,tj1,result);
    UCheb(x,-4.832622e+00,tj,tj1,result);
@@ -7384,17 +7100,13 @@ static double CMannWhitneyU::UTbln11n12(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 11, 13)                                                  |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln11n13(const double s)
+double CMannWhitneyU::UTbln11n13(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.700000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.700000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.477880e+00,tj,tj1,result);
    UCheb(x,-4.796242e+00,tj,tj1,result);
@@ -7418,17 +7130,13 @@ static double CMannWhitneyU::UTbln11n13(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 11, 14)                                                  |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln11n14(const double s)
+double CMannWhitneyU::UTbln11n14(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.700000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.700000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.463683e+00,tj,tj1,result);
    UCheb(x,-4.766969e+00,tj,tj1,result);
@@ -7452,17 +7160,13 @@ static double CMannWhitneyU::UTbln11n14(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 11, 15)                                                  |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln11n15(const double s)
+double CMannWhitneyU::UTbln11n15(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.700000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.700000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.452526e+00,tj,tj1,result);
    UCheb(x,-4.743570e+00,tj,tj1,result);
@@ -7486,17 +7190,13 @@ static double CMannWhitneyU::UTbln11n15(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 11, 30)                                                  |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln11n30(const double s)
+double CMannWhitneyU::UTbln11n30(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.700000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.700000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.402621e+00,tj,tj1,result);
    UCheb(x,-4.627440e+00,tj,tj1,result);
@@ -7520,17 +7220,13 @@ static double CMannWhitneyU::UTbln11n30(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 11, 100)                                                 |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln11n100(const double s)
+double CMannWhitneyU::UTbln11n100(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.700000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.700000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.398795e+00,tj,tj1,result);
    UCheb(x,-4.596486e+00,tj,tj1,result);
@@ -7554,17 +7250,13 @@ static double CMannWhitneyU::UTbln11n100(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 12, 12)                                                  |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln12n12(const double s)
+double CMannWhitneyU::UTbln12n12(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.700000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.700000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.472616e+00,tj,tj1,result);
    UCheb(x,-4.786627e+00,tj,tj1,result);
@@ -7588,17 +7280,13 @@ static double CMannWhitneyU::UTbln12n12(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 12,13)                                                   |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln12n13(const double s)
+double CMannWhitneyU::UTbln12n13(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.700000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.700000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.454800e+00,tj,tj1,result);
    UCheb(x,-4.750794e+00,tj,tj1,result);
@@ -7622,17 +7310,13 @@ static double CMannWhitneyU::UTbln12n13(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 12, 14)                                                  |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln12n14(const double s)
+double CMannWhitneyU::UTbln12n14(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.700000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.700000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.440910e+00,tj,tj1,result);
    UCheb(x,-4.722404e+00,tj,tj1,result);
@@ -7656,17 +7340,13 @@ static double CMannWhitneyU::UTbln12n14(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 12, 15)                                                  |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln12n15(const double s)
+double CMannWhitneyU::UTbln12n15(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.700000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.700000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.430123e+00,tj,tj1,result);
    UCheb(x,-4.700008e+00,tj,tj1,result);
@@ -7690,17 +7370,13 @@ static double CMannWhitneyU::UTbln12n15(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 12, 30)                                                  |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln12n30(const double s)
+double CMannWhitneyU::UTbln12n30(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.700000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.700000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.380023e+00,tj,tj1,result);
    UCheb(x,-4.585782e+00,tj,tj1,result);
@@ -7724,17 +7400,13 @@ static double CMannWhitneyU::UTbln12n30(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 12, 100)                                                 |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln12n100(const double s)
+double CMannWhitneyU::UTbln12n100(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.700000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.700000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.374567e+00,tj,tj1,result);
    UCheb(x,-4.553481e+00,tj,tj1,result);
@@ -7758,17 +7430,13 @@ static double CMannWhitneyU::UTbln12n100(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 13, 13)                                                  |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln13n13(const double s)
+double CMannWhitneyU::UTbln13n13(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.750000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.750000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.541046e+00,tj,tj1,result);
    UCheb(x,-4.859047e+00,tj,tj1,result);
@@ -7792,17 +7460,13 @@ static double CMannWhitneyU::UTbln13n13(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 13, 14)                                                  |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln13n14(const double s)
+double CMannWhitneyU::UTbln13n14(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.750000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.750000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.525655e+00,tj,tj1,result);
    UCheb(x,-4.828341e+00,tj,tj1,result);
@@ -7826,17 +7490,13 @@ static double CMannWhitneyU::UTbln13n14(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 13, 15)                                                  |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln13n15(const double s)
+double CMannWhitneyU::UTbln13n15(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.750000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.750000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.513585e+00,tj,tj1,result);
    UCheb(x,-4.803952e+00,tj,tj1,result);
@@ -7860,17 +7520,13 @@ static double CMannWhitneyU::UTbln13n15(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 13, 30)                                                  |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln13n30(const double s)
+double CMannWhitneyU::UTbln13n30(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.750000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.750000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.455999e+00,tj,tj1,result);
    UCheb(x,-4.678434e+00,tj,tj1,result);
@@ -7894,17 +7550,13 @@ static double CMannWhitneyU::UTbln13n30(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 13, 100)                                                 |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln13n100(const double s)
+double CMannWhitneyU::UTbln13n100(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.750000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.750000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.446787e+00,tj,tj1,result);
    UCheb(x,-4.640804e+00,tj,tj1,result);
@@ -7928,17 +7580,13 @@ static double CMannWhitneyU::UTbln13n100(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 14, 14)                                                  |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln14n14(const double s)
+double CMannWhitneyU::UTbln14n14(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.750000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.750000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.510624e+00,tj,tj1,result);
    UCheb(x,-4.798584e+00,tj,tj1,result);
@@ -7962,17 +7610,13 @@ static double CMannWhitneyU::UTbln14n14(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 14, 15)                                                  |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln14n15(const double s)
+double CMannWhitneyU::UTbln14n15(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.750000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.750000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.498681e+00,tj,tj1,result);
    UCheb(x,-4.774668e+00,tj,tj1,result);
@@ -7996,17 +7640,13 @@ static double CMannWhitneyU::UTbln14n15(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 14, 30)                                                  |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln14n30(const double s)
+double CMannWhitneyU::UTbln14n30(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.750000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.750000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.440378e+00,tj,tj1,result);
    UCheb(x,-4.649587e+00,tj,tj1,result);
@@ -8030,17 +7670,13 @@ static double CMannWhitneyU::UTbln14n30(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 14, 100)                                                 |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::UTbln14n100(const double s)
+double CMannWhitneyU::UTbln14n100(const double s)
   {
 //--- create variables
    double result=0;
-   double x;
-   double tj;
-   double tj1;
-//--- assignments
-   x=MathMin(2*(s-0.000000e+00)/3.750000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/3.750000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    UCheb(x,-4.429701e+00,tj,tj1,result);
    UCheb(x,-4.610577e+00,tj,tj1,result);
@@ -8064,7 +7700,7 @@ static double CMannWhitneyU::UTbln14n100(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, N1, N2)                                                  |
 //+------------------------------------------------------------------+
-static double CMannWhitneyU::USigma(double s,const int n1,const int n2)
+double CMannWhitneyU::USigma(double s,const int n1,const int n2)
   {
 //--- create variables
    double f0;
@@ -8500,26 +8136,9 @@ static double CMannWhitneyU::USigma(double s,const int n1,const int n2)
 class CSignTest
   {
 public:
-   //--- constructor, destructor
-                     CSignTest(void);
-                    ~CSignTest(void);
-   //--- method
    static void       OneSampleSignTest(const double &x[],const int n,const double median,double &bothTails,double &leftTail,double &rightTail);
+   static void       OneSampleSignTest(const CRowDouble &x,const int n,const double median,double &bothTails,double &leftTail,double &rightTail);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CSignTest::CSignTest(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CSignTest::~CSignTest(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| Sign test                                                        |
 //| This test checks three hypotheses about the median of the given  |
@@ -8558,9 +8177,19 @@ CSignTest::~CSignTest(void)
 //| approximation is used, so significance levels have about 15 exact|
 //| digits.                                                          |
 //+------------------------------------------------------------------+
-static void CSignTest::OneSampleSignTest(const double &x[],const int n,
-                                         const double median,double &bothTails,
-                                         double &leftTail,double &rightTail)
+void CSignTest::OneSampleSignTest(const double &x[],const int n,
+                                  const double median,double &bothTails,
+                                  double &leftTail,double &rightTail)
+  {
+   CRowDouble X=x;
+   OneSampleSignTest(X,n,median,bothTails,leftTail,rightTail);
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void CSignTest::OneSampleSignTest(const CRowDouble &x,const int n,
+                                  const double median,double &bothTails,
+                                  double &leftTail,double &rightTail)
   {
 //--- check
    if(n<=1)
@@ -8573,11 +8202,10 @@ static void CSignTest::OneSampleSignTest(const double &x[],const int n,
 //--- Calculate:
 //--- GTCnt - count of x[i]>Median
 //--- NECnt - count of x[i]<>Median
-   int i;
    int greater=0;
    int noteql=0;
 //--- calculation
-   for(i=0;i<n;i++)
+   for(int i=0; i<n; i++)
      {
       //--- check
       if(x[i]>median)
@@ -8589,13 +8217,15 @@ static void CSignTest::OneSampleSignTest(const double &x[],const int n,
 //--- check
    if(noteql==0)
      {
-      bothTails=0.0;
-      leftTail=0.0;
-      rightTail=0.0;
+      //--- all x[i] are equal to Median.
+      //--- So we can conclude that Median is a true median :)
+      bothTails=1.0;
+      leftTail=1.0;
+      rightTail=1.0;
       return;
      }
 //--- calculation
-   bothTails=2*CBinomialDistr::BinomialDistribution(MathMin(greater,noteql-greater),noteql,0.5);
+   bothTails=MathMin(2*CBinomialDistr::BinomialDistribution(MathMin(greater,noteql-greater),noteql,0.5),1.0);
    leftTail=CBinomialDistr::BinomialDistribution(greater,noteql,0.5);
    rightTail=CBinomialDistr::BinomialComplDistribution(greater-1,noteql,0.5);
   }
@@ -8605,28 +8235,13 @@ static void CSignTest::OneSampleSignTest(const double &x[],const int n,
 class CStudentTests
   {
 public:
-   //--- constructor, destructor
-                     CStudentTests(void);
-                    ~CStudentTests(void);
-   //--- methods
    static void       StudentTest1(const double &x[],const int n,const double mean,double &bothTails,double &leftTail,double &rightTail);
+   static void       StudentTest1(const CRowDouble &x,const int n,const double mean,double &bothTails,double &leftTail,double &rightTail);
    static void       StudentTest2(const double &x[],const int n,const double &y[],const int m,double &bothTails,double &leftTail,double &rightTail);
+   static void       StudentTest2(const CRowDouble &x,const int n,const CRowDouble &y,const int m,double &bothTails,double &leftTail,double &rightTail);
    static void       UnequalVarianceTest(const double &x[],const int n,const double &y[],const int m,double &bothTails,double &leftTail,double &rightTail);
+   static void       UnequalVarianceTest(const CRowDouble &x,const int n,const CRowDouble &y,const int m,double &bothTails,double &leftTail,double &rightTail);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CStudentTests::CStudentTests(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CStudentTests::~CStudentTests(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| One-sample t-test                                                |
 //| This test checks three hypotheses about the mean of the given    |
@@ -8659,12 +8274,22 @@ CStudentTests::~CStudentTests(void)
 //|                     significance level the null hypothesis is    |
 //|                     rejected.                                    |
 //+------------------------------------------------------------------+
-static void CStudentTests::StudentTest1(const double &x[],const int n,
-                                        const double mean,double &bothTails,
-                                        double &leftTail,double &rightTail)
+void CStudentTests::StudentTest1(const double &x[],const int n,
+                                 const double mean,double &bothTails,
+                                 double &leftTail,double &rightTail)
+  {
+   CRowDouble X=x;
+   StudentTest1(X,n,mean,bothTails,leftTail,rightTail);
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void CStudentTests::StudentTest1(const CRowDouble&x,const int n,
+                                 const double mean,double&bothTails,
+                                 double&leftTail,double&rightTail)
   {
 //--- check
-   if(n<=1)
+   if(n<=0)
      {
       bothTails=1.0;
       leftTail=1.0;
@@ -8674,24 +8299,31 @@ static void CStudentTests::StudentTest1(const double &x[],const int n,
      }
 //--- create variables
    int    i;
-   double xmean;
+   double xmean=0;
    double xvariance=0;
    double xstddev=0;
    double v1=0;
    double v2=0;
    double stat=0;
    double s=0;
+   double x0=x[0];
+   bool   samex=true;
 //--- Mean
-   xmean=0;
-   for(i=0;i<n;i++)
-      xmean+=x[i];
-   xmean=xmean/n;
-//--- Variance (using corrected two-pass algorithm)
-   if(n!=1)
+   for(i=0; i<n; i++)
      {
-      for(i=0;i<n;i++)
+      xmean+=x[i];
+      samex=samex && x0==x[i];
+     }
+   if(samex)
+      xmean=x0;
+   else
+      xmean=xmean/n;
+//--- Variance (using corrected two-pass algorithm)
+   if(n!=1 && !samex)
+     {
+      for(i=0; i<n; i++)
          v1+=CMath::Sqr(x[i]-xmean);
-      for(i=0;i<n;i++)
+      for(i=0; i<n; i++)
          v2+=x[i]-xmean;
       v2=CMath::Sqr(v2)/n;
       //--- calculation
@@ -8704,9 +8336,18 @@ static void CStudentTests::StudentTest1(const double &x[],const int n,
 //--- check
    if(xstddev==0)
      {
-      bothTails=1.0;
-      leftTail=1.0;
-      rightTail=1.0;
+      if(xmean==mean)
+         bothTails=1.0;
+      else
+         bothTails=0.0;
+      if(xmean>=mean)
+         leftTail=1.0;
+      else
+         leftTail=0.0;
+      if(xmean<=mean)
+         rightTail=1.0;
+      else
+         rightTail=0.0;
       //--- exit the function
       return;
      }
@@ -8752,13 +8393,25 @@ static void CStudentTests::StudentTest1(const double &x[],const int n,
 //|                     significance level the null hypothesis is    |
 //|                     rejected.                                    |
 //+------------------------------------------------------------------+
-static void CStudentTests::StudentTest2(const double &x[],const int n,
-                                        const double &y[],const int m,
-                                        double &bothTails,double &leftTail,
-                                        double &rightTail)
+void CStudentTests::StudentTest2(const double&x[],const int n,
+                                 const double&y[],const int m,
+                                 double&bothTails,double&leftTail,
+                                 double&rightTail)
+  {
+   CRowDouble X=x;
+   CRowDouble Y=y;
+   StudentTest2(X,n,Y,m,bothTails,leftTail,rightTail);
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void CStudentTests::StudentTest2(const CRowDouble &x,const int n,
+                                 const CRowDouble &y,const int m,
+                                 double&bothTails,double&leftTail,
+                                 double&rightTail)
   {
 //--- check
-   if(n<=1 || m<=1)
+   if(n<=0 || m<=0)
      {
       bothTails=1.0;
       leftTail=1.0;
@@ -8773,26 +8426,54 @@ static void CStudentTests::StudentTest2(const double &x[],const int n,
    double stat=0;
    double s=0;
    double p=0;
+   double x0=x[0];
+   double y0=y[0];
+   bool samex=true;
+   bool samey=true;
 //--- Mean
-   for(i=0;i<n;i++)
+   for(i=0; i<n; i++)
+     {
       xmean=xmean+x[i];
-   xmean=xmean/n;
+      samex=samex && x0==x[i];
+     }
+   if(samex)
+      xmean=x0;
+   else
+      xmean=xmean/n;
 //--- y
-   for(i=0;i<m;i++)
+   for(i=0; i<m; i++)
+     {
       ymean=ymean+y[i];
-   ymean=ymean/m;
+      samey=samey && y0==y[i];
+     }
+   if(samey)
+      ymean=y0;
+   else
+      ymean=ymean/m;
 //--- S
-   for(i=0;i<n;i++)
-      s+=CMath::Sqr(x[i]-xmean);
-   for(i=0;i<m;i++)
-      s+=CMath::Sqr(y[i]-ymean);
-   s=MathSqrt(s*(1.0/(double)n+1.0/(double)m)/(n+m-2));
+   if((n+m)>2)
+     {
+      for(i=0; i<n; i++)
+         s+=CMath::Sqr(x[i]-xmean);
+      for(i=0; i<m; i++)
+         s+=CMath::Sqr(y[i]-ymean);
+      s=MathSqrt(s*(1.0/(double)n+1.0/(double)m)/(n+m-2));
+     }
 //--- check
    if(s==0)
      {
-      bothTails=1.0;
-      leftTail=1.0;
-      rightTail=1.0;
+      if(xmean==ymean)
+         bothTails=1.0;
+      else
+         bothTails=0.0;
+      if(xmean>=ymean)
+         leftTail=1.0;
+      else
+         leftTail=0.0;
+      if(xmean<=ymean)
+         rightTail=1.0;
+      else
+         rightTail=0.0;
       //--- exit the function
       return;
      }
@@ -8838,13 +8519,25 @@ static void CStudentTests::StudentTest2(const double &x[],const int n,
 //|                     significance level the null hypothesis is    |
 //|                     rejected.                                    |
 //+------------------------------------------------------------------+
-static void CStudentTests::UnequalVarianceTest(const double &x[],const int n,
-                                               const double &y[],const int m,
-                                               double &bothTails,double &leftTail,
-                                               double &rightTail)
+void CStudentTests::UnequalVarianceTest(const double&x[],const int n,
+                                        const double&y[],const int m,
+                                        double&bothTails,double&leftTail,
+                                        double&rightTail)
+  {
+   CRowDouble X=x;
+   CRowDouble Y=y;
+   UnequalVarianceTest(X,n,Y,m,bothTails,leftTail,rightTail);
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void CStudentTests::UnequalVarianceTest(const CRowDouble &x,const int n,
+                                        const CRowDouble &y,const int m,
+                                        double&bothTails,double&leftTail,
+                                        double&rightTail)
   {
 //--- check
-   if(n<=1 || m<=1)
+   if(n<=0 || m<=0)
      {
       bothTails=1.0;
       leftTail=1.0;
@@ -8862,38 +8555,83 @@ static void CStudentTests::UnequalVarianceTest(const double &x[],const int n,
    double p=0;
    double stat=0;
    double c=0;
+   bool samex=true;
+   bool samey=true;
 //--- Mean
    for(i=0; i<n; i++)
+   {
       xmean+=x[i];
+      samex=samex && x[0]==x[i];
+      }
+      if(samex)
+        xmean=x[0];
+        else
    xmean=xmean/n;
-   for(i=0; i<=m-1;i++)
+   for(i=0; i<=m-1; i++)
+   {
       ymean+=y[i];
+      samey=samey && y[0]==y[i];
+      }
+      if(samey)
+        ymean=y[0];
+        else
    ymean=ymean/m;
 //--- Variance (using corrected two-pass algorithm)
-   for(i=0;i<n;i++)
-      xvar+=CMath::Sqr(x[i]-xmean);
-   xvar=xvar/(n-1);
-   for(i=0; i<=m-1;i++)
-      yvar+=CMath::Sqr(y[i]-ymean);
-   yvar=yvar/(m-1);
-//--- check
-   if(xvar==0 || yvar==0)
+   if(n>1 && !samex)
      {
-      bothTails=1.0;
-      leftTail=1.0;
-      rightTail=1.0;
-      //--- exit the function
+      for(i=0; i<n; i++)
+         xvar+=CMath::Sqr(x[i]-xmean);
+      xvar=xvar/(n-1);
+      }
+   if(m>1 && !samey)
+     {
+      for(i=0; i<m; i++)
+         yvar+=CMath::Sqr(y[i]-ymean);
+      yvar=yvar/(m-1);
+     }
+//--- Handle different special cases
+//--- (one or both variances are zero).
+   if(xvar==0.0 && yvar==0.0)
+     {
+      if( xmean==ymean )
+         bothTails=1.0;
+      else
+         bothTails=0.0;
+      if( xmean>=ymean )
+         leftTail=1.0;
+      else
+         leftTail=0.0;
+      if( xmean<=ymean )
+         rightTail=1.0;
+      else
+        rightTail=0.0;
+      return;
+     }
+   if(xvar==0.0)
+     {
+      //--- X is constant, unpooled 2-sample test reduces to 1-sample test.
+      //--- NOTE: right-tail and left-tail must be passed to 1-sample
+      //---       t-test in reverse order because we reverse order of
+      //---       of samples.
+      StudentTest1(y,m,xmean,bothTails,rightTail,leftTail);
+      return;
+     }
+   if(yvar==0.0)
+     {
+      //--- Y is constant, unpooled 2-sample test reduces to 1-sample test.
+      StudentTest1(x,n,ymean,bothTails,leftTail,rightTail);
       return;
      }
 //--- Statistic
-   stat=(xmean-ymean)/MathSqrt(xvar/n+yvar/m);
-   c=xvar/n/(xvar/n+yvar/m);
-   df=(n-1)*(m-1)/((m-1)*CMath::Sqr(c)+(n-1)*CMath::Sqr(1-c));
+   c=xvar/n+yvar/m;
+   stat=(xmean-ymean)/MathSqrt(c);
+   c=xvar/n/(c);
+   df=(n-1.0)*(m-1.0)/((m-1.0)*CMath::Sqr(c)+(n-1.0)*CMath::Sqr(1.0-c));
 //--- check
    if(stat>0)
-      p=1-0.5*CIncBetaF::IncompleteBeta(df/2,0.5,df/(df+CMath::Sqr(stat)));
+      p=1-0.5*CIncBetaF::IncompleteBeta(df/2.0,0.5,df/(df+CMath::Sqr(stat)));
    else
-      p=0.5*CIncBetaF::IncompleteBeta(df/2,0.5,df/(df+CMath::Sqr(stat)));
+      p=0.5*CIncBetaF::IncompleteBeta(df/2.0,0.5,df/(df+CMath::Sqr(stat)));
 //--- get parameters
    bothTails=2*MathMin(p,1-p);
    leftTail=p;
@@ -8905,27 +8643,11 @@ static void CStudentTests::UnequalVarianceTest(const double &x[],const int n,
 class CVarianceTests
   {
 public:
-   //--- constructor, destructor
-                     CVarianceTests(void);
-                    ~CVarianceTests(void);
-   //--- method
    static void       FTest(const double &x[],const int n,const double &y[],const int m,double &bothTails,double &leftTail,double &rightTail);
+   static void       FTest(const CRowDouble &x,const int n,const CRowDouble &y,const int m,double &bothTails,double &leftTail,double &rightTail);
    static void       OneSampleVarianceTest(const double &x[],const int n,const double variance,double &bothTails,double &leftTail,double &rightTail);
+   static void       OneSampleVarianceTest(const CRowDouble&x,const int n,const double variance,double&bothTails,double&leftTail,double&rightTail);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CVarianceTests::CVarianceTests(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CVarianceTests::~CVarianceTests(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| Two-sample F-test                                                |
 //| This test checks three hypotheses about dispersions of the given |
@@ -8960,9 +8682,20 @@ CVarianceTests::~CVarianceTests(void)
 //|                     significance level the null hypothesis is    |
 //|                     rejected.                                    |
 //+------------------------------------------------------------------+
-static void CVarianceTests::FTest(const double &x[],const int n,const double &y[],
-                                  const int m,double &bothTails,double &leftTail,
-                                  double &rightTail)
+void CVarianceTests::FTest(const double &x[],const int n,const double &y[],
+                           const int m,double &bothTails,double &leftTail,
+                           double &rightTail)
+  {
+   CRowDouble X=x;
+   CRowDouble Y=y;
+   CVarianceTests::FTest(X,n,Y,m,bothTails,leftTail,rightTail);
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void CVarianceTests::FTest(const CRowDouble &x,const int n,const CRowDouble &y,
+                           const int m,double &bothTails,double &leftTail,
+                           double &rightTail)
   {
 //--- check
    if(n<=2 || m<=2)
@@ -8990,14 +8723,14 @@ static void CVarianceTests::FTest(const double &x[],const int n,const double &y[
       ymean+=y[i];
    ymean=ymean/m;
 //--- Variance (using corrected two-pass algorithm)
-   for(i=0;i<n;i++)
+   for(i=0; i<n; i++)
       xvar+=CMath::Sqr(x[i]-xmean);
    xvar=xvar/(n-1);
-   for(i=0;i<m;i++)
+   for(i=0; i<m; i++)
       yvar+=CMath::Sqr(y[i]-ymean);
    yvar=yvar/(m-1);
 //--- check
-   if((double)(xvar)==(double)(0)||(double)(yvar)==(double)(0))
+   if((double)(xvar)==(double)(0) || (double)(yvar)==(double)(0))
      {
       bothTails=1.0;
       leftTail=1.0;
@@ -9045,12 +8778,25 @@ static void CVarianceTests::FTest(const double &x[],const int n,const double &y[
 //|                     significance level the null hypothesis is    |
 //|                     rejected.                                    |
 //+------------------------------------------------------------------+
-static void CVarianceTests::OneSampleVarianceTest(const double &x[],
-                                                  const int n,
-                                                  const double variance,
-                                                  double &bothTails,
-                                                  double &leftTail,
-                                                  double &rightTail)
+void CVarianceTests::OneSampleVarianceTest(const double &x[],
+                                           const int n,
+                                           const double variance,
+                                           double &bothTails,
+                                           double &leftTail,
+                                           double &rightTail)
+  {
+   CRowDouble X=x;
+   OneSampleVarianceTest(X,n,variance,bothTails,leftTail,rightTail);
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void CVarianceTests::OneSampleVarianceTest(const CRowDouble &x,
+                                           const int n,
+                                           const double variance,
+                                           double &bothTails,
+                                           double &leftTail,
+                                           double &rightTail)
   {
 //--- create variables
    int    i;
@@ -9068,11 +8814,11 @@ static void CVarianceTests::OneSampleVarianceTest(const double &x[],
       return;
      }
 //--- Variance
-   for(i=0;i<n;i++)
+   for(i=0; i<n; i++)
       xmean+=x[i];
    xmean=xmean/n;
-//---
-   for(i=0;i<n;i++)
+
+   for(i=0; i<n; i++)
       xvar+=CMath::Sqr(x[i]-xmean);
    xvar=xvar/(n-1);
 //--- check
@@ -9097,6 +8843,10 @@ static void CVarianceTests::OneSampleVarianceTest(const double &x[],
 //+------------------------------------------------------------------+
 class CWilcoxonSignedRank
   {
+public:
+   static void       WilcoxonSignedRankTest(const double &cx[],const int n,const double e,double &bothTails,double &leftTail,double &rightTail);
+   static void       WilcoxonSignedRankTest(const CRowDouble &cx,const int n,const double e,double &bothTails,double &leftTail,double &rightTail);
+
 private:
    static void       WCheb(const double x,const double c,double &tj,double &tj1,double &r);
    //--- calculation sigma
@@ -9131,27 +8881,7 @@ private:
    static double     W60(const double s);
    static double     W120(const double s);
    static double     W200(const double s);
-public:
-   //--- constructor, destructor
-                     CWilcoxonSignedRank(void);
-                    ~CWilcoxonSignedRank(void);
-   //--- check
-   static void       WilcoxonSignedRankTest(const double &cx[],const int n,const double e,double &bothTails,double &leftTail,double &rightTail);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CWilcoxonSignedRank::CWilcoxonSignedRank(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CWilcoxonSignedRank::~CWilcoxonSignedRank(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| Wilcoxon signed-rank test                                        |
 //| This test checks three hypotheses about the median of the given  |
@@ -9199,12 +8929,25 @@ CWilcoxonSignedRank::~CWilcoxonSignedRank(void)
 //| Therefore, if the significance level outlies this interval, the  |
 //| test returns 0.0001.                                             |
 //+------------------------------------------------------------------+
-static void CWilcoxonSignedRank::WilcoxonSignedRankTest(const double &cx[],
-                                                        const int n,
-                                                        const double e,
-                                                        double &bothTails,
-                                                        double &leftTail,
-                                                        double &rightTail)
+void CWilcoxonSignedRank::WilcoxonSignedRankTest(const double &cx[],
+                                                 const int n,
+                                                 const double e,
+                                                 double &bothTails,
+                                                 double &leftTail,
+                                                 double &rightTail)
+  {
+   CRowDouble X=cx;
+   WilcoxonSignedRankTest(X,n,e,bothTails,leftTail,rightTail);
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void CWilcoxonSignedRank::WilcoxonSignedRankTest(const CRowDouble &cx,
+                                                 const int n,
+                                                 const double e,
+                                                 double &bothTails,
+                                                 double &leftTail,
+                                                 double &rightTail)
   {
 //--- create variables
    int    i=0;
@@ -9214,7 +8957,7 @@ static void CWilcoxonSignedRank::WilcoxonSignedRankTest(const double &cx[],
    double tmp=0;
    int    tmpi=0;
    int    ns=0;
-   double r[];
+   vector<double> r;
    int    c[];
    double w=0;
    double p=0;
@@ -9223,10 +8966,8 @@ static void CWilcoxonSignedRank::WilcoxonSignedRankTest(const double &cx[],
    double sigma=0;
    double mu=0;
 //--- create copy
-   double x[];
-   ArrayResizeAL(x,n);
-   for(i=0;i<n;i++)
-      x[i]=cx[i];
+   vector<double> x=cx.ToVector();
+   x.Resize(n);
 //--- Prepare
    if(n<5)
      {
@@ -9237,7 +8978,7 @@ static void CWilcoxonSignedRank::WilcoxonSignedRankTest(const double &cx[],
       return;
      }
 //--- calculation ns
-   for(i=0;i<n;i++)
+   for(i=0; i<n; i++)
      {
       //--- check
       if(x[i]==e)
@@ -9255,13 +8996,11 @@ static void CWilcoxonSignedRank::WilcoxonSignedRankTest(const double &cx[],
       return;
      }
 //--- allocation
-   ArrayResizeAL(r,ns);
+   x.Resize(ns);
+   r=MathAbs(x-e);
    ArrayResizeAL(c,ns);
-   for(i=0;i<ns;i++)
-     {
-      r[i]=MathAbs(x[i]-e);
+   for(i=0; i<ns; i++)
       c[i]=i;
-     }
 //--- sort {R, C}
    if(ns!=1)
      {
@@ -9353,13 +9092,13 @@ static void CWilcoxonSignedRank::WilcoxonSignedRankTest(const double &cx[],
             break;
          j++;
         }
-      for(k=i;k<j;k++)
+      for(k=i; k<j; k++)
          r[k]=1+(double)(i+j-1)/2.0;
       i=j;
      }
 //--- Compute W+
    w=0;
-   for(i=0;i<ns;i++)
+   for(i=0; i<ns; i++)
      {
       if(x[c[i]]>e)
          w+=r[i];
@@ -9380,17 +9119,16 @@ static void CWilcoxonSignedRank::WilcoxonSignedRankTest(const double &cx[],
       p=1-MathExp(WSigma((w+1-mu)/sigma,ns));
      }
 //--- get parameters
-   bothTails=MathMax(2*MathMin(p,mp),1.0E-4);
    leftTail=MathMax(p,1.0E-4);
    rightTail=MathMax(mp,1.0E-4);
+   bothTails=2*MathMin(leftTail,rightTail);
   }
 //+------------------------------------------------------------------+
 //| Sequential Chebyshev interpolation.                              |
 //+------------------------------------------------------------------+
-static void CWilcoxonSignedRank::WCheb(const double x,const double c,
-                                       double &tj,double &tj1,double &r)
+void CWilcoxonSignedRank::WCheb(const double x,const double c,
+                                double &tj,double &tj1,double &r)
   {
-//--- create a variable
    double t;
 //--- change values
    r+=c*tj;
@@ -9401,12 +9139,11 @@ static void CWilcoxonSignedRank::WCheb(const double x,const double c,
 //+------------------------------------------------------------------+
 //| Tail(S, 5)                                                       |
 //+------------------------------------------------------------------+
-static double CWilcoxonSignedRank::W5(const double s)
+double CWilcoxonSignedRank::W5(const double s)
   {
 //--- create variables
-   int    w=0;
+   int    w=(int)MathRound(-(3.708099e+00*s)+7.500000e+00);
    double r=0;
-   w=(int)MathRound(-(3.708099e+00*s)+7.500000e+00);
 //--- check
    if(w>=7)
       r=-6.931e-01;
@@ -9437,13 +9174,12 @@ static double CWilcoxonSignedRank::W5(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 6)                                                       |
 //+------------------------------------------------------------------+
-static double CWilcoxonSignedRank::W6(const double s)
+double CWilcoxonSignedRank::W6(const double s)
   {
 //--- create variables
-   int    w=0;
+   int    w=(int)MathRound(-(4.769696e+00*s)+1.050000e+01);
    double r=0;
 //--- check
-   w=(int)MathRound(-(4.769696e+00*s)+1.050000e+01);
    if(w>=10)
       r=-6.931e-01;
 //--- check
@@ -9482,13 +9218,12 @@ static double CWilcoxonSignedRank::W6(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 7)                                                       |
 //+------------------------------------------------------------------+
-static double CWilcoxonSignedRank::W7(const double s)
+double CWilcoxonSignedRank::W7(const double s)
   {
 //--- create variables
-   int    w=0;
+   int    w=(int)MathRound(-(5.916080e+00*s)+1.400000e+01);
    double r=0;
 //--- check
-   w=(int)MathRound(-(5.916080e+00*s)+1.400000e+01);
    if(w>=14)
       r=-6.325e-01;
 //--- check
@@ -9539,13 +9274,12 @@ static double CWilcoxonSignedRank::W7(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 8)                                                       |
 //+------------------------------------------------------------------+
-static double CWilcoxonSignedRank::W8(const double s)
+double CWilcoxonSignedRank::W8(const double s)
   {
 //--- create variables
-   int    w=0;
+   int    w=(int)MathRound(-(7.141428e+00*s)+1.800000e+01);
    double r=0;
 //--- check
-   w=(int)MathRound(-(7.141428e+00*s)+1.800000e+01);
    if(w>=18)
       r=-6.399e-01;
 //--- check
@@ -9608,13 +9342,12 @@ static double CWilcoxonSignedRank::W8(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 9)                                                       |
 //+------------------------------------------------------------------+
-static double CWilcoxonSignedRank::W9(const double s)
+double CWilcoxonSignedRank::W9(const double s)
   {
 //--- create variables
-   int    w=0;
+   int    w=(int)MathRound(-(8.440972e+00*s)+2.250000e+01);
    double r=0;
 //--- check
-   w=(int)MathRound(-(8.440972e+00*s)+2.250000e+01);
    if(w>=22)
       r=-6.931e-01;
 //--- check
@@ -9689,13 +9422,12 @@ static double CWilcoxonSignedRank::W9(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 10)                                                      |
 //+------------------------------------------------------------------+
-static double CWilcoxonSignedRank::W10(const double s)
+double CWilcoxonSignedRank::W10(const double s)
   {
 //--- create variables
-   int    w=0;
+   int    w=(int)MathRound(-(9.810708e+00*s)+2.750000e+01);
    double r=0;
 //--- check
-   w=(int)MathRound(-(9.810708e+00*s)+2.750000e+01);
    if(w>=27)
       r=-6.931e-01;
 //--- check
@@ -9785,13 +9517,12 @@ static double CWilcoxonSignedRank::W10(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 11)                                                      |
 //+------------------------------------------------------------------+
-static double CWilcoxonSignedRank::W11(const double s)
+double CWilcoxonSignedRank::W11(const double s)
   {
 //--- create variables
-   int    w=0;
+   int    w=(int)MathRound(-(1.124722e+01*s)+3.300000e+01);
    double r=0;
 //--- check
-   w=(int)MathRound(-(1.124722e+01*s)+3.300000e+01);
    if(w>=33)
       r=-6.595e-01;
 //--- check
@@ -9899,13 +9630,12 @@ static double CWilcoxonSignedRank::W11(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 12)                                                      |
 //+------------------------------------------------------------------+
-static double CWilcoxonSignedRank::W12(const double s)
+double CWilcoxonSignedRank::W12(const double s)
   {
 //--- create variables
-   int    w=0;
+   int    w=(int)MathRound(-(1.274755e+01*s)+3.900000e+01);
    double r=0;
 //--- check
-   w=(int)MathRound(-(1.274755e+01*s)+3.900000e+01);
    if(w>=39)
       r=-6.633e-01;
 //--- check
@@ -10031,13 +9761,12 @@ static double CWilcoxonSignedRank::W12(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 13)                                                      |
 //+------------------------------------------------------------------+
-static double CWilcoxonSignedRank::W13(const double s)
+double CWilcoxonSignedRank::W13(const double s)
   {
 //--- create variables
-   int    w=0;
+   int    w=(int)MathRound(-(1.430909e+01*s)+4.550000e+01);
    double r=0;
 //--- check
-   w=(int)MathRound(-(1.430909e+01*s)+4.550000e+01);
    if(w>=45)
       r=-6.931e-01;
 //--- check
@@ -10181,13 +9910,12 @@ static double CWilcoxonSignedRank::W13(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 14)                                                      |
 //+------------------------------------------------------------------+
-static double CWilcoxonSignedRank::W14(const double s)
+double CWilcoxonSignedRank::W14(const double s)
   {
 //--- create variables
-   int    w=0;
+   int    w=(int)MathRound(-(1.592953e+01*s)+5.250000e+01);
    double r=0;
 //--- check
-   w=(int)MathRound(-(1.592953e+01*s)+5.250000e+01);
    if(w>=52)
       r=-6.931e-01;
 //--- check
@@ -10352,13 +10080,12 @@ static double CWilcoxonSignedRank::W14(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 15)                                                      |
 //+------------------------------------------------------------------+
-static double CWilcoxonSignedRank::W15(const double s)
+double CWilcoxonSignedRank::W15(const double s)
   {
 //--- create variables
-   int    w=0;
+   int    w=(int)MathRound(-(1.760682e+01*s)+6.000000e+01);
    double r=0;
 //--- check
-   w=(int)MathRound(-(1.760682e+01*s)+6.000000e+01);
    if(w>=60)
       r=-6.714e-01;
 //--- check
@@ -10547,13 +10274,12 @@ static double CWilcoxonSignedRank::W15(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 16)                                                      |
 //+------------------------------------------------------------------+
-static double CWilcoxonSignedRank::W16(const double s)
+double CWilcoxonSignedRank::W16(const double s)
   {
 //--- create variables
-   int    w=0;
+   int    w=(int)MathRound(-(1.933908e+01*s)+6.800000e+01);
    double r=0;
 //--- check
-   w=(int)MathRound(-(1.933908e+01*s)+6.800000e+01);
    if(w>=68)
       r=-6.733e-01;
 //--- check
@@ -10766,13 +10492,12 @@ static double CWilcoxonSignedRank::W16(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 17)                                                      |
 //+------------------------------------------------------------------+
-static double CWilcoxonSignedRank::W17(const double s)
+double CWilcoxonSignedRank::W17(const double s)
   {
 //--- create variables
-   int    w=0;
+   int    w=(int)MathRound(-(2.112463e+01*s)+7.650000e+01);
    double r=0;
 //--- check
-   w=(int)MathRound(-(2.112463e+01*s)+7.650000e+01);
    if(w>=76)
       r=-6.931e-01;
 //--- check
@@ -11009,13 +10734,12 @@ static double CWilcoxonSignedRank::W17(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 18)                                                      |
 //+------------------------------------------------------------------+
-static double CWilcoxonSignedRank::W18(const double s)
+double CWilcoxonSignedRank::W18(const double s)
   {
 //--- create variables
-   int    w=0;
+   int    w=(int)MathRound(-(2.296193e+01*s)+8.550000e+01);
    double r=0;
 //--- check
-   w=(int)MathRound(-(2.296193e+01*s)+8.550000e+01);
    if(w>=85)
       r=-6.931e-01;
 //--- check
@@ -11279,13 +11003,12 @@ static double CWilcoxonSignedRank::W18(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 19)                                                      |
 //+------------------------------------------------------------------+
-static double CWilcoxonSignedRank::W19(const double s)
+double CWilcoxonSignedRank::W19(const double s)
   {
 //--- create variables
-   int    w=0;
+   int    w=(int)MathRound(-(2.484955e+01*s)+9.500000e+01);
    double r=0;
 //--- check
-   w=(int)MathRound(-(2.484955e+01*s)+9.500000e+01);
    if(w>=95)
       r=-6.776e-01;
 //--- check
@@ -11579,13 +11302,12 @@ static double CWilcoxonSignedRank::W19(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 20)                                                      |
 //+------------------------------------------------------------------+
-static double CWilcoxonSignedRank::W20(const double s)
+double CWilcoxonSignedRank::W20(const double s)
   {
 //--- create variables
-   int    w=0;
+   int    w=(int)MathRound(-(2.678619e+01*s)+1.050000e+02);
    double r=0;
 //--- check
-   w=(int)MathRound(-(2.678619e+01*s)+1.050000e+02);
    if(w>=105)
       r=-6.787e-01;
 //--- check
@@ -11903,19 +11625,18 @@ static double CWilcoxonSignedRank::W20(const double s)
 //--- check
    if(w<=0)
       r=-1.386e+01;
-//---
+
    return(r);
   }
 //+------------------------------------------------------------------+
 //| Tail(S, 21)                                                      |
 //+------------------------------------------------------------------+
-static double CWilcoxonSignedRank::W21(const double s)
+double CWilcoxonSignedRank::W21(const double s)
   {
 //--- create variables
-   int    w=0;
+   int    w=(int)MathRound(-(2.877064e+01*s)+1.155000e+02);
    double r=0;
 //--- check
-   w=(int)MathRound(-(2.877064e+01*s)+1.155000e+02);
    if(w>=115)
       r=-6.931e-01;
 //--- check
@@ -12269,13 +11990,12 @@ static double CWilcoxonSignedRank::W21(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 22)                                                      |
 //+------------------------------------------------------------------+
-static double CWilcoxonSignedRank::W22(const double s)
+double CWilcoxonSignedRank::W22(const double s)
   {
 //--- create variables
-   int    w=0;
+   int    w=(int)MathRound(-(3.080179e+01*s)+1.265000e+02);
    double r=0;
 //--- check
-   w=(int)MathRound(-(3.080179e+01*s)+1.265000e+02);
    if(w>=126)
       r=-6.931e-01;
 //--- check
@@ -12662,13 +12382,12 @@ static double CWilcoxonSignedRank::W22(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 23)                                                      |
 //+------------------------------------------------------------------+
-static double CWilcoxonSignedRank::W23(const double s)
+double CWilcoxonSignedRank::W23(const double s)
   {
 //--- create variables
-   int    w=0;
+   int    w=(int)MathRound(-(3.287856e+01*s)+1.380000e+02);
    double r=0;
 //--- check
-   w=(int)MathRound(-(3.287856e+01*s)+1.380000e+02);
    if(w>=138)
       r=-6.813e-01;
 //--- check
@@ -13091,13 +12810,12 @@ static double CWilcoxonSignedRank::W23(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 24)                                                      |
 //+------------------------------------------------------------------+
-static double CWilcoxonSignedRank::W24(const double s)
+double CWilcoxonSignedRank::W24(const double s)
   {
 //--- create variables
-   int    w=0;
+   int    w=(int)MathRound(-(3.500000e+01*s)+1.500000e+02);
    double r=0;
 //--- check
-   w=(int)MathRound(-(3.500000e+01*s)+1.500000e+02);
    if(w>=150)
       r=-6.820e-01;
 //--- check
@@ -13556,17 +13274,13 @@ static double CWilcoxonSignedRank::W24(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 25)                                                      |
 //+------------------------------------------------------------------+
-static double CWilcoxonSignedRank::W25(const double s)
+double CWilcoxonSignedRank::W25(const double s)
   {
 //--- create variables
    double result=0;
-   double x=0;
-   double tj=0;
-   double tj1=0;
-//--- change values
-   x=MathMin(2*(s-0.000000e+00)/4.000000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/4.000000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    WCheb(x,-5.150509e+00,tj,tj1,result);
    WCheb(x,-5.695528e+00,tj,tj1,result);
@@ -13585,17 +13299,13 @@ static double CWilcoxonSignedRank::W25(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 26)                                                      |
 //+------------------------------------------------------------------+
-static double CWilcoxonSignedRank::W26(const double s)
+double CWilcoxonSignedRank::W26(const double s)
   {
 //--- create variables
    double result=0;
-   double x=0;
-   double tj=0;
-   double tj1=0;
-//--- change values
-   x=MathMin(2*(s-0.000000e+00)/4.000000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/4.000000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    WCheb(x,-5.117622e+00,tj,tj1,result);
    WCheb(x,-5.635159e+00,tj,tj1,result);
@@ -13614,17 +13324,13 @@ static double CWilcoxonSignedRank::W26(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 27)                                                      |
 //+------------------------------------------------------------------+
-static double CWilcoxonSignedRank::W27(const double s)
+double CWilcoxonSignedRank::W27(const double s)
   {
 //--- create variables
    double result=0;
-   double x=0;
-   double tj=0;
-   double tj1=0;
-//--- change values
-   x=MathMin(2*(s-0.000000e+00)/4.000000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/4.000000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    WCheb(x,-5.089731e+00,tj,tj1,result);
    WCheb(x,-5.584248e+00,tj,tj1,result);
@@ -13643,17 +13349,13 @@ static double CWilcoxonSignedRank::W27(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 28)                                                      |
 //+------------------------------------------------------------------+
-static double CWilcoxonSignedRank::W28(const double s)
+double CWilcoxonSignedRank::W28(const double s)
   {
 //--- create variables
    double result=0;
-   double x=0;
-   double tj=0;
-   double tj1=0;
-//--- change values
-   x=MathMin(2*(s-0.000000e+00)/4.000000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/4.000000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    WCheb(x,-5.065046e+00,tj,tj1,result);
    WCheb(x,-5.539163e+00,tj,tj1,result);
@@ -13672,17 +13374,13 @@ static double CWilcoxonSignedRank::W28(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 29)                                                      |
 //+------------------------------------------------------------------+
-static double CWilcoxonSignedRank::W29(const double s)
+double CWilcoxonSignedRank::W29(const double s)
   {
 //--- create variables
    double result=0;
-   double x=0;
-   double tj=0;
-   double tj1=0;
-//--- change values
-   x=MathMin(2*(s-0.000000e+00)/4.000000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/4.000000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    WCheb(x,-5.043413e+00,tj,tj1,result);
    WCheb(x,-5.499756e+00,tj,tj1,result);
@@ -13701,17 +13399,13 @@ static double CWilcoxonSignedRank::W29(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 30)                                                      |
 //+------------------------------------------------------------------+
-static double CWilcoxonSignedRank::W30(const double s)
+double CWilcoxonSignedRank::W30(const double s)
   {
 //--- create variables
    double result=0;
-   double x=0;
-   double tj=0;
-   double tj1=0;
-//--- change values
-   x=MathMin(2*(s-0.000000e+00)/4.000000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/4.000000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    WCheb(x,-5.024071e+00,tj,tj1,result);
    WCheb(x,-5.464515e+00,tj,tj1,result);
@@ -13730,17 +13424,13 @@ static double CWilcoxonSignedRank::W30(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 40)                                                      |
 //+------------------------------------------------------------------+
-static double CWilcoxonSignedRank::W40(const double s)
+double CWilcoxonSignedRank::W40(const double s)
   {
 //--- create variables
    double result=0;
-   double x=0;
-   double tj=0;
-   double tj1=0;
-//--- change values
-   x=MathMin(2*(s-0.000000e+00)/4.000000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/4.000000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    WCheb(x,-4.904809e+00,tj,tj1,result);
    WCheb(x,-5.248327e+00,tj,tj1,result);
@@ -13759,17 +13449,13 @@ static double CWilcoxonSignedRank::W40(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 60)                                                      |
 //+------------------------------------------------------------------+
-static double CWilcoxonSignedRank::W60(const double s)
+double CWilcoxonSignedRank::W60(const double s)
   {
 //--- create variables
    double result=0;
-   double x=0;
-   double tj=0;
-   double tj1=0;
-//--- change values
-   x=MathMin(2*(s-0.000000e+00)/4.000000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/4.000000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    WCheb(x,-4.809656e+00,tj,tj1,result);
    WCheb(x,-5.077191e+00,tj,tj1,result);
@@ -13788,17 +13474,13 @@ static double CWilcoxonSignedRank::W60(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 120)                                                     |
 //+------------------------------------------------------------------+
-static double CWilcoxonSignedRank::W120(const double s)
+double CWilcoxonSignedRank::W120(const double s)
   {
 //--- create variables
    double result=0;
-   double x=0;
-   double tj=0;
-   double tj1=0;
-//--- change values
-   x=MathMin(2*(s-0.000000e+00)/4.000000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/4.000000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    WCheb(x,-4.729426e+00,tj,tj1,result);
    WCheb(x,-4.934426e+00,tj,tj1,result);
@@ -13817,17 +13499,13 @@ static double CWilcoxonSignedRank::W120(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S, 200)                                                     |
 //+------------------------------------------------------------------+
-static double CWilcoxonSignedRank::W200(const double s)
+double CWilcoxonSignedRank::W200(const double s)
   {
 //--- create variables
    double result=0;
-   double x=0;
-   double tj=0;
-   double tj1=0;
-//--- change values
-   x=MathMin(2*(s-0.000000e+00)/4.000000e+00-1,1.0);
-   tj=1;
-   tj1=x;
+   double x=MathMin(2*(s-0.000000e+00)/4.000000e+00-1,1.0);
+   double tj=1;
+   double tj1=x;
 //--- interpolating
    WCheb(x,-4.700240e+00,tj,tj1,result);
    WCheb(x,-4.883080e+00,tj,tj1,result);
@@ -13846,7 +13524,7 @@ static double CWilcoxonSignedRank::W200(const double s)
 //+------------------------------------------------------------------+
 //| Tail(S,N), S>=0                                                  |
 //+------------------------------------------------------------------+
-static double CWilcoxonSignedRank::WSigma(const double s,const int n)
+double CWilcoxonSignedRank::WSigma(const double s,const int n)
   {
 //--- create variables
    double f0;

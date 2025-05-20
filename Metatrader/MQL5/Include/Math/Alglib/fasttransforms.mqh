@@ -1,7 +1,7 @@
 //+------------------------------------------------------------------+
 //|                                               fasttransforms.mqh |
-//|            Copyright 2003-2012 Sergey Bochkanov (ALGLIB project) |
-//|                   Copyright 2012-2017, MetaQuotes Software Corp. |
+//|            Copyright 2003-2022 Sergey Bochkanov (ALGLIB project) |
+//|                             Copyright 2012-2023, MetaQuotes Ltd. |
 //|                                             https://www.mql5.com |
 //+------------------------------------------------------------------+
 //| Implementation of ALGLIB library in MetaQuotes Language 5        |
@@ -31,7 +31,6 @@
 //| MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the     |
 //| GNU General Public License for more details.                     |
 //+------------------------------------------------------------------+
-#include "complex.mqh"
 #include "alglibinternal.mqh"
 //+------------------------------------------------------------------+
 //| Fast Fourier Transform                                           |
@@ -39,30 +38,19 @@
 class CFastFourierTransform
   {
 public:
-                     CFastFourierTransform(void);
-                    ~CFastFourierTransform(void);
-
-   static void       FFTC1D(al_complex &a[],const int n);
-   static void       FFTC1DInv(al_complex &a[],const int n);
-   static void       FFTR1D(double &a[],const int n,al_complex &f[]);
-   static void       FFTR1DInv(al_complex &f[],const int n,double &a[]);
+   static void       FFTC1D(complex &a[],const int n);
+   static void       FFTC1DInv(complex &a[],const int n);
+   static void       FFTR1D(double &a[],const int n,complex &f[]);
+   static void       FFTR1DInv(complex &f[],const int n,double &a[]);
    static void       FFTR1DInternalEven(double &a[],const int n,double &buf[],CFtPlan &plan);
    static void       FFTR1DInvInternalEven(double &a[],const int n,double &buf[],CFtPlan &plan);
+   static void       FFTC1D(CRowComplex &a,const int n);
+   static void       FFTC1DInv(CRowComplex &a,const int n);
+   static void       FFTR1D(CRowDouble &a,const int n,CRowComplex &f);
+   static void       FFTR1DInv(CRowComplex &f,const int n,CRowDouble &a);
+   static void       FFTR1DInternalEven(CRowDouble &a,const int n,CRowDouble &buf,CFtPlan &plan);
+   static void       FFTR1DInvInternalEven(CRowDouble &a,const int n,CRowDouble &buf,CFtPlan &plan);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CFastFourierTransform::CFastFourierTransform(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CFastFourierTransform::~CFastFourierTransform(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| 1-dimensional complex FFT.                                       |
 //| Array size N may be arbitrary number (composite or prime).       |
@@ -87,12 +75,12 @@ CFastFourierTransform::~CFastFourierTransform(void)
 //|             A_out[j] = SUM(A_in[k]*exp(-2*pi*sqrt(-1)*j*k/N),    |
 //|             k = 0..N-1)                                          |
 //+------------------------------------------------------------------+
-static void CFastFourierTransform::FFTC1D(al_complex &a[],const int n)
+void CFastFourierTransform::FFTC1D(complex &a[],const int n)
   {
 //--- create a variable
    int i=0;
 //--- create array
-   double buf[];
+   CRowDouble buf;
 //--- object of class
    CFtPlan plan;
 //--- check
@@ -109,23 +97,67 @@ static void CFastFourierTransform::FFTC1D(al_complex &a[],const int n)
    if(n==1)
       return;
 //--- convert input array to the more convinient format
-   ArrayResizeAL(buf,2*n);
-   for(i=0;i<=n-1;i++)
+   buf.Resize(2*n);
+   for(i=0; i<n; i++)
      {
-      buf[2*i+0]=a[i].re;
-      buf[2*i+1]=a[i].im;
+      buf.Set(2*i+0,a[i].real);
+      buf.Set(2*i+1,a[i].imag);
      }
 //--- Generate plan and execute it.
 //--- Plan is a combination of a successive factorizations of N and
 //--- precomputed data. It is much like a FFTW plan,but is not stored
 //--- between subroutine calls and is much simpler.
-   CFtBase::FtBaseGenerateComplexFFtPlan(n,plan);
-   CFtBase::FtBaseExecutePlan(buf,0,n,plan);
+   CFtBase::FtComplexFFTPlan(n,1,plan);
+   CFtBase::FtApplyPlan(plan,buf,0,1);
 //--- result
-   for(i=0;i<=n-1;i++)
+   for(i=0; i<n; i++)
      {
-      a[i].re=buf[2*i+0];
-      a[i].im=buf[2*i+1];
+      a[i].real=buf[2*i+0];
+      a[i].imag=buf[2*i+1];
+     }
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void CFastFourierTransform::FFTC1D(CRowComplex &a,const int n)
+  {
+//--- create a variable
+   int i=0;
+//--- create array
+   CRowDouble buf;
+//--- object of class
+   CFtPlan plan;
+//--- check
+   if(!CAp::Assert(n>0,__FUNCTION__+": incorrect N!"))
+      return;
+//--- check
+   if(!CAp::Assert(CAp::Len(a)>=n,__FUNCTION__+": Length(A)<N!"))
+      return;
+//--- check
+   if(!CAp::Assert(CApServ::IsFiniteComplexVector(a,n),__FUNCTION__+": A contains infinite or NAN values!"))
+      return;
+//--- Special case: N=1,FFT is just identity transform.
+//--- After this block we assume that N is strictly greater than 1.
+   if(n==1)
+      return;
+//--- convert input array to the more convinient format
+   buf.Resize(2*n);
+   for(i=0; i<n; i++)
+     {
+      buf.Set(2*i+0,a[i].real);
+      buf.Set(2*i+1,a[i].imag);
+     }
+//--- Generate plan and execute it.
+//--- Plan is a combination of a successive factorizations of N and
+//--- precomputed data. It is much like a FFTW plan,but is not stored
+//--- between subroutine calls and is much simpler.
+   CFtBase::FtComplexFFTPlan(n,1,plan);
+   CFtBase::FtApplyPlan(plan,buf,0,1);
+//--- result
+   for(i=0; i<n; i++)
+     {
+      a.SetRe(i,buf[2*i+0]);
+      a.SetIm(i,buf[2*i+1]);
      }
   }
 //+------------------------------------------------------------------+
@@ -142,7 +174,7 @@ static void CFastFourierTransform::FFTC1D(al_complex &a[],const int n)
 //|             A_out[j] = SUM(A_in[k]/N*exp(+2*pi*sqrt(-1)*j*k/N),  |
 //|             k = 0..N-1)                                          |
 //+------------------------------------------------------------------+
-static void CFastFourierTransform::FFTC1DInv(al_complex &a[],const int n)
+void CFastFourierTransform::FFTC1DInv(complex &a[],const int n)
   {
 //--- create a variable
    int i=0;
@@ -158,15 +190,45 @@ static void CFastFourierTransform::FFTC1DInv(al_complex &a[],const int n)
 //--- Inverse DFT can be expressed in terms of the DFT as
 //---     invfft(x)=fft(x')'/N
 //--- here x' means conj(x).
-   for(i=0;i<=n-1;i++)
-      a[i].im=-a[i].im;
+   for(i=0; i<=n-1; i++)
+      a[i].imag=-a[i].imag;
 //--- function call
    FFTC1D(a,n);
 //--- change values
-   for(i=0;i<=n-1;i++)
+   for(i=0; i<=n-1; i++)
      {
-      a[i].re=a[i].re/n;
-      a[i].im=-(a[i].im/n);
+      a[i].real=a[i].real/n;
+      a[i].imag=-(a[i].imag/n);
+     }
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void CFastFourierTransform::FFTC1DInv(CRowComplex &a,const int n)
+  {
+//--- create a variable
+   int i=0;
+//--- check
+   if(!CAp::Assert(n>0,__FUNCTION__+": incorrect N!"))
+      return;
+//--- check
+   if(!CAp::Assert(CAp::Len(a)>=n,__FUNCTION__+": Length(A)<N!"))
+      return;
+//--- check
+   if(!CAp::Assert(CApServ::IsFiniteComplexVector(a,n),__FUNCTION__+": A contains infinite or NAN values!"))
+      return;
+//--- Inverse DFT can be expressed in terms of the DFT as
+//---     invfft(x)=fft(x')'/N
+//--- here x' means conj(x).
+   for(i=0; i<n; i++)
+      a.SetIm(i,-a[i].imag);
+//--- function call
+   FFTC1D(a,n);
+//--- change values
+   for(i=0; i<=n-1; i++)
+     {
+      a.SetRe(i,a[i].real/n);
+      a.SetIm(i,-(a[i].imag/n));
      }
   }
 //+------------------------------------------------------------------+
@@ -186,18 +248,18 @@ static void CFastFourierTransform::FFTC1DInv(al_complex &a[],const int n)
 //| subroutine returns full complex array (with frequencies above    |
 //| N/2), so its result may be used by other FFT-related subroutines.|
 //+------------------------------------------------------------------+
-static void CFastFourierTransform::FFTR1D(double &a[],const int n,al_complex &f[])
+void CFastFourierTransform::FFTR1D(double &a[],const int n,complex &f[])
   {
 //--- create variables
-   int        i=0;
-   int        n2=0;
-   int        idx=0;
-   al_complex hn=0;
-   al_complex hmnc=0;
-   al_complex v=0;
-   int        i_=0;
+   int     i=0;
+   int     n2=0;
+   int     idx=0;
+   complex hn=0;
+   complex hmnc=0;
+   complex v=0;
+   int     i_=0;
 //--- create array
-   double buf[];
+   CRowDouble buf;
 //--- object of class
    CFtPlan plan;
 //--- check
@@ -216,7 +278,7 @@ static void CFastFourierTransform::FFTR1D(double &a[],const int n,al_complex &f[
    if(n==1)
      {
       //--- allocation
-      ArrayResizeAL(f,1);
+      ArrayResize(f,1);
       f[0]=a[0];
       //--- exit the function
       return;
@@ -225,11 +287,11 @@ static void CFastFourierTransform::FFTR1D(double &a[],const int n,al_complex &f[
    if(n==2)
      {
       //--- allocation
-      ArrayResizeAL(f,2);
-      f[0].re=a[0]+a[1];
-      f[0].im=0;
-      f[1].re=a[0]-a[1];
-      f[1].im=0;
+      ArrayResize(f,2);
+      f[0].real=a[0]+a[1];
+      f[0].imag=0;
+      f[1].real=a[0]-a[1];
+      f[1].imag=0;
       //--- exit the function
       return;
      }
@@ -239,40 +301,130 @@ static void CFastFourierTransform::FFTR1D(double &a[],const int n,al_complex &f[
       //--- even-size real FFT,use reduction to the complex task
       n2=n/2;
       //--- allocation
-      ArrayResizeAL(buf,n);
-      for(i_=0;i_<=n-1;i_++)
-         buf[i_]=a[i_];
+      buf=a;
+      buf.Resize(n);
       //--- function call
-      CFtBase::FtBaseGenerateComplexFFtPlan(n2,plan);
-      CFtBase::FtBaseExecutePlan(buf,0,n2,plan);
+      CFtBase::FtComplexFFTPlan(n2,1,plan);
+      CFtBase::FtApplyPlan(plan,buf,0,1);
       //--- allocation
-      ArrayResizeAL(f,n);
+      ArrayResize(f,n);
       //--- calculation
-      for(i=0;i<=n2;i++)
+      for(i=0; i<=n2; i++)
         {
          idx=2*(i%n2);
-         hn.re=buf[idx+0];
-         hn.im=buf[idx+1];
+         hn.real=buf[idx+0];
+         hn.imag=buf[idx+1];
          idx=2*((n2-i)%n2);
-         hmnc.re=buf[idx+0];
-         hmnc.im=-buf[idx+1];
-         v.re=-MathSin(-(2*M_PI*i/n));
-         v.im=MathCos(-(2*M_PI*i/n));
+         hmnc.real=buf[idx+0];
+         hmnc.imag=-buf[idx+1];
+         v.real=-MathSin(-(2*M_PI*i/n));
+         v.imag=MathCos(-(2*M_PI*i/n));
          f[i]=hn+hmnc-v*(hn-hmnc);
-         f[i].re=0.5*f[i].re;
-         f[i].im=0.5*f[i].im;
+         f[i].real=0.5*f[i].real;
+         f[i].imag=0.5*f[i].imag;
         }
       //--- copy
-      for(i=n2+1;i<=n-1;i++)
+      for(i=n2+1; i<=n-1; i++)
          f[i]=CMath::Conj(f[n-i]);
      }
    else
      {
       //--- use complex FFT
-      ArrayResizeAL(f,n);
+      ArrayResize(f,n);
       //--- copy
-      for(i=0;i<=n-1;i++)
+      for(i=0; i<=n-1; i++)
          f[i]=a[i];
+      //--- function call
+      FFTC1D(f,n);
+     }
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void CFastFourierTransform::FFTR1D(CRowDouble &a,const int n,CRowComplex &f)
+  {
+//--- create variables
+   int     i=0;
+   int     n2=0;
+   int     idx=0;
+   complex hn=0;
+   complex hmnc=0;
+   complex v=0;
+   int     i_=0;
+//--- create array
+   CRowDouble buf;
+//--- object of class
+   CFtPlan plan;
+//--- check
+   if(!CAp::Assert(n>0,__FUNCTION__+": incorrect N!"))
+      return;
+//--- check
+   if(!CAp::Assert(CAp::Len(a)>=n,__FUNCTION__+": Length(A)<N!"))
+      return;
+//--- check
+   if(!CAp::Assert(CApServ::IsFiniteVector(a,n),__FUNCTION__+": A contains infinite or NAN values!"))
+      return;
+//--- Special cases:
+//--- * N=1,FFT is just identity transform.
+//--- * N=2,FFT is simple too
+//--- After this block we assume that N is strictly greater than 2
+   if(n==1)
+     {
+      //--- allocation
+      f.Resize(1);
+      f.Set(0,a[0]);
+      //--- exit the function
+      return;
+     }
+//--- check
+   if(n==2)
+     {
+      //--- allocation
+      f.Resize(2);
+      f.Set(0,a[0]+a[1]);
+      f.Set(1,a[0]-a[1]);
+      //--- exit the function
+      return;
+     }
+//--- Choose between odd-size and even-size FFTs
+   if(n%2==0)
+     {
+      //--- even-size real FFT,use reduction to the complex task
+      n2=n/2;
+      //--- allocation
+      buf=a;
+      buf.Resize(n);
+      //--- function call
+      CFtBase::FtComplexFFTPlan(n2,1,plan);
+      CFtBase::FtApplyPlan(plan,buf,0,1);
+      //--- allocation
+      f.Resize(n);
+      //--- calculation
+      for(i=0; i<=n2; i++)
+        {
+         idx=2*(i%n2);
+         hn.real=buf[idx+0];
+         hn.imag=buf[idx+1];
+         idx=2*((n2-i)%n2);
+         hmnc.real=buf[idx+0];
+         hmnc.imag=-buf[idx+1];
+         v.real=-MathSin(-(2*M_PI*i/n));
+         v.imag=MathCos(-(2*M_PI*i/n));
+         f.Set(i,hn+hmnc-v*(hn-hmnc));
+         f.SetRe(i,0.5*f[i].real);
+         f.SetIm(i,0.5*f[i].imag);
+        }
+      //--- copy
+      for(i=n2+1; i<n; i++)
+         f.Set(i,CMath::Conj(f[n-i]));
+     }
+   else
+     {
+      //--- use complex FFT
+      f.Resize(n);
+      //--- copy
+      for(i=0; i<n; i++)
+         f.Set(i,a[i]);
       //--- function call
       FFTC1D(f,n);
      }
@@ -307,14 +459,13 @@ static void CFastFourierTransform::FFTR1D(double &a[],const int n,al_complex &f[
 //| (although higher N/2 are still not used) because array size is   |
 //| used to automatically determine FFT length                       |
 //+------------------------------------------------------------------+
-static void CFastFourierTransform::FFTR1DInv(al_complex &f[],const int n,
-                                             double &a[])
+void CFastFourierTransform::FFTR1DInv(complex &f[],const int n,double &a[])
   {
 //--- create a variable
    int i=0;
 //--- create arrays
-   double     h[];
-   al_complex fh[];
+   double  h[];
+   complex fh[];
 //--- check
    if(!CAp::Assert(n>0,__FUNCTION__+": incorrect N!"))
       return;
@@ -322,22 +473,22 @@ static void CFastFourierTransform::FFTR1DInv(al_complex &f[],const int n,
    if(!CAp::Assert(CAp::Len(f)>=(int)MathFloor((double)n/2.0)+1,__FUNCTION__+": Length(F)<Floor(N/2)+1!"))
       return;
 //--- check
-   if(!CAp::Assert(CMath::IsFinite(f[0].re),__FUNCTION__+": F contains infinite or NAN values!"))
+   if(!CAp::Assert(CMath::IsFinite(f[0].real),__FUNCTION__+": F contains infinite or NAN values!"))
       return;
-   for(i=1;i<=(int)MathFloor((double)n/2.0)-1;i++)
+   for(i=1; i<=(int)MathFloor((double)n/2.0)-1; i++)
      {
       //--- check
-      if(!CAp::Assert(CMath::IsFinite(f[i].re) && CMath::IsFinite(f[i].im),__FUNCTION__+": F contains infinite or NAN values!"))
+      if(!CAp::Assert(CMath::IsFinite(f[i].real) && CMath::IsFinite(f[i].imag),__FUNCTION__+": F contains infinite or NAN values!"))
          return;
      }
 //--- check
-   if(!CAp::Assert(CMath::IsFinite(f[(int)MathFloor((double)n/2.0)].re),__FUNCTION__+": F contains infinite or NAN values!"))
+   if(!CAp::Assert(CMath::IsFinite(f[(int)MathFloor((double)n/2.0)].real),__FUNCTION__+": F contains infinite or NAN values!"))
       return;
 //--- check
    if(n%2!=0)
      {
       //--- check
-      if(!CAp::Assert(CMath::IsFinite(f[(int)MathFloor((double)n/2.0)].im),__FUNCTION__+": F contains infinite or NAN values!"))
+      if(!CAp::Assert(CMath::IsFinite(f[(int)MathFloor((double)n/2.0)].imag),__FUNCTION__+": F contains infinite or NAN values!"))
          return;
      }
 //--- Special case: N=1,FFT is just identity transform.
@@ -345,8 +496,8 @@ static void CFastFourierTransform::FFTR1DInv(al_complex &f[],const int n,
    if(n==1)
      {
       //--- allocation
-      ArrayResizeAL(a,1);
-      a[0]=f[0].re;
+      ArrayResize(a,1);
+      a[0]=f[0].real;
       //--- exit the function
       return;
      }
@@ -354,45 +505,129 @@ static void CFastFourierTransform::FFTR1DInv(al_complex &f[],const int n,
 //--- which is reduced to the forward real FHT,
 //--- which is reduced to the forward real FFT.
 //--- Don't worry,it is really compact and efficient reduction :)
-   ArrayResizeAL(h,n);
-   ArrayResizeAL(a,n);
+   ArrayResize(h,n);
+   ArrayResize(a,n);
 //--- change values
-   h[0]=f[0].re;
-   for(i=1;i<=(int)MathFloor((double)n/2.0)-1;i++)
+   h[0]=f[0].real;
+   for(i=1; i<=(int)MathFloor((double)n/2.0)-1; i++)
      {
-      h[i]=f[i].re-f[i].im;
-      h[n-i]=f[i].re+f[i].im;
+      h[i]=f[i].real-f[i].imag;
+      h[n-i]=f[i].real+f[i].imag;
      }
 //--- check
    if(n%2==0)
-      h[(int)MathFloor((double)n/2.0)]=f[(int)MathFloor((double)n/2.0)].re;
+      h[(int)MathFloor((double)n/2.0)]=f[(int)MathFloor((double)n/2.0)].real;
    else
      {
-      h[(int)MathFloor((double)n/2.0)]=f[(int)MathFloor((double)n/2.0)].re-f[(int)MathFloor((double)n/2.0)].im;
-      h[(int)MathFloor((double)n/2.0)+1]=f[(int)MathFloor((double)n/2.0)].re+f[(int)MathFloor((double)n/2.0)].im;
+      h[(int)MathFloor((double)n/2.0)]=f[(int)MathFloor((double)n/2.0)].real-f[(int)MathFloor((double)n/2.0)].imag;
+      h[(int)MathFloor((double)n/2.0)+1]=f[(int)MathFloor((double)n/2.0)].real+f[(int)MathFloor((double)n/2.0)].imag;
      }
 //--- function call
    FFTR1D(h,n,fh);
 //--- change values
-   for(i=0;i<=n-1;i++)
-      a[i]=(fh[i].re-fh[i].im)/n;
+   for(i=0; i<=n-1; i++)
+      a[i]=(fh[i].real-fh[i].imag)/n;
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void CFastFourierTransform::FFTR1DInv(CRowComplex &f,const int n,CRowDouble &a)
+  {
+//--- create a variable
+   int i=0;
+//--- create arrays
+   double  h[];
+   complex fh[];
+//--- check
+   if(!CAp::Assert(n>0,__FUNCTION__+": incorrect N!"))
+      return;
+//--- check
+   if(!CAp::Assert(CAp::Len(f)>=(int)MathFloor((double)n/2.0)+1,__FUNCTION__+": Length(F)<Floor(N/2)+1!"))
+      return;
+//--- check
+   if(!CAp::Assert(CMath::IsFinite(f[0].real),__FUNCTION__+": F contains infinite or NAN values!"))
+      return;
+   for(i=1; i<=(int)MathFloor((double)n/2.0)-1; i++)
+     {
+      //--- check
+      if(!CAp::Assert(CMath::IsFinite(f[i].real) && CMath::IsFinite(f[i].imag),__FUNCTION__+": F contains infinite or NAN values!"))
+         return;
+     }
+//--- check
+   if(!CAp::Assert(CMath::IsFinite(f[(int)MathFloor((double)n/2.0)].real),__FUNCTION__+": F contains infinite or NAN values!"))
+      return;
+//--- check
+   if(n%2!=0)
+     {
+      //--- check
+      if(!CAp::Assert(CMath::IsFinite(f[(int)MathFloor((double)n/2.0)].imag),__FUNCTION__+": F contains infinite or NAN values!"))
+         return;
+     }
+//--- Special case: N=1,FFT is just identity transform.
+//--- After this block we assume that N is strictly greater than 1.
+   if(n==1)
+     {
+      //--- allocation
+      a.Resize(1);
+      a.Set(0,f[0].real);
+      //--- exit the function
+      return;
+     }
+//--- inverse real FFT is reduced to the inverse real FHT,
+//--- which is reduced to the forward real FHT,
+//--- which is reduced to the forward real FFT.
+//--- Don't worry,it is really compact and efficient reduction :)
+   ArrayResize(h,n);
+   a.Resize(n);
+//--- change values
+   h[0]=f[0].real;
+   for(i=1; i<=(int)MathFloor((double)n/2.0)-1; i++)
+     {
+      h[i]=f[i].real-f[i].imag;
+      h[n-i]=f[i].real+f[i].imag;
+     }
+//--- check
+   if(n%2==0)
+      h[(int)MathFloor((double)n/2.0)]=f[(int)MathFloor((double)n/2.0)].real;
+   else
+     {
+      h[(int)MathFloor((double)n/2.0)]=f[(int)MathFloor((double)n/2.0)].real-f[(int)MathFloor((double)n/2.0)].imag;
+      h[(int)MathFloor((double)n/2.0)+1]=f[(int)MathFloor((double)n/2.0)].real+f[(int)MathFloor((double)n/2.0)].imag;
+     }
+//--- function call
+   FFTR1D(h,n,fh);
+//--- change values
+   for(i=0; i<n; i++)
+      a.Set(i,(fh[i].real-fh[i].imag)/n);
   }
 //+------------------------------------------------------------------+
 //| Internal subroutine. Never call it directly!                     |
 //+------------------------------------------------------------------+
-static void CFastFourierTransform::FFTR1DInternalEven(double &a[],const int n,
-                                                      double &buf[],CFtPlan &plan)
+void CFastFourierTransform::FFTR1DInternalEven(double &a[],const int n,
+                                               double &buf[],CFtPlan &plan)
+  {
+   CRowDouble A=a;
+   CRowDouble Buf;
+   FFTR1DInternalEven(A,n,Buf,plan);
+   A.ToArray(a);
+   Buf.ToArray(buf);
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void CFastFourierTransform::FFTR1DInternalEven(CRowDouble &a,const int n,
+                                               CRowDouble &buf,CFtPlan &plan)
   {
 //--- create variables
-   double     x=0;
-   double     y=0;
-   int        i=0;
-   int        n2=0;
-   int        idx=0;
-   al_complex hn=0;
-   al_complex hmnc=0;
-   al_complex v=0;
-   int        i_=0;
+   double  x=0;
+   double  y=0;
+   int     i=0;
+   int     n2=0;
+   int     idx=0;
+   complex hn=0;
+   complex hmnc=0;
+   complex v=0;
+   int     i_=0;
 //--- check
    if(!CAp::Assert(n>0 && n%2==0,__FUNCTION__+": incorrect N!"))
       return;
@@ -404,43 +639,43 @@ static void CFastFourierTransform::FFTR1DInternalEven(double &a[],const int n,
       //--- change values
       x=a[0]+a[1];
       y=a[0]-a[1];
-      a[0]=x;
-      a[1]=y;
+      a.Set(0,x);
+      a.Set(1,y);
       //--- exit the function
       return;
      }
 //--- even-size real FFT,use reduction to the complex task
    n2=n/2;
 //--- copy
-   for(i_=0;i_<=n-1;i_++)
-      buf[i_]=a[i_];
+   buf=a;
+   buf.Resize(n);
 //--- function call
-   CFtBase::FtBaseExecutePlan(buf,0,n2,plan);
+   CFtBase::FtApplyPlan(plan,buf,0,1);
 //--- change value
-   a[0]=buf[0]+buf[1];
-   for(i=1;i<=n2-1;i++)
+   a.Set(0,buf[0]+buf[1]);
+   for(i=1; i<=n2-1; i++)
      {
       //--- calculation
       idx=2*(i%n2);
-      hn.re=buf[idx+0];
-      hn.im=buf[idx+1];
+      hn.real=buf[idx+0];
+      hn.imag=buf[idx+1];
       idx=2*(n2-i);
-      hmnc.re=buf[idx+0];
-      hmnc.im=-buf[idx+1];
-      v.re=-MathSin(-(2*M_PI*i/n));
-      v.im=MathCos(-(2*M_PI*i/n));
+      hmnc.real=buf[idx+0];
+      hmnc.imag=-buf[idx+1];
+      v.real=-MathSin(-(2*M_PI*i/n));
+      v.imag=MathCos(-(2*M_PI*i/n));
       v=hn+hmnc-v*(hn-hmnc);
-      a[2*i+0]=0.5*v.re;
-      a[2*i+1]=0.5*v.im;
+      a.Set(2*i+0,0.5*v.real);
+      a.Set(2*i+1,0.5*v.imag);
      }
 //--- change value
-   a[1]=buf[0]-buf[1];
+   a.Set(1,buf[0]-buf[1]);
   }
 //+------------------------------------------------------------------+
 //| Internal subroutine. Never call it directly!                     |
 //+------------------------------------------------------------------+
-static void CFastFourierTransform::FFTR1DInvInternalEven(double &a[],const int n,
-                                                         double &buf[],CFtPlan &plan)
+void CFastFourierTransform::FFTR1DInvInternalEven(double &a[],const int n,
+                                                  double &buf[],CFtPlan &plan)
   {
 //--- create variables
    double x=0;
@@ -471,7 +706,7 @@ static void CFastFourierTransform::FFTR1DInvInternalEven(double &a[],const int n
    n2=n/2;
    buf[0]=a[0];
 //--- calculation
-   for(i=1;i<=n2-1;i++)
+   for(i=1; i<=n2-1; i++)
      {
       x=a[2*i+0];
       y=a[2*i+1];
@@ -485,7 +720,7 @@ static void CFastFourierTransform::FFTR1DInvInternalEven(double &a[],const int n
    a[0]=buf[0]/n;
    t=1.0/(double)n;
 //--- calculation
-   for(i=1;i<=n2-1;i++)
+   for(i=1; i<=n2-1; i++)
      {
       x=buf[2*i+0];
       y=buf[2*i+1];
@@ -496,40 +731,81 @@ static void CFastFourierTransform::FFTR1DInvInternalEven(double &a[],const int n
    a[n2]=buf[1]/n;
   }
 //+------------------------------------------------------------------+
+//| Internal subroutine. Never call it directly!                     |
+//+------------------------------------------------------------------+
+void CFastFourierTransform::FFTR1DInvInternalEven(CRowDouble &a,const int n,
+                                                  CRowDouble &buf,CFtPlan &plan)
+  {
+//--- create variables
+   double x=0;
+   double y=0;
+   double t=0;
+   int    i=0;
+   int    n2=0;
+//--- check
+   if(!CAp::Assert(n>0 && n%2==0,__FUNCTION__+": incorrect N!"))
+      return;
+//--- Special cases:
+//--- * N=2
+//--- After this block we assume that N is strictly greater than 2
+   if(n==2)
+     {
+      //--- change values
+      x=0.5*(a[0]+a[1]);
+      y=0.5*(a[0]-a[1]);
+      a.Set(0,x);
+      a.Set(1,y);
+      //--- exit the function
+      return;
+     }
+//--- inverse real FFT is reduced to the inverse real FHT,
+//--- which is reduced to the forward real FHT,
+//--- which is reduced to the forward real FFT.
+//--- Don't worry,it is really compact and efficient reduction :)
+   n2=n/2;
+   buf.Set(0,a[0]);
+//--- calculation
+   for(i=1; i<=n2-1; i++)
+     {
+      x=a[2*i+0];
+      y=a[2*i+1];
+      buf.Set(i,x-y);
+      buf.Set(n-i,x+y);
+     }
+   buf.Set(n2,a[1]);
+//--- function call
+   FFTR1DInternalEven(buf,n,a,plan);
+//--- change values
+   a.Set(0,buf[0]/n);
+   t=1.0/(double)n;
+//--- calculation
+   for(i=1; i<=n2-1; i++)
+     {
+      x=buf[2*i+0];
+      y=buf[2*i+1];
+      a.Set(i,t*(x-y));
+      a.Set(n-i,t*(x+y));
+     }
+//--- change value
+   a.Set(n2,buf[1]/n);
+  }
+//+------------------------------------------------------------------+
 //| Convolution class                                                |
 //+------------------------------------------------------------------+
 class CConv
   {
 public:
-   //--- constructor, destructor
-                     CConv(void);
-                    ~CConv(void);
-   //--- methods
-   static void       ConvC1D(al_complex &a[],const int m,al_complex &b[],const int n,al_complex &r[]);
-   static void       ConvC1DInv(al_complex &a[],const int m,al_complex &b[],const int n,al_complex &r[]);
-   static void       ConvC1DCircular(al_complex &s[],const int m,al_complex &r[],const int n,al_complex &c[]);
-   static void       ConvC1DCircularInv(al_complex &a[],const int m,al_complex &b[],const int n,al_complex &r[]);
+   static void       ConvC1D(complex &a[],const int m,complex &b[],const int n,complex &r[]);
+   static void       ConvC1DInv(complex &a[],const int m,complex &b[],const int n,complex &r[]);
+   static void       ConvC1DCircular(complex &s[],const int m,complex &r[],const int n,complex &c[]);
+   static void       ConvC1DCircularInv(complex &a[],const int m,complex &b[],const int n,complex &r[]);
    static void       ConvR1D(double &a[],const int m,double &b[],const int n,double &r[]);
    static void       ConvR1DInv(double &a[],const int m,double &b[],const int n,double &r[]);
    static void       ConvR1DCircular(double &s[],const int m,double &r[],const int n,double &c[]);
    static void       ConvR1DCircularInv(double &a[],const int m,double &b[],const int n,double &r[]);
-   static void       ConvC1DX(al_complex &a[],const int m,al_complex &b[],const int n,const bool circular,int alg,int q,al_complex &r[]);
+   static void       ConvC1DX(complex &a[],const int m,complex &b[],const int n,const bool circular,int alg,int q,complex &r[]);
    static void       ConvR1DX(double &a[],const int m,double &b[],const int n,const bool circular,int alg,int q,double &r[]);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CConv::CConv(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CConv::~CConv(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| 1-dimensional complex convolution.                               |
 //| For given A/B returns conv(A,B) (non-circular). Subroutine can   |
@@ -552,8 +828,7 @@ CConv::~CConv(void)
 //| still use this subroutine - just shift its result                |
 //| correspondingly.                                                 |
 //+------------------------------------------------------------------+
-static void CConv::ConvC1D(al_complex &a[],const int m,al_complex &b[],const int n,
-                           al_complex &r[])
+void CConv::ConvC1D(complex &a[],const int m,complex &b[],const int n,complex &r[])
   {
 //--- check
    if(!CAp::Assert(n>0 && m>0,__FUNCTION__+": incorrect N or M!"))
@@ -589,16 +864,16 @@ static void CConv::ConvC1D(al_complex &a[],const int m,al_complex &b[],const int
 //| or both functions have non-zero values at negative T's, you can  |
 //| still use this subroutine - just shift its result correspondingly|
 //+------------------------------------------------------------------+
-static void CConv::ConvC1DInv(al_complex &a[],const int m,al_complex &b[],
-                              const int n,al_complex &r[])
+void CConv::ConvC1DInv(complex &a[],const int m,complex &b[],
+                       const int n,complex &r[])
   {
 //--- create variables
-   int        i=0;
-   int        p=0;
-   al_complex c1=0;
-   al_complex c2=0;
-   al_complex c3=0;
-   double     t=0;
+   int     i=0;
+   int     p=0;
+   complex c1=0;
+   complex c2=0;
+   complex c3=0;
+   double  t=0;
 //--- create arrays
    double buf[];
    double buf2[];
@@ -609,59 +884,59 @@ static void CConv::ConvC1DInv(al_complex &a[],const int m,al_complex &b[],
       return;
 //--- function call
    p=CFtBase::FtBaseFindSmooth(m);
-   CFtBase::FtBaseGenerateComplexFFtPlan(p,plan);
+   CFtBase::FtComplexFFTPlan(p,1,plan);
 //--- allocation
-   ArrayResizeAL(buf,2*p);
+   ArrayResize(buf,2*p);
 //--- copy
-   for(i=0;i<=m-1;i++)
+   for(i=0; i<=m-1; i++)
      {
-      buf[2*i+0]=a[i].re;
-      buf[2*i+1]=a[i].im;
+      buf[2*i+0]=a[i].real;
+      buf[2*i+1]=a[i].imag;
      }
 //--- make zero
-   for(i=m;i<=p-1;i++)
+   for(i=m; i<=p-1; i++)
      {
       buf[2*i+0]=0;
       buf[2*i+1]=0;
      }
 //--- allocation
-   ArrayResizeAL(buf2,2*p);
+   ArrayResize(buf2,2*p);
 //--- copy
-   for(i=0;i<=n-1;i++)
+   for(i=0; i<=n-1; i++)
      {
-      buf2[2*i+0]=b[i].re;
-      buf2[2*i+1]=b[i].im;
+      buf2[2*i+0]=b[i].real;
+      buf2[2*i+1]=b[i].imag;
      }
 //--- make zero
-   for(i=n;i<=p-1;i++)
+   for(i=n; i<=p-1; i++)
      {
       buf2[2*i+0]=0;
       buf2[2*i+1]=0;
      }
 //--- function call
-   CFtBase::FtBaseExecutePlan(buf,0,p,plan);
-   CFtBase::FtBaseExecutePlan(buf2,0,p,plan);
+   CFtBase::FtApplyPlan(plan,buf,0,1);
+   CFtBase::FtApplyPlan(plan,buf2,0,1);
 //--- calculation
-   for(i=0;i<=p-1;i++)
+   for(i=0; i<=p-1; i++)
      {
-      c1.re=buf[2*i+0];
-      c1.im=buf[2*i+1];
-      c2.re=buf2[2*i+0];
-      c2.im=buf2[2*i+1];
+      c1.real=buf[2*i+0];
+      c1.imag=buf[2*i+1];
+      c2.real=buf2[2*i+0];
+      c2.imag=buf2[2*i+1];
       c3=c1/c2;
-      buf[2*i+0]=c3.re;
-      buf[2*i+1]=-c3.im;
+      buf[2*i+0]=c3.real;
+      buf[2*i+1]=-c3.imag;
      }
 //--- function call
-   CFtBase::FtBaseExecutePlan(buf,0,p,plan);
+   CFtBase::FtApplyPlan(plan,buf,0,1);
    t=1.0/(double)p;
 //--- allocation
-   ArrayResizeAL(r,m-n+1);
+   ArrayResize(r,m-n+1);
 //--- change values
-   for(i=0;i<=m-n;i++)
+   for(i=0; i<=m-n; i++)
      {
-      r[i].re=t*buf[2*i+0];
-      r[i].im=-(t*buf[2*i+1]);
+      r[i].real=t*buf[2*i+0];
+      r[i].imag=-(t*buf[2*i+1]);
      }
   }
 //+------------------------------------------------------------------+
@@ -684,8 +959,8 @@ static void CConv::ConvC1DInv(al_complex &a[],const int m,al_complex &b[],
 //| values at negative T's, you can still use this subroutine - just |
 //| shift its result correspondingly.                                |
 //+------------------------------------------------------------------+
-static void CConv::ConvC1DCircular(al_complex &s[],const int m,al_complex &r[],
-                                   const int n,al_complex &c[])
+void CConv::ConvC1DCircular(complex &s[],const int m,complex &r[],
+                            const int n,complex &c[])
   {
 //--- create variables
    int i1=0;
@@ -694,7 +969,7 @@ static void CConv::ConvC1DCircular(al_complex &s[],const int m,al_complex &r[],
    int i_=0;
    int i1_=0;
 //--- create array
-   al_complex buf[];
+   complex buf[];
 //--- check
    if(!CAp::Assert(n>0 && m>0,__FUNCTION__+": incorrect N or M!"))
       return;
@@ -703,9 +978,9 @@ static void CConv::ConvC1DCircular(al_complex &s[],const int m,al_complex &r[],
    if(m<n)
      {
       //--- allocation
-      ArrayResizeAL(buf,m);
+      ArrayResize(buf,m);
       //--- initialization
-      for(i1=0;i1<=m-1;i1++)
+      for(i1=0; i1<=m-1; i1++)
          buf[i1]=0;
       i1=0;
       //--- calculation
@@ -715,7 +990,7 @@ static void CConv::ConvC1DCircular(al_complex &s[],const int m,al_complex &r[],
          i2=MathMin(i1+m-1,n-1);
          j2=i2-i1;
          i1_=i1;
-         for(i_=0;i_<=j2;i_++)
+         for(i_=0; i_<=j2; i_++)
             buf[i_]=buf[i_]+r[i_+i1_];
          i1=i1+m;
         }
@@ -748,24 +1023,24 @@ static void CConv::ConvC1DCircular(al_complex &s[],const int m,al_complex &r[],
 //| values at negative T's, you can still use this subroutine - just |
 //| shift its result correspondingly.                                |
 //+------------------------------------------------------------------+
-static void CConv::ConvC1DCircularInv(al_complex &a[],const int m,al_complex &b[],
-                                      const int n,al_complex &r[])
+void CConv::ConvC1DCircularInv(complex &a[],const int m,complex &b[],
+                               const int n,complex &r[])
   {
 //--- create variables
-   int        i=0;
-   int        i1=0;
-   int        i2=0;
-   int        j2=0;
-   al_complex c1=0;
-   al_complex c2=0;
-   al_complex c3=0;
-   double     t=0;
-   int        i_=0;
-   int        i1_=0;
+   int     i=0;
+   int     i1=0;
+   int     i2=0;
+   int     j2=0;
+   complex c1=0;
+   complex c2=0;
+   complex c3=0;
+   double  t=0;
+   int     i_=0;
+   int     i1_=0;
 //--- create arrays
-   double     buf[];
-   double     buf2[];
-   al_complex cbuf[];
+   double  buf[];
+   double  buf2[];
+   complex cbuf[];
 //--- object of class
    CFtPlan plan;
 //--- check
@@ -776,9 +1051,9 @@ static void CConv::ConvC1DCircularInv(al_complex &a[],const int m,al_complex &b[
    if(m<n)
      {
       //--- allocation
-      ArrayResizeAL(cbuf,m);
+      ArrayResize(cbuf,m);
       //--- initialization
-      for(i=0;i<=m-1;i++)
+      for(i=0; i<=m-1; i++)
          cbuf[i]=0;
       i1=0;
       //--- calculation
@@ -788,7 +1063,7 @@ static void CConv::ConvC1DCircularInv(al_complex &a[],const int m,al_complex &b[
          i2=MathMin(i1+m-1,n-1);
          j2=i2-i1;
          i1_=i1;
-         for(i_=0;i_<=j2;i_++)
+         for(i_=0; i_<=j2; i_++)
             cbuf[i_]=cbuf[i_]+b[i_+i1_];
          i1=i1+m;
         }
@@ -798,53 +1073,53 @@ static void CConv::ConvC1DCircularInv(al_complex &a[],const int m,al_complex &b[
       return;
      }
 //--- Task is normalized
-   CFtBase::FtBaseGenerateComplexFFtPlan(m,plan);
+   CFtBase::FtComplexFFTPlan(m,1,plan);
 //--- allocation
-   ArrayResizeAL(buf,2*m);
+   ArrayResize(buf,2*m);
 //--- copy
-   for(i=0;i<=m-1;i++)
+   for(i=0; i<=m-1; i++)
      {
-      buf[2*i+0]=a[i].re;
-      buf[2*i+1]=a[i].im;
+      buf[2*i+0]=a[i].real;
+      buf[2*i+1]=a[i].imag;
      }
 //--- allocation
-   ArrayResizeAL(buf2,2*m);
+   ArrayResize(buf2,2*m);
 //--- copy
-   for(i=0;i<=n-1;i++)
+   for(i=0; i<=n-1; i++)
      {
-      buf2[2*i+0]=b[i].re;
-      buf2[2*i+1]=b[i].im;
+      buf2[2*i+0]=b[i].real;
+      buf2[2*i+1]=b[i].imag;
      }
 //--- make zero
-   for(i=n;i<=m-1;i++)
+   for(i=n; i<=m-1; i++)
      {
       buf2[2*i+0]=0;
       buf2[2*i+1]=0;
      }
 //--- function call
-   CFtBase::FtBaseExecutePlan(buf,0,m,plan);
-   CFtBase::FtBaseExecutePlan(buf2,0,m,plan);
+   CFtBase::FtApplyPlan(plan,buf,0,1);
+   CFtBase::FtApplyPlan(plan,buf2,0,1);
 //--- calculation
-   for(i=0;i<=m-1;i++)
+   for(i=0; i<=m-1; i++)
      {
-      c1.re=buf[2*i+0];
-      c1.im=buf[2*i+1];
-      c2.re=buf2[2*i+0];
-      c2.im=buf2[2*i+1];
+      c1.real=buf[2*i+0];
+      c1.imag=buf[2*i+1];
+      c2.real=buf2[2*i+0];
+      c2.imag=buf2[2*i+1];
       c3=c1/c2;
-      buf[2*i+0]=c3.re;
-      buf[2*i+1]=-c3.im;
+      buf[2*i+0]=c3.real;
+      buf[2*i+1]=-c3.imag;
      }
 //--- function call
-   CFtBase::FtBaseExecutePlan(buf,0,m,plan);
+   CFtBase::FtApplyPlan(plan,buf,0,1);
    t=1.0/(double)m;
 //--- allocation
-   ArrayResizeAL(r,m);
+   ArrayResize(r,m);
 //--- change values
-   for(i=0;i<=m-1;i++)
+   for(i=0; i<=m-1; i++)
      {
-      r[i].re=t*buf[2*i+0];
-      r[i].im=-(t*buf[2*i+1]);
+      r[i].real=t*buf[2*i+0];
+      r[i].imag=-(t*buf[2*i+1]);
      }
   }
 //+------------------------------------------------------------------+
@@ -862,8 +1137,8 @@ static void CConv::ConvC1DCircularInv(al_complex &a[],const int m,al_complex &b[
 //| or both functions have non-zero values at negative T's, you can  |
 //| still use this subroutine - just shift its result correspondingly|
 //+------------------------------------------------------------------+
-static void CConv::ConvR1D(double &a[],const int m,double &b[],
-                           const int n,double &r[])
+void CConv::ConvR1D(double &a[],const int m,double &b[],
+                    const int n,double &r[])
   {
 //--- check
    if(!CAp::Assert(n>0 && m>0,__FUNCTION__+": incorrect N or M!"))
@@ -898,16 +1173,16 @@ static void CConv::ConvR1D(double &a[],const int m,double &b[],
 //| both functions have non-zero values at negative T's, you can     |
 //| still use this subroutine - just shift its result correspondingly|
 //+------------------------------------------------------------------+
-static void CConv::ConvR1DInv(double &a[],const int m,double &b[],
-                              const int n,double &r[])
+void CConv::ConvR1DInv(double &a[],const int m,double &b[],
+                       const int n,double &r[])
   {
 //--- create variables
-   int        i=0;
-   int        p=0;
-   al_complex c1=0;
-   al_complex c2=0;
-   al_complex c3=0;
-   int        i_=0;
+   int     i=0;
+   int     p=0;
+   complex c1=0;
+   complex c2=0;
+   complex c3=0;
+   int     i_=0;
 //--- create arrays
    double buf[];
    double buf2[];
@@ -920,24 +1195,24 @@ static void CConv::ConvR1DInv(double &a[],const int m,double &b[],
 //--- function call
    p=CFtBase::FtBaseFindSmoothEven(m);
 //--- allocation
-   ArrayResizeAL(buf,p);
+   ArrayResize(buf,p);
 //--- copy
-   for(i_=0;i_<=m-1;i_++)
+   for(i_=0; i_<=m-1; i_++)
       buf[i_]=a[i_];
 //--- make zero
-   for(i=m;i<=p-1;i++)
+   for(i=m; i<=p-1; i++)
       buf[i]=0;
 //--- allocation
-   ArrayResizeAL(buf2,p);
-   for(i_=0;i_<=n-1;i_++)
+   ArrayResize(buf2,p);
+   for(i_=0; i_<=n-1; i_++)
       buf2[i_]=b[i_];
 //--- make zero
-   for(i=n;i<=p-1;i++)
+   for(i=n; i<=p-1; i++)
       buf2[i]=0;
 //--- allocation
-   ArrayResizeAL(buf3,p);
+   ArrayResize(buf3,p);
 //--- function call
-   CFtBase::FtBaseGenerateComplexFFtPlan(p/2,plan);
+   CFtBase::FtComplexFFTPlan(p/2,1,plan);
 //--- function call
    CFastFourierTransform::FFTR1DInternalEven(buf,p,buf3,plan);
 //--- function call
@@ -946,22 +1221,22 @@ static void CConv::ConvR1DInv(double &a[],const int m,double &b[],
    buf[0]=buf[0]/buf2[0];
    buf[1]=buf[1]/buf2[1];
 //--- calculation
-   for(i=1;i<=p/2-1;i++)
+   for(i=1; i<=p/2-1; i++)
      {
-      c1.re=buf[2*i+0];
-      c1.im=buf[2*i+1];
-      c2.re=buf2[2*i+0];
-      c2.im=buf2[2*i+1];
+      c1.real=buf[2*i+0];
+      c1.imag=buf[2*i+1];
+      c2.real=buf2[2*i+0];
+      c2.imag=buf2[2*i+1];
       c3=c1/c2;
-      buf[2*i+0]=c3.re;
-      buf[2*i+1]=c3.im;
+      buf[2*i+0]=c3.real;
+      buf[2*i+1]=c3.imag;
      }
 //--- function call
    CFastFourierTransform::FFTR1DInvInternalEven(buf,p,buf3,plan);
 //--- allocation
-   ArrayResizeAL(r,m-n+1);
+   ArrayResize(r,m-n+1);
 //--- copy
-   for(i_=0;i_<=m-n;i_++)
+   for(i_=0; i_<=m-n; i_++)
       r[i_]=buf[i_];
   }
 //+------------------------------------------------------------------+
@@ -980,8 +1255,8 @@ static void CConv::ConvR1DInv(double &a[],const int m,double &b[],
 //| values at negative T's, you can still use this subroutine - just |
 //| shift its result correspondingly.                                |
 //+------------------------------------------------------------------+
-static void CConv::ConvR1DCircular(double &s[],const int m,double &r[],
-                                   const int n,double &c[])
+void CConv::ConvR1DCircular(double &s[],const int m,double &r[],
+                            const int n,double &c[])
   {
 //--- create variables
    int i1=0;
@@ -999,9 +1274,9 @@ static void CConv::ConvR1DCircular(double &s[],const int m,double &r[],
    if(m<n)
      {
       //--- allocation
-      ArrayResizeAL(buf,m);
+      ArrayResize(buf,m);
       //--- initialization
-      for(i1=0;i1<=m-1;i1++)
+      for(i1=0; i1<=m-1; i1++)
          buf[i1]=0;
       i1=0;
       //--- calculation
@@ -1010,7 +1285,7 @@ static void CConv::ConvR1DCircular(double &s[],const int m,double &r[],
          i2=MathMin(i1+m-1,n-1);
          j2=i2-i1;
          i1_=i1;
-         for(i_=0;i_<=j2;i_++)
+         for(i_=0; i_<=j2; i_++)
             buf[i_]=buf[i_]+r[i_+i1_];
          i1=i1+m;
         }
@@ -1040,25 +1315,25 @@ static void CConv::ConvR1DCircular(double &s[],const int m,double &r[],
 //| values at negative T's, you can still use this subroutine - just |
 //| shift its result correspondingly.                                |
 //+------------------------------------------------------------------+
-static void CConv::ConvR1DCircularInv(double &a[],const int m,double &b[],
-                                      const int n,double &r[])
+void CConv::ConvR1DCircularInv(double &a[],const int m,double &b[],
+                               const int n,double &r[])
   {
 //--- create variables
-   int        i=0;
-   int        i1=0;
-   int        i2=0;
-   int        j2=0;
-   al_complex c1=0;
-   al_complex c2=0;
-   al_complex c3=0;
-   int        i_=0;
-   int        i1_=0;
+   int     i=0;
+   int     i1=0;
+   int     i2=0;
+   int     j2=0;
+   complex c1=0;
+   complex c2=0;
+   complex c3=0;
+   int     i_=0;
+   int     i1_=0;
 //--- create arrays
-   double     buf[];
-   double     buf2[];
-   double     buf3[];
-   al_complex cbuf[];
-   al_complex cbuf2[];
+   double  buf[];
+   double  buf2[];
+   double  buf3[];
+   complex cbuf[];
+   complex cbuf2[];
 //--- object of class
    CFtPlan plan;
 //--- check
@@ -1069,9 +1344,9 @@ static void CConv::ConvR1DCircularInv(double &a[],const int m,double &b[],
    if(m<n)
      {
       //--- allocation
-      ArrayResizeAL(buf,m);
+      ArrayResize(buf,m);
       //--- initialization
-      for(i=0;i<=m-1;i++)
+      for(i=0; i<=m-1; i++)
          buf[i]=0;
       i1=0;
       //--- calculation
@@ -1080,7 +1355,7 @@ static void CConv::ConvR1DCircularInv(double &a[],const int m,double &b[],
          i2=MathMin(i1+m-1,n-1);
          j2=i2-i1;
          i1_=i1;
-         for(i_=0;i_<=j2;i_++)
+         for(i_=0; i_<=j2; i_++)
             buf[i_]=buf[i_]+b[i_+i1_];
          i1=i1+m;
         }
@@ -1093,21 +1368,21 @@ static void CConv::ConvR1DCircularInv(double &a[],const int m,double &b[],
    if(m%2==0)
      {
       //--- size is even,use fast even-size FFT
-      ArrayResizeAL(buf,m);
-      for(i_=0;i_<=m-1;i_++)
+      ArrayResize(buf,m);
+      for(i_=0; i_<=m-1; i_++)
          buf[i_]=a[i_];
       //--- allocation
-      ArrayResizeAL(buf2,m);
+      ArrayResize(buf2,m);
       //--- copy
-      for(i_=0;i_<=n-1;i_++)
+      for(i_=0; i_<=n-1; i_++)
          buf2[i_]=b[i_];
       //--- make zero
-      for(i=n;i<=m-1;i++)
+      for(i=n; i<=m-1; i++)
          buf2[i]=0;
       //--- allocation
-      ArrayResizeAL(buf3,m);
+      ArrayResize(buf3,m);
       //--- function call
-      CFtBase::FtBaseGenerateComplexFFtPlan(m/2,plan);
+      CFtBase::FtComplexFFTPlan(m/2,1,plan);
       //--- function call
       CFastFourierTransform::FFTR1DInternalEven(buf,m,buf3,plan);
       //--- function call
@@ -1116,22 +1391,22 @@ static void CConv::ConvR1DCircularInv(double &a[],const int m,double &b[],
       buf[0]=buf[0]/buf2[0];
       buf[1]=buf[1]/buf2[1];
       //--- calculation
-      for(i=1;i<=m/2-1;i++)
+      for(i=1; i<=m/2-1; i++)
         {
-         c1.re=buf[2*i+0];
-         c1.im=buf[2*i+1];
-         c2.re=buf2[2*i+0];
-         c2.im=buf2[2*i+1];
+         c1.real=buf[2*i+0];
+         c1.imag=buf[2*i+1];
+         c2.real=buf2[2*i+0];
+         c2.imag=buf2[2*i+1];
          c3=c1/c2;
-         buf[2*i+0]=c3.re;
-         buf[2*i+1]=c3.im;
+         buf[2*i+0]=c3.real;
+         buf[2*i+1]=c3.imag;
         }
       //--- function call
       CFastFourierTransform::FFTR1DInvInternalEven(buf,m,buf3,plan);
       //--- allocation
-      ArrayResizeAL(r,m);
+      ArrayResize(r,m);
       //--- copy
-      for(i_=0;i_<=m-1;i_++)
+      for(i_=0; i_<=m-1; i_++)
          r[i_]=buf[i_];
      }
    else
@@ -1139,17 +1414,17 @@ static void CConv::ConvR1DCircularInv(double &a[],const int m,double &b[],
       //--- odd-size,use general real FFT
       CFastFourierTransform::FFTR1D(a,m,cbuf);
       //--- allocation
-      ArrayResizeAL(buf2,m);
+      ArrayResize(buf2,m);
       //--- copy
-      for(i_=0;i_<=n-1;i_++)
+      for(i_=0; i_<=n-1; i_++)
          buf2[i_]=b[i_];
       //--- initialization
-      for(i=n;i<=m-1;i++)
+      for(i=n; i<=m-1; i++)
          buf2[i]=0;
       //--- function call
       CFastFourierTransform::FFTR1D(buf2,m,cbuf2);
       //--- calculation
-      for(i=0;i<=(int)MathFloor((double)m/2.0);i++)
+      for(i=0; i<=(int)MathFloor((double)m/2.0); i++)
          cbuf[i]=cbuf[i]/cbuf2[i];
       //--- function call
       CFastFourierTransform::FFTR1DInv(cbuf,m,r);
@@ -1175,35 +1450,35 @@ static void CConv::ConvR1DCircularInv(double &a[],const int m,double &b[],
 //| OUTPUT PARAMETERS                                                |
 //|     R   -   convolution: A*B. array[0..N+M-1].                   |
 //+------------------------------------------------------------------+
-static void CConv::ConvC1DX(al_complex &a[],const int m,al_complex &b[],const int n,
-                            const bool circular,int alg,int q,al_complex &r[])
+void CConv::ConvC1DX(complex &a[],const int m,complex &b[],const int n,
+                     const bool circular,int alg,int q,complex &r[])
   {
 //--- create variables
-   int        i=0;
-   int        j=0;
-   int        p=0;
-   int        ptotal=0;
-   int        i1=0;
-   int        i2=0;
-   int        j1=0;
-   int        j2=0;
-   al_complex v=0;
-   double     ax=0;
-   double     ay=0;
-   double     bx=0;
-   double     by=0;
-   double     t=0;
-   double     tx=0;
-   double     ty=0;
-   double     flopcand=0;
-   double     flopbest=0;
-   int        algbest=0;
-   int        i_=0;
-   int        i1_=0;
+   int     i=0;
+   int     j=0;
+   int     p=0;
+   int     ptotal=0;
+   int     i1=0;
+   int     i2=0;
+   int     j1=0;
+   int     j2=0;
+   complex v=0;
+   double  ax=0;
+   double  ay=0;
+   double  bx=0;
+   double  by=0;
+   double  t=0;
+   double  tx=0;
+   double  ty=0;
+   double  flopcand=0;
+   double  flopbest=0;
+   int     algbest=0;
+   int     i_=0;
+   int     i1_=0;
 //--- create arrays
-   al_complex bbuf[];
-   double     buf[];
-   double     buf2[];
+   complex bbuf[];
+   double  buf[];
+   double  buf2[];
 //--- object of class
    CFtPlan plan;
 //--- check
@@ -1289,9 +1564,9 @@ static void CConv::ConvC1DX(al_complex &a[],const int m,al_complex &b[],const in
       if(n==1)
         {
          //--- allocation
-         ArrayResizeAL(r,m);
+         ArrayResize(r,m);
          v=b[0];
-         for(i_=0;i_<=m-1;i_++)
+         for(i_=0; i_<=m-1; i_++)
             r[i_]=v*a[i_];
          //--- exit the function
          return;
@@ -1300,13 +1575,13 @@ static void CConv::ConvC1DX(al_complex &a[],const int m,al_complex &b[],const in
       if(circular)
         {
          //--- circular convolution
-         ArrayResizeAL(r,m);
+         ArrayResize(r,m);
          //--- change values
          v=b[0];
-         for(i_=0;i_<=m-1;i_++)
+         for(i_=0; i_<=m-1; i_++)
             r[i_]=v*a[i_];
          //--- calculation
-         for(i=1;i<=n-1;i++)
+         for(i=1; i<=n-1; i++)
            {
             //--- change values
             v=b[i];
@@ -1316,7 +1591,7 @@ static void CConv::ConvC1DX(al_complex &a[],const int m,al_complex &b[],const in
             j2=m-1;
             i1_=j1-i1;
             //--- calculation
-            for(i_=i1;i_<=i2;i_++)
+            for(i_=i1; i_<=i2; i_++)
                r[i_]=r[i_]+v*a[i_+i1_];
             //--- change values
             i1=i;
@@ -1325,23 +1600,23 @@ static void CConv::ConvC1DX(al_complex &a[],const int m,al_complex &b[],const in
             j2=m-i-1;
             i1_=j1-i1;
             //--- calculation
-            for(i_=i1;i_<=i2;i_++)
+            for(i_=i1; i_<=i2; i_++)
                r[i_]=r[i_]+v*a[i_+i1_];
            }
         }
       else
         {
          //--- non-circular convolution
-         ArrayResizeAL(r,m+n-1);
+         ArrayResize(r,m+n-1);
          //--- initialization
-         for(i=0;i<=m+n-2;i++)
+         for(i=0; i<=m+n-2; i++)
             r[i]=0;
          //--- calculation
-         for(i=0;i<=n-1;i++)
+         for(i=0; i<=n-1; i++)
            {
             v=b[i];
             i1_=-i;
-            for(i_=i;i_<=i+m-1;i_++)
+            for(i_=i; i_<=i+m-1; i_++)
                r[i_]=r[i_]+v*a[i_+i1_];
            }
         }
@@ -1360,34 +1635,34 @@ static void CConv::ConvC1DX(al_complex &a[],const int m,al_complex &b[],const in
       if(circular && CFtBase::FtBaseIsSmooth(m))
         {
          //--- special code for circular convolution with smooth M
-         CFtBase::FtBaseGenerateComplexFFtPlan(m,plan);
+         CFtBase::FtComplexFFTPlan(m,1,plan);
          //--- allocation
-         ArrayResizeAL(buf,2*m);
+         ArrayResize(buf,2*m);
          //--- copy
-         for(i=0;i<=m-1;i++)
+         for(i=0; i<=m-1; i++)
            {
-            buf[2*i+0]=a[i].re;
-            buf[2*i+1]=a[i].im;
+            buf[2*i+0]=a[i].real;
+            buf[2*i+1]=a[i].imag;
            }
          //--- allocation
-         ArrayResizeAL(buf2,2*m);
+         ArrayResize(buf2,2*m);
          //--- copy
-         for(i=0;i<=n-1;i++)
+         for(i=0; i<=n-1; i++)
            {
-            buf2[2*i+0]=b[i].re;
-            buf2[2*i+1]=b[i].im;
+            buf2[2*i+0]=b[i].real;
+            buf2[2*i+1]=b[i].imag;
            }
          //--- make zero
-         for(i=n;i<=m-1;i++)
+         for(i=n; i<=m-1; i++)
            {
             buf2[2*i+0]=0;
             buf2[2*i+1]=0;
            }
          //--- function call
-         CFtBase::FtBaseExecutePlan(buf,0,m,plan);
-         CFtBase::FtBaseExecutePlan(buf2,0,m,plan);
+         CFtBase::FtApplyPlan(plan,buf,0,1);
+         CFtBase::FtApplyPlan(plan,buf2,0,1);
          //--- calculation
-         for(i=0;i<=m-1;i++)
+         for(i=0; i<=m-1; i++)
            {
             ax=buf[2*i+0];
             ay=buf[2*i+1];
@@ -1399,15 +1674,15 @@ static void CConv::ConvC1DX(al_complex &a[],const int m,al_complex &b[],const in
             buf[2*i+1]=-ty;
            }
          //--- function call
-         CFtBase::FtBaseExecutePlan(buf,0,m,plan);
+         CFtBase::FtApplyPlan(plan,buf,0,1);
          t=1.0/(double)m;
          //--- allocation
-         ArrayResizeAL(r,m);
+         ArrayResize(r,m);
          //--- change values
-         for(i=0;i<=m-1;i++)
+         for(i=0; i<=m-1; i++)
            {
-            r[i].re=t*buf[2*i+0];
-            r[i].im=-(t*buf[2*i+1]);
+            r[i].real=t*buf[2*i+0];
+            r[i].imag=-(t*buf[2*i+1]);
            }
         }
       else
@@ -1419,40 +1694,40 @@ static void CConv::ConvC1DX(al_complex &a[],const int m,al_complex &b[],const in
          //---   * for non-circular convolution we just copy array
          //---   * for circular convolution we add array tail to its head
          p=CFtBase::FtBaseFindSmooth(m+n-1);
-         CFtBase::FtBaseGenerateComplexFFtPlan(p,plan);
+         CFtBase::FtComplexFFTPlan(p,1,plan);
          //--- allocation
-         ArrayResizeAL(buf,2*p);
+         ArrayResize(buf,2*p);
          //--- copy
-         for(i=0;i<=m-1;i++)
+         for(i=0; i<=m-1; i++)
            {
-            buf[2*i+0]=a[i].re;
-            buf[2*i+1]=a[i].im;
+            buf[2*i+0]=a[i].real;
+            buf[2*i+1]=a[i].imag;
            }
          //--- make zero
-         for(i=m;i<=p-1;i++)
+         for(i=m; i<=p-1; i++)
            {
             buf[2*i+0]=0;
             buf[2*i+1]=0;
            }
          //--- allocation
-         ArrayResizeAL(buf2,2*p);
+         ArrayResize(buf2,2*p);
          //--- copy
-         for(i=0;i<=n-1;i++)
+         for(i=0; i<=n-1; i++)
            {
-            buf2[2*i+0]=b[i].re;
-            buf2[2*i+1]=b[i].im;
+            buf2[2*i+0]=b[i].real;
+            buf2[2*i+1]=b[i].imag;
            }
          //--- make zero
-         for(i=n;i<=p-1;i++)
+         for(i=n; i<=p-1; i++)
            {
             buf2[2*i+0]=0;
             buf2[2*i+1]=0;
            }
          //--- function call
-         CFtBase::FtBaseExecutePlan(buf,0,p,plan);
-         CFtBase::FtBaseExecutePlan(buf2,0,p,plan);
+         CFtBase::FtApplyPlan(plan,buf,0,1);
+         CFtBase::FtApplyPlan(plan,buf2,0,1);
          //--- calculation
-         for(i=0;i<=p-1;i++)
+         for(i=0; i<=p-1; i++)
            {
             ax=buf[2*i+0];
             ay=buf[2*i+1];
@@ -1464,34 +1739,34 @@ static void CConv::ConvC1DX(al_complex &a[],const int m,al_complex &b[],const in
             buf[2*i+1]=-ty;
            }
          //--- function call
-         CFtBase::FtBaseExecutePlan(buf,0,p,plan);
+         CFtBase::FtApplyPlan(plan,buf,0,1);
          t=1.0/(double)p;
          //--- check
          if(circular)
            {
             //--- circular,add tail to head
-            ArrayResizeAL(r,m);
+            ArrayResize(r,m);
             //--- copy
-            for(i=0;i<=m-1;i++)
+            for(i=0; i<=m-1; i++)
               {
-               r[i].re=t*buf[2*i+0];
-               r[i].im=-(t*buf[2*i+1]);
+               r[i].real=t*buf[2*i+0];
+               r[i].imag=-(t*buf[2*i+1]);
               }
             //--- change values
-            for(i=m;i<=m+n-2;i++)
+            for(i=m; i<=m+n-2; i++)
               {
-               r[i-m].re=r[i-m].re+t*buf[2*i+0];
-               r[i-m].im=r[i-m].im-t*buf[2*i+1];
+               r[i-m].real=r[i-m].real+t*buf[2*i+0];
+               r[i-m].imag=r[i-m].imag-t*buf[2*i+1];
               }
            }
          else
            {
             //--- non-circular,just copy
-            ArrayResizeAL(r,m+n-1);
-            for(i=0;i<=m+n-2;i++)
+            ArrayResize(r,m+n-1);
+            for(i=0; i<=m+n-2; i++)
               {
-               r[i].re=t*buf[2*i+0];
-               r[i].im=-(t*buf[2*i+1]);
+               r[i].real=t*buf[2*i+0];
+               r[i].imag=-(t*buf[2*i+1]);
               }
            }
         }
@@ -1508,32 +1783,32 @@ static void CConv::ConvC1DX(al_complex &a[],const int m,al_complex &b[],const in
    if(alg==2)
      {
       //--- allocation
-      ArrayResizeAL(buf,2*(q+n-1));
+      ArrayResize(buf,2*(q+n-1));
       //--- prepare R
       if(circular)
         {
          //--- allocation
-         ArrayResizeAL(r,m);
-         for(i=0;i<=m-1;i++)
+         ArrayResize(r,m);
+         for(i=0; i<=m-1; i++)
             r[i]=0;
         }
       else
         {
          //--- allocation
-         ArrayResizeAL(r,m+n-1);
-         for(i=0;i<=m+n-2;i++)
+         ArrayResize(r,m+n-1);
+         for(i=0; i<=m+n-2; i++)
             r[i]=0;
         }
       //--- pre-calculated FFT(B)
-      ArrayResizeAL(bbuf,q+n-1);
-      for(i_=0;i_<=n-1;i_++)
+      ArrayResize(bbuf,q+n-1);
+      for(i_=0; i_<=n-1; i_++)
          bbuf[i_]=b[i_];
-      for(j=n;j<=q+n-2;j++)
+      for(j=n; j<=q+n-2; j++)
          bbuf[j]=0;
       //--- function call
       CFastFourierTransform::FFTC1D(bbuf,q+n-1);
       //--- prepare FFT plan for chunks of A
-      CFtBase::FtBaseGenerateComplexFFtPlan(q+n-1,plan);
+      CFtBase::FtComplexFFTPlan(q+n-1,1,plan);
       //--- main overlap-add cycle
       i=0;
       //--- calculation
@@ -1541,33 +1816,33 @@ static void CConv::ConvC1DX(al_complex &a[],const int m,al_complex &b[],const in
         {
          p=MathMin(q,m-i);
          //--- copy
-         for(j=0;j<=p-1;j++)
+         for(j=0; j<=p-1; j++)
            {
-            buf[2*j+0]=a[i+j].re;
-            buf[2*j+1]=a[i+j].im;
+            buf[2*j+0]=a[i+j].real;
+            buf[2*j+1]=a[i+j].imag;
            }
          //--- make zero
-         for(j=p;j<=q+n-2;j++)
+         for(j=p; j<=q+n-2; j++)
            {
             buf[2*j+0]=0;
             buf[2*j+1]=0;
            }
          //--- function call
-         CFtBase::FtBaseExecutePlan(buf,0,q+n-1,plan);
+         CFtBase::FtApplyPlan(plan,buf,0,1);
          //--- calculation
-         for(j=0;j<=q+n-2;j++)
+         for(j=0; j<=q+n-2; j++)
            {
             ax=buf[2*j+0];
             ay=buf[2*j+1];
-            bx=bbuf[j].re;
-            by=bbuf[j].im;
+            bx=bbuf[j].real;
+            by=bbuf[j].imag;
             tx=ax*bx-ay*by;
             ty=ax*by+ay*bx;
             buf[2*j+0]=tx;
             buf[2*j+1]=-ty;
            }
          //--- function call
-         CFtBase::FtBaseExecutePlan(buf,0,q+n-1,plan);
+         CFtBase::FtApplyPlan(plan,buf,0,1);
          t=1.0/(double)(q+n-1);
          //--- check
          if(circular)
@@ -1581,16 +1856,16 @@ static void CConv::ConvC1DX(al_complex &a[],const int m,al_complex &b[],const in
             j2=j1+1;
            }
          //--- change values
-         for(j=0;j<=j1;j++)
+         for(j=0; j<=j1; j++)
            {
-            r[i+j].re=r[i+j].re+buf[2*j+0]*t;
-            r[i+j].im=r[i+j].im-buf[2*j+1]*t;
+            r[i+j].real=r[i+j].real+buf[2*j+0]*t;
+            r[i+j].imag=r[i+j].imag-buf[2*j+1]*t;
            }
          //--- change values
-         for(j=j2;j<=p+n-2;j++)
+         for(j=j2; j<=p+n-2; j++)
            {
-            r[j-j2].re=r[j-j2].re+buf[2*j+0]*t;
-            r[j-j2].im=r[j-j2].im-buf[2*j+1]*t;
+            r[j-j2].real=r[j-j2].real+buf[2*j+0]*t;
+            r[j-j2].imag=r[j-j2].imag-buf[2*j+1]*t;
            }
          i=i+p;
         }
@@ -1617,8 +1892,8 @@ static void CConv::ConvC1DX(al_complex &a[],const int m,al_complex &b[],const in
 //| OUTPUT PARAMETERS                                                |
 //|     R   -   convolution: A*B. array[0..N+M-1].                   |
 //+------------------------------------------------------------------+
-static void CConv::ConvR1DX(double &a[],const int m,double &b[],const int n,
-                            const bool circular,int alg,int q,double &r[])
+void CConv::ConvR1DX(double &a[],const int m,double &b[],const int n,
+                     const bool circular,int alg,int q,double &r[])
   {
 //--- create variables
    double v=0;
@@ -1732,9 +2007,9 @@ static void CConv::ConvR1DX(double &a[],const int m,double &b[],const int n,
       if(n==1)
         {
          //--- allocation
-         ArrayResizeAL(r,m);
+         ArrayResize(r,m);
          v=b[0];
-         for(i_=0;i_<=m-1;i_++)
+         for(i_=0; i_<=m-1; i_++)
             r[i_]=v*a[i_];
          //--- exit the function
          return;
@@ -1743,12 +2018,12 @@ static void CConv::ConvR1DX(double &a[],const int m,double &b[],const int n,
       if(circular)
         {
          //--- circular convolution
-         ArrayResizeAL(r,m);
+         ArrayResize(r,m);
          v=b[0];
-         for(i_=0;i_<=m-1;i_++)
+         for(i_=0; i_<=m-1; i_++)
             r[i_]=v*a[i_];
          //--- calculation
-         for(i=1;i<=n-1;i++)
+         for(i=1; i<=n-1; i++)
            {
             //--- change values
             v=b[i];
@@ -1758,7 +2033,7 @@ static void CConv::ConvR1DX(double &a[],const int m,double &b[],const int n,
             j2=m-1;
             i1_=j1-i1;
             //--- calculation
-            for(i_=i1;i_<=i2;i_++)
+            for(i_=i1; i_<=i2; i_++)
                r[i_]=r[i_]+v*a[i_+i1_];
             //--- change values
             i1=i;
@@ -1767,22 +2042,22 @@ static void CConv::ConvR1DX(double &a[],const int m,double &b[],const int n,
             j2=m-i-1;
             i1_=j1-i1;
             //--- calculation
-            for(i_=i1;i_<=i2;i_++)
+            for(i_=i1; i_<=i2; i_++)
                r[i_]=r[i_]+v*a[i_+i1_];
            }
         }
       else
         {
          //--- non-circular convolution
-         ArrayResizeAL(r,m+n-1);
-         for(i=0;i<=m+n-2;i++)
+         ArrayResize(r,m+n-1);
+         for(i=0; i<=m+n-2; i++)
             r[i]=0;
          //--- calculation
-         for(i=0;i<=n-1;i++)
+         for(i=0; i<=n-1; i++)
            {
             v=b[i];
             i1_=-i;
-            for(i_=i;i_<=i+m-1;i_++)
+            for(i_=i; i_<=i+m-1; i_++)
                r[i_]=r[i_]+v*a[i_+i1_];
            }
         }
@@ -1805,19 +2080,19 @@ static void CConv::ConvR1DX(double &a[],const int m,double &b[],const int n,
       if((circular && CFtBase::FtBaseIsSmooth(m)) && m%2==0)
         {
          //--- special code for circular convolution with smooth even M
-         ArrayResizeAL(buf,m);
-         for(i_=0;i_<=m-1;i_++)
+         ArrayResize(buf,m);
+         for(i_=0; i_<=m-1; i_++)
             buf[i_]=a[i_];
          //--- allocation
-         ArrayResizeAL(buf2,m);
-         for(i_=0;i_<=n-1;i_++)
+         ArrayResize(buf2,m);
+         for(i_=0; i_<=n-1; i_++)
             buf2[i_]=b[i_];
-         for(i=n;i<=m-1;i++)
+         for(i=n; i<=m-1; i++)
             buf2[i]=0;
          //--- allocation
-         ArrayResizeAL(buf3,m);
+         ArrayResize(buf3,m);
          //--- function call
-         CFtBase::FtBaseGenerateComplexFFtPlan(m/2,plan);
+         CFtBase::FtComplexFFTPlan(m/2,1,plan);
          //--- function call
          CFastFourierTransform::FFTR1DInternalEven(buf,m,buf3,plan);
          //--- function call
@@ -1826,7 +2101,7 @@ static void CConv::ConvR1DX(double &a[],const int m,double &b[],const int n,
          buf[0]=buf[0]*buf2[0];
          buf[1]=buf[1]*buf2[1];
          //--- calculation
-         for(i=1;i<=m/2-1;i++)
+         for(i=1; i<=m/2-1; i++)
            {
             ax=buf[2*i+0];
             ay=buf[2*i+1];
@@ -1840,9 +2115,9 @@ static void CConv::ConvR1DX(double &a[],const int m,double &b[],const int n,
          //--- function call
          CFastFourierTransform::FFTR1DInvInternalEven(buf,m,buf3,plan);
          //--- allocation
-         ArrayResizeAL(r,m);
+         ArrayResize(r,m);
          //--- copy
-         for(i_=0;i_<=m-1;i_++)
+         for(i_=0; i_<=m-1; i_++)
             r[i_]=buf[i_];
         }
       else
@@ -1855,21 +2130,21 @@ static void CConv::ConvR1DX(double &a[],const int m,double &b[],const int n,
          //---   * for circular convolution we add array tail to its head
          p=CFtBase::FtBaseFindSmoothEven(m+n-1);
          //--- allocation
-         ArrayResizeAL(buf,p);
-         for(i_=0;i_<=m-1;i_++)
+         ArrayResize(buf,p);
+         for(i_=0; i_<=m-1; i_++)
             buf[i_]=a[i_];
-         for(i=m;i<=p-1;i++)
+         for(i=m; i<=p-1; i++)
             buf[i]=0;
          //--- allocation
-         ArrayResizeAL(buf2,p);
-         for(i_=0;i_<=n-1;i_++)
+         ArrayResize(buf2,p);
+         for(i_=0; i_<=n-1; i_++)
             buf2[i_]=b[i_];
-         for(i=n;i<=p-1;i++)
+         for(i=n; i<=p-1; i++)
             buf2[i]=0;
          //--- allocation
-         ArrayResizeAL(buf3,p);
+         ArrayResize(buf3,p);
          //--- function call
-         CFtBase::FtBaseGenerateComplexFFtPlan(p/2,plan);
+         CFtBase::FtComplexFFTPlan(p/2,1,plan);
          //--- function call
          CFastFourierTransform::FFTR1DInternalEven(buf,p,buf3,plan);
          //--- function call
@@ -1878,7 +2153,7 @@ static void CConv::ConvR1DX(double &a[],const int m,double &b[],const int n,
          buf[0]=buf[0]*buf2[0];
          buf[1]=buf[1]*buf2[1];
          //--- calculation
-         for(i=1;i<=p/2-1;i++)
+         for(i=1; i<=p/2-1; i++)
            {
             ax=buf[2*i+0];
             ay=buf[2*i+1];
@@ -1895,22 +2170,22 @@ static void CConv::ConvR1DX(double &a[],const int m,double &b[],const int n,
          if(circular)
            {
             //--- circular,add tail to head
-            ArrayResizeAL(r,m);
-            for(i_=0;i_<=m-1;i_++)
+            ArrayResize(r,m);
+            for(i_=0; i_<=m-1; i_++)
                r[i_]=buf[i_];
             //--- check
             if(n>=2)
               {
                i1_=m;
-               for(i_=0;i_<=n-2;i_++)
+               for(i_=0; i_<=n-2; i_++)
                   r[i_]=r[i_]+buf[i_+i1_];
               }
            }
          else
            {
             //--- non-circular,just copy
-            ArrayResizeAL(r,m+n-1);
-            for(i_=0;i_<=m+n-2;i_++)
+            ArrayResize(r,m+n-1);
+            for(i_=0; i_<=m+n-2; i_++)
                r[i_]=buf[i_];
            }
         }
@@ -1924,30 +2199,30 @@ static void CConv::ConvR1DX(double &a[],const int m,double &b[],const int n,
       if(!CAp::Assert((q+n-1)%2==0,__FUNCTION__+": internal error!"))
          return;
       //--- allocation
-      ArrayResizeAL(buf,q+n-1);
-      ArrayResizeAL(buf2,q+n-1);
-      ArrayResizeAL(buf3,q+n-1);
+      ArrayResize(buf,q+n-1);
+      ArrayResize(buf2,q+n-1);
+      ArrayResize(buf3,q+n-1);
       //--- function call
-      CFtBase::FtBaseGenerateComplexFFtPlan((q+n-1)/2,plan);
+      CFtBase::FtComplexFFTPlan((q+n-1)/2,1,plan);
       //--- prepare R
       if(circular)
         {
          //--- allocation
-         ArrayResizeAL(r,m);
-         for(i=0;i<=m-1;i++)
+         ArrayResize(r,m);
+         for(i=0; i<=m-1; i++)
             r[i]=0;
         }
       else
         {
          //--- allocation
-         ArrayResizeAL(r,m+n-1);
-         for(i=0;i<=m+n-2;i++)
+         ArrayResize(r,m+n-1);
+         for(i=0; i<=m+n-2; i++)
             r[i]=0;
         }
       //--- pre-calculated FFT(B)
-      for(i_=0;i_<=n-1;i_++)
+      for(i_=0; i_<=n-1; i_++)
          buf2[i_]=b[i_];
-      for(j=n;j<=q+n-2;j++)
+      for(j=n; j<=q+n-2; j++)
          buf2[j]=0;
       //--- function call
       CFastFourierTransform::FFTR1DInternalEven(buf2,q+n-1,buf3,plan);
@@ -1959,10 +2234,10 @@ static void CConv::ConvR1DX(double &a[],const int m,double &b[],const int n,
          p=MathMin(q,m-i);
          i1_=i;
          //--- copy
-         for(i_=0;i_<=p-1;i_++)
+         for(i_=0; i_<=p-1; i_++)
             buf[i_]=a[i_+i1_];
          //--- make zero
-         for(j=p;j<=q+n-2;j++)
+         for(j=p; j<=q+n-2; j++)
             buf[j]=0;
          //--- function call
          CFastFourierTransform::FFTR1DInternalEven(buf,q+n-1,buf3,plan);
@@ -1970,7 +2245,7 @@ static void CConv::ConvR1DX(double &a[],const int m,double &b[],const int n,
          buf[0]=buf[0]*buf2[0];
          buf[1]=buf[1]*buf2[1];
          //--- calculation
-         for(j=1;j<=(q+n-1)/2-1;j++)
+         for(j=1; j<=(q+n-1)/2-1; j++)
            {
             ax=buf[2*j+0];
             ay=buf[2*j+1];
@@ -1996,13 +2271,13 @@ static void CConv::ConvR1DX(double &a[],const int m,double &b[],const int n,
            }
          //--- change values
          i1_=-i;
-         for(i_=i;i_<=i+j1;i_++)
+         for(i_=i; i_<=i+j1; i_++)
             r[i_]=r[i_]+buf[i_+i1_];
          //--- check
          if(p+n-2>=j2)
            {
             i1_=j2;
-            for(i_=0;i_<=p+n-2-j2;i_++)
+            for(i_=0; i_<=p+n-2-j2; i_++)
                r[i_]=r[i_]+buf[i_+i1_];
            }
          i=i+p;
@@ -2017,29 +2292,11 @@ static void CConv::ConvR1DX(double &a[],const int m,double &b[],const int n,
 class CCorr
   {
 public:
-   //--- constructor, destructor
-                     CCorr(void);
-                    ~CCorr(void);
-   //--- methods
-   static void       CorrC1D(al_complex &signal[],const int n,al_complex &pattern[],const int m,al_complex &r[]);
-   static void       CorrC1DCircular(al_complex &signal[],const int m,al_complex &pattern[],const int n,al_complex &c[]);
+   static void       CorrC1D(complex &signal[],const int n,complex &pattern[],const int m,complex &r[]);
+   static void       CorrC1DCircular(complex &signal[],const int m,complex &pattern[],const int n,complex &c[]);
    static void       CorrR1D(double &signal[],const int n,double &pattern[],const int m,double &r[]);
    static void       CorrR1DCircular(double &signal[],const int m,double &pattern[],const int n,double &c[]);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CCorr::CCorr(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CCorr::~CCorr(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| 1-dimensional complex cross-correlation.                         |
 //| For given Pattern/Signal returns corr(Pattern,Signal)            |
@@ -2070,35 +2327,35 @@ CCorr::~CCorr(void)
 //| non-zero on [-K..M-1], you can still use this subroutine, just   |
 //| shift result by K.                                               |
 //+------------------------------------------------------------------+
-static void CCorr::CorrC1D(al_complex &signal[],const int n,al_complex &pattern[],
-                           const int m,al_complex &r[])
+void CCorr::CorrC1D(complex &signal[],const int n,complex &pattern[],
+                    const int m,complex &r[])
   {
 //--- create variables
    int i=0;
    int i_=0;
    int i1_=0;
 //--- create arrays
-   al_complex p[];
-   al_complex b[];
+   complex p[];
+   complex b[];
 //--- check
    if(!CAp::Assert(n>0 && m>0,__FUNCTION__+": incorrect N or M!"))
       return;
 //--- allocation
-   ArrayResizeAL(p,m);
-   for(i=0;i<=m-1;i++)
+   ArrayResize(p,m);
+   for(i=0; i<=m-1; i++)
       p[m-1-i]=CMath::Conj(pattern[i]);
 //--- function call
    CConv::ConvC1D(p,m,signal,n,b);
 //--- allocation
-   ArrayResizeAL(r,m+n-1);
+   ArrayResize(r,m+n-1);
    i1_=m-1;
-   for(i_=0;i_<=n-1;i_++)
+   for(i_=0; i_<=n-1; i_++)
       r[i_]=b[i_+i1_];
 //--- check
    if(m+n-2>=n)
      {
       i1_=-n;
-      for(i_=n;i_<=m+n-2;i_++)
+      for(i_=n; i_<=m+n-2; i_++)
          r[i_]=b[i_+i1_];
      }
   }
@@ -2122,8 +2379,8 @@ static void CCorr::CorrC1D(al_complex &signal[],const int n,al_complex &pattern[
 //| OUTPUT PARAMETERS                                                |
 //|     R   -   convolution: A*B. array[0..M-1].                     |
 //+------------------------------------------------------------------+
-static void CCorr::CorrC1DCircular(al_complex &signal[],const int m,al_complex &pattern[],
-                                   const int n,al_complex &c[])
+void CCorr::CorrC1DCircular(complex &signal[],const int m,complex &pattern[],
+                            const int n,complex &c[])
   {
 //--- create variables
    int i1=0;
@@ -2133,8 +2390,8 @@ static void CCorr::CorrC1DCircular(al_complex &signal[],const int m,al_complex &
    int i_=0;
    int i1_=0;
 //--- create arrays
-   al_complex p[];
-   al_complex b[];
+   complex p[];
+   complex b[];
 //--- check
    if(!CAp::Assert(n>0 && m>0,__FUNCTION__+": incorrect N or M!"))
       return;
@@ -2143,9 +2400,9 @@ static void CCorr::CorrC1DCircular(al_complex &signal[],const int m,al_complex &
    if(m<n)
      {
       //--- allocation
-      ArrayResizeAL(b,m);
+      ArrayResize(b,m);
       //--- initialization
-      for(i1=0;i1<=m-1;i1++)
+      for(i1=0; i1<=m-1; i1++)
          b[i1]=0;
       i1=0;
       //--- calculation
@@ -2155,7 +2412,7 @@ static void CCorr::CorrC1DCircular(al_complex &signal[],const int m,al_complex &
          i2=MathMin(i1+m-1,n-1);
          j2=i2-i1;
          i1_=i1;
-         for(i_=0;i_<=j2;i_++)
+         for(i_=0; i_<=j2; i_++)
             b[i_]=b[i_]+pattern[i_+i1_];
          i1=i1+m;
         }
@@ -2165,22 +2422,22 @@ static void CCorr::CorrC1DCircular(al_complex &signal[],const int m,al_complex &
       return;
      }
 //--- Task is normalized
-   ArrayResizeAL(p,n);
-   for(i=0;i<=n-1;i++)
+   ArrayResize(p,n);
+   for(i=0; i<=n-1; i++)
       p[n-1-i]=CMath::Conj(pattern[i]);
 //--- function call
    CConv::ConvC1DCircular(signal,m,p,n,b);
 //--- allocation
-   ArrayResizeAL(c,m);
+   ArrayResize(c,m);
    i1_=n-1;
 //--- copy
-   for(i_=0;i_<=m-n;i_++)
+   for(i_=0; i_<=m-n; i_++)
       c[i_]=b[i_+i1_];
 //--- check
    if(m-n+1<=m-1)
      {
       i1_=-(m-n+1);
-      for(i_=m-n+1;i_<=m-1;i_++)
+      for(i_=m-n+1; i_<=m-1; i_++)
          c[i_]=b[i_+i1_];
      }
   }
@@ -2214,8 +2471,8 @@ static void CCorr::CorrC1DCircular(al_complex &signal[],const int m,al_complex &
 //| non-zero on [-K..M-1],  you can still use this subroutine, just  |
 //| shift result by K.                                               |
 //+------------------------------------------------------------------+
-static void CCorr::CorrR1D(double &signal[],const int n,double &pattern[],
-                           const int m,double &r[])
+void CCorr::CorrR1D(double &signal[],const int n,double &pattern[],
+                    const int m,double &r[])
   {
 //--- create variables
    int i=0;
@@ -2228,23 +2485,23 @@ static void CCorr::CorrR1D(double &signal[],const int n,double &pattern[],
    if(!CAp::Assert(n>0 && m>0,__FUNCTION__+": incorrect N or M!"))
       return;
 //--- allocation
-   ArrayResizeAL(p,m);
+   ArrayResize(p,m);
 //--- copy
-   for(i=0;i<=m-1;i++)
+   for(i=0; i<=m-1; i++)
       p[m-1-i]=pattern[i];
 //--- function call
    CConv::ConvR1D(p,m,signal,n,b);
 //--- allocation
-   ArrayResizeAL(r,m+n-1);
+   ArrayResize(r,m+n-1);
    i1_=m-1;
 //--- copy
-   for(i_=0;i_<=n-1;i_++)
+   for(i_=0; i_<=n-1; i_++)
       r[i_]=b[i_+i1_];
 //--- check
    if(m+n-2>=n)
      {
       i1_=-n;
-      for(i_=n;i_<=m+n-2;i_++)
+      for(i_=n; i_<=m+n-2; i_++)
          r[i_]=b[i_+i1_];
      }
   }
@@ -2267,8 +2524,8 @@ static void CCorr::CorrR1D(double &signal[],const int n,double &pattern[],
 //| OUTPUT PARAMETERS                                                |
 //|     R   -   convolution: A*B. array[0..M-1].                     |
 //+------------------------------------------------------------------+
-static void CCorr::CorrR1DCircular(double &signal[],const int m,double &pattern[],
-                                   const int n,double &c[])
+void CCorr::CorrR1DCircular(double &signal[],const int m,double &pattern[],
+                            const int n,double &c[])
   {
 //--- create variables
    int i1=0;
@@ -2288,9 +2545,9 @@ static void CCorr::CorrR1DCircular(double &signal[],const int m,double &pattern[
    if(m<n)
      {
       //--- allocation
-      ArrayResizeAL(b,m);
+      ArrayResize(b,m);
       //--- initialization
-      for(i1=0;i1<=m-1;i1++)
+      for(i1=0; i1<=m-1; i1++)
          b[i1]=0;
       i1=0;
       //--- calculation
@@ -2300,7 +2557,7 @@ static void CCorr::CorrR1DCircular(double &signal[],const int m,double &pattern[
          i2=MathMin(i1+m-1,n-1);
          j2=i2-i1;
          i1_=i1;
-         for(i_=0;i_<=j2;i_++)
+         for(i_=0; i_<=j2; i_++)
             b[i_]=b[i_]+pattern[i_+i1_];
          i1=i1+m;
         }
@@ -2310,22 +2567,22 @@ static void CCorr::CorrR1DCircular(double &signal[],const int m,double &pattern[
       return;
      }
 //--- Task is normalized
-   ArrayResizeAL(p,n);
-   for(i=0;i<=n-1;i++)
+   ArrayResize(p,n);
+   for(i=0; i<=n-1; i++)
       p[n-1-i]=pattern[i];
 //--- function call
    CConv::ConvR1DCircular(signal,m,p,n,b);
 //--- allocation
-   ArrayResizeAL(c,m);
+   ArrayResize(c,m);
    i1_=n-1;
 //--- copy
-   for(i_=0;i_<=m-n;i_++)
+   for(i_=0; i_<=m-n; i_++)
       c[i_]=b[i_+i1_];
 //--- check
    if(m-n+1<=m-1)
      {
       i1_=-(m-n+1);
-      for(i_=m-n+1;i_<=m-1;i_++)
+      for(i_=m-n+1; i_<=m-1; i_++)
          c[i_]=b[i_+i1_];
      }
   }
@@ -2335,27 +2592,9 @@ static void CCorr::CorrR1DCircular(double &signal[],const int m,double &pattern[
 class CFastHartleyTransform
   {
 public:
-   //--- constructor, destructor
-                     CFastHartleyTransform(void);
-                    ~CFastHartleyTransform(void);
-   //--- methods
    static void       FHTR1D(double &a[],const int n);
    static void       FHTR1DInv(double &a[],const int n);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CFastHartleyTransform::CFastHartleyTransform(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CFastHartleyTransform::~CFastHartleyTransform(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| 1-dimensional Fast Hartley Transform.                            |
 //| Algorithm has O(N*logN) complexity for any N (composite or prime)|
@@ -2367,12 +2606,12 @@ CFastHartleyTransform::~CFastHartleyTransform(void)
 //|           A_out[k]=sum(A_in[j]*(cos(2*pi*j*k/N)+sin(2*pi*j*k/N)),|
 //|           j=0..N-1)                                              |
 //+------------------------------------------------------------------+
-static void CFastHartleyTransform::FHTR1D(double &a[],const int n)
+void CFastHartleyTransform::FHTR1D(double &a[],const int n)
   {
 //--- create a variable
    int i=0;
 //--- create array
-   al_complex fa[];
+   complex fa[];
 //--- object of class
    CFtPlan plan;
 //--- check
@@ -2385,8 +2624,8 @@ static void CFastHartleyTransform::FHTR1D(double &a[],const int n)
 //--- Reduce FHt to real FFT
    CFastFourierTransform::FFTR1D(a,n,fa);
 //--- change values
-   for(i=0;i<=n-1;i++)
-      a[i]=fa[i].re-fa[i].im;
+   for(i=0; i<=n-1; i++)
+      a[i]=fa[i].real-fa[i].imag;
   }
 //+------------------------------------------------------------------+
 //| 1-dimensional inverse FHT.                                       |
@@ -2397,7 +2636,7 @@ static void CFastHartleyTransform::FHTR1D(double &a[],const int n)
 //| OUTPUT PARAMETERS                                                |
 //|     A   -   inverse FHT of a input array, array[0..N-1]          |
 //+------------------------------------------------------------------+
-static void CFastHartleyTransform::FHTR1DInv(double &a[],const int n)
+void CFastHartleyTransform::FHTR1DInv(double &a[],const int n)
   {
 //--- create a variable
    int i=0;
@@ -2412,7 +2651,7 @@ static void CFastHartleyTransform::FHTR1DInv(double &a[],const int n)
 //---     invfht(x)=fht(x)/N
    FHTR1D(a,n);
 //--- change values
-   for(i=0;i<=n-1;i++)
+   for(i=0; i<=n-1; i++)
       a[i]=a[i]/n;
   }
 //+------------------------------------------------------------------+

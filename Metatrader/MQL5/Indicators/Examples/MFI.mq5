@@ -1,10 +1,10 @@
 //+------------------------------------------------------------------+
 //|                                                          MFI.mq5 |
-//|                   Copyright 2009-2020, MetaQuotes Software Corp. |
-//|                                              http://www.mql5.com |
+//|                             Copyright 2000-2025, MetaQuotes Ltd. |
+//|                                             https://www.mql5.com |
 //+------------------------------------------------------------------+
-#property copyright   "2009-2020, MetaQuotes Software Corp."
-#property link        "http://www.mql5.com"
+#property copyright   "Copyright 2000-2025, MetaQuotes Ltd."
+#property link        "https://www.mql5.com"
 #property description "Money Flow Index"
 //--- indicator settings
 #property indicator_separate_window

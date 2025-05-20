@@ -1,6 +1,6 @@
 //+------------------------------------------------------------------+
 //|                                                    Remnant3D.mq5 |
-//|                        Copyright 2017, MetaQuotes Software Corp. |
+//|                             Copyright 2000-2025, MetaQuotes Ltd. |
 //|                                             https://www.mql5.com |
 //+------------------------------------------------------------------+
 #resource "Shaders/vertex.hlsl" as string ExtShaderVS;

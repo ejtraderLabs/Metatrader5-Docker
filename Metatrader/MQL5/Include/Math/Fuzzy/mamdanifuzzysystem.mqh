@@ -1,6 +1,6 @@
 //+------------------------------------------------------------------+
 //|                                           mandanifuzzysystem.mqh |
-//|                   Copyright 2015-2017, MetaQuotes Software Corp. |
+//|                             Copyright 2000-2025, MetaQuotes Ltd. |
 //|                                             https://www.mql5.com |
 //+------------------------------------------------------------------+
 //| Implementation of Fuzzy library in MetaQuotes Language 5         |
@@ -41,8 +41,8 @@
 class CMamdaniFuzzySystem : public CGenericFuzzySystem
   {
 private:
-   CList            *m_output;              // List of fuzzy variable
-   CList            *m_rules;               // List of Mamdani fuzzy rule
+   CList*            m_output;              // List of fuzzy variable
+   CList*            m_rules;               // List of Mamdani fuzzy rule
    ImplicationMethod m_impl_method;         // Implication method
    AggregationMethod m_aggr_method;         // Aggregation method
    DefuzzificationMethod m_defuzz_method;   // Defuzzification method
@@ -51,30 +51,30 @@ public:
                      CMamdaniFuzzySystem(void);
                     ~CMamdaniFuzzySystem(void);
    //--- method gets the output linguistic variables
-   CList             *Output() { return(m_output); }
+   CList*            Output(void) { return(m_output); }
    //--- method gets the fuzzy rule
-   CList             *Rules() { return(m_rules);  }
+   CList*            Rules(void)  { return(m_rules);  }
    //--- methods gets or sets the implication method
-   ImplicationMethod ImplicationMethod()                                { return (m_impl_method);   }
-   void              ImplicationMethod(ImplicationMethod value)         { m_impl_method=value;      }
+   ImplicationMethod GetImplicationMethod(void) const                      { return (m_impl_method);   }
+   void              SetImplicationMethod(ImplicationMethod value)         { m_impl_method=value;      }
    //--- methods gets or sets the aggregation method
-   AggregationMethod AggregationMethod()                                { return (m_aggr_method);   }
-   void              AggregationMethod(AggregationMethod value)         { m_aggr_method=value;      }
+   AggregationMethod GetAggregationMethod(void) const                      { return (m_aggr_method);   }
+   void              SetAggregationMethod(AggregationMethod value)         { m_aggr_method=value;      }
    //--- methods gets or sets the defuzzification method
-   DefuzzificationMethod DefuzzificationMethod()                        { return (m_defuzz_method); }
-   void              DefuzzificationMethod(DefuzzificationMethod value) { m_defuzz_method=value;    }
+   DefuzzificationMethod GetDefuzzificationMethod(void) const              { return (m_defuzz_method); }
+   void              SetDefuzzificationMethod(DefuzzificationMethod value) { m_defuzz_method=value;    }
    //--- maethod gets the variable by name
-   CFuzzyVariable   *OutputByName(const string name);
+   CFuzzyVariable*   OutputByName(const string name);
    //--- create a new rule
-   CMamdaniFuzzyRule *EmptyRule();
+   CMamdaniFuzzyRule* EmptyRule(void);
    //--- parse rule
-   CMamdaniFuzzyRule *ParseRule(const string rule);
+   CMamdaniFuzzyRule* ParseRule(const string rule);
    //--- method for calculate result
-   CList            *Calculate(CList *inputValues);
-   CList            *EvaluateConditions(CList *fuzzifiedInput);
-   CList            *Implicate(CList *conditions);
-   CList            *Aggregate(CList *conclusions);
-   CList            *Defuzzify(CList *fuzzyResult);
+   CList*            Calculate(CList *inputValues);
+   CList*            EvaluateConditions(CList *fuzzifiedInput);
+   CList*            Implicate(CList *conditions);
+   CList*            Aggregate(CList *conclusions);
+   CList*            Defuzzify(CList *fuzzyResult);
    double            Defuzzify(IMembershipFunction *mf,const double min,const double max);
   };
 //+------------------------------------------------------------------+
@@ -82,15 +82,15 @@ public:
 //+------------------------------------------------------------------+
 CMamdaniFuzzySystem::CMamdaniFuzzySystem(void)
   {
-   m_output= new CList;
-   m_rules = new CList;
-   m_impl_method = MinIpm;                // Implication method default is Min
-   m_aggr_method =MaxAgg;                 // Aggregation method default is Max
-   m_defuzz_method = CentroidDef;         // Defuzzification method default is Centroid   
+   m_output        = new CList;
+   m_rules         = new CList;
+   m_impl_method   = MinIpm;                 // Implication method default is Min
+   m_aggr_method   = MaxAgg;                 // Aggregation method default is Max
+   m_defuzz_method = CentroidDef;            // Defuzzification method default is Centroid
   }
 //+------------------------------------------------------------------+
 //| Destructor                                                       |
-//+------------------------------------------------------------------+     
+//+------------------------------------------------------------------+
 CMamdaniFuzzySystem::~CMamdaniFuzzySystem(void)
   {
    delete m_output;
@@ -111,7 +111,7 @@ CFuzzyVariable *CMamdaniFuzzySystem::OutputByName(const string name)
         }
      }
    Print("Variable with that name is not found");
-//--- return 
+//--- return
    return (NULL);
   }
 //+------------------------------------------------------------------+
@@ -139,7 +139,7 @@ CList *CMamdaniFuzzySystem::Calculate(CList *inputValues)
    if(m_rules.Total()==0)
      {
       Print("There should be one rule as minimum.");
-      //--- return 
+      //--- return
       return (NULL);
      }
 //--- Fuzzification step
@@ -152,7 +152,7 @@ CList *CMamdaniFuzzySystem::Calculate(CList *inputValues)
    CList *fuzzyResult=Aggregate(implicatedConclusions);
 //--- Defuzzify the result
    CList *result=Defuzzify(fuzzyResult);
-//--- 
+//---
    delete fuzzyResult;
    for(int i=0; i<implicatedConclusions.Total(); i++)
      {
@@ -260,7 +260,7 @@ CList *CMamdaniFuzzySystem::Aggregate(CList *conclusions)
          default:
            {
             Print("Internal exception.");
-            //--- return 
+            //--- return
             return (NULL);
            }
         }
@@ -296,7 +296,7 @@ double CMamdaniFuzzySystem::Defuzzify(IMembershipFunction *mf,const double min,c
   {
    if(m_defuzz_method==CentroidDef)
      {
-      int k=50;                        // The function is divided into "k" steps 
+      int k=50;                        // The function is divided into "k" steps
       double step=(max-min)/k;         // Calculate the step function
       //+------------------------------------------------------------------+
       //| Calculate a center of gravity as integral                        |
@@ -344,209 +344,213 @@ double CMamdaniFuzzySystem::Defuzzify(IMembershipFunction *mf,const double min,c
          return (MathLog(-1));
         }
      }
-   else if(m_defuzz_method==BisectorDef)
-     {
-      //+-------------------------------------------------------------------------------------+
-      //| The method Bisector consists in finding the point on the abscissa,                  |
-      //| which divides the area under the curve of the membership function in two equal parts|
-      //+-------------------------------------------------------------------------------------+   
-      double Area=0.0;                 // The area under the function
-      int k=50;                        // The function is divided into "k" steps 
-      double now=min;                  // The current position
-      for(int i=0; i<k; i++)
+   else
+      if(m_defuzz_method==BisectorDef)
         {
-         Area+=mf.GetValue(now);
-         now=now+(max-min)/k;
-        }
-      now=min;
-      double halfArea=fabs(Area/2-mf.GetValue(min));
-      Area=0.0;
-      while(true)
-        {
-         Area+=mf.GetValue(now);
-         if(Area>=halfArea)
+         //+-------------------------------------------------------------------------------------+
+         //| The method Bisector consists in finding the point on the abscissa,                  |
+         //| which divides the area under the curve of the membership function in two equal parts|
+         //+-------------------------------------------------------------------------------------+
+         double Area=0.0;                 // The area under the function
+         int k=50;                        // The function is divided into "k" steps
+         double now=min;                  // The current position
+         for(int i=0; i<k; i++)
            {
-            break;
+            Area+=mf.GetValue(now);
+            now=now+(max-min)/k;
            }
-         now=now+(max-min)/k;
-        }
-      delete mf;
-      //--- return result
-      return (now);
-     }
-   else if(m_defuzz_method==AverageMaximumDef)
-     {
-      //+------------------------------------------------------------------------------------------+
-      //| AverageMaximum method is the arithmetic mean of all the maxima of the membership function|
-      //+------------------------------------------------------------------------------------------+    
-      double sum_max=0;                // Sum of local maxima
-      double count_max=0;              // Count of local maxima
-      int k=50;                        // The function is divided into "k" steps 
-      double now=min;                  // The current position
-      double step=(max-min)/k;         // Calculate the step function
-      for(int i=1; i<k; i++)
-        {
-         double point_1 = mf.GetValue(now);
-         double point_0 = mf.GetValue(now - step);
-         double point_2 = mf.GetValue(now + step);
-         //--- check the first element
-         if(i==1)
+         now=min;
+         double halfArea=fabs(Area/2-mf.GetValue(min));
+         Area=0.0;
+         while(true)
            {
-            if(mf.GetValue(min)>mf.GetValue(min+step))
+            Area+=mf.GetValue(now);
+            if(Area>=halfArea)
               {
-               sum_max+=mf.GetValue(min);
-               count_max++;
+               break;
               }
+            now=now+(max-min)/k;
            }
-         //--- check the second element  
-         if(i==k-1)
-           {
-            if(mf.GetValue(max)>mf.GetValue(max-step))
-              {
-               sum_max+=mf.GetValue(max);
-               count_max++;
-              }
-           }
-         //--- check all the other elements   
-         if((point_1>point_0) && (point_1>point_2))
-           {
-            sum_max+=point_1;
-            count_max++;
-           }
-        }
-      if(count_max==0)
-        {
          delete mf;
          //--- return result
-         return (0);
+         return (now);
         }
       else
-        {
-         delete mf;
-         //--- return result
-         return (sum_max/count_max);
-        }
-     }
-   else if(m_defuzz_method==LargestMaximumDef)
-     {
-      CArrayDouble *local_max=new CArrayDouble; // Array of all local maximum
-      double result;                   // Result of defuzzification method
-      int k=50;                        // The function is divided into "k" steps 
-      double now=min;                  // The current position
-      double step=(max-min)/k;         // Calculate the step function
-      for(int i=1; i<k; i++)
-        {
-         double point_1 = mf.GetValue(now);
-         double point_0 = mf.GetValue(now - step);
-         double point_2 = mf.GetValue(now + step);
-         //--- check the first element
-         if(i==1)
+         if(m_defuzz_method==AverageMaximumDef)
            {
-            if(mf.GetValue(min)>mf.GetValue(min+step))
+            //+------------------------------------------------------------------------------------------+
+            //| AverageMaximum method is the arithmetic mean of all the maxima of the membership function|
+            //+------------------------------------------------------------------------------------------+
+            double sum_max=0;                // Sum of local maxima
+            double count_max=0;              // Count of local maxima
+            int k=50;                        // The function is divided into "k" steps
+            double now=min;                  // The current position
+            double step=(max-min)/k;         // Calculate the step function
+            for(int i=1; i<k; i++)
               {
-               local_max.Add(mf.GetValue(min));
+               double point_1 = mf.GetValue(now);
+               double point_0 = mf.GetValue(now - step);
+               double point_2 = mf.GetValue(now + step);
+               //--- check the first element
+               if(i==1)
+                 {
+                  if(mf.GetValue(min)>mf.GetValue(min+step))
+                    {
+                     sum_max+=mf.GetValue(min);
+                     count_max++;
+                    }
+                 }
+               //--- check the second element
+               if(i==k-1)
+                 {
+                  if(mf.GetValue(max)>mf.GetValue(max-step))
+                    {
+                     sum_max+=mf.GetValue(max);
+                     count_max++;
+                    }
+                 }
+               //--- check all the other elements
+               if((point_1>point_0) && (point_1>point_2))
+                 {
+                  sum_max+=point_1;
+                  count_max++;
+                 }
+              }
+            if(count_max==0)
+              {
+               delete mf;
+               //--- return result
+               return (0);
+              }
+            else
+              {
+               delete mf;
+               //--- return result
+               return (sum_max/count_max);
               }
            }
-         //--- check the second element  
-         if(i==k-1)
-           {
-            if(mf.GetValue(max)>mf.GetValue(max-step))
+         else
+            if(m_defuzz_method==LargestMaximumDef)
               {
-               local_max.Add(mf.GetValue(max));
+               CArrayDouble *local_max=new CArrayDouble; // Array of all local maximum
+               double result;                   // Result of defuzzification method
+               int k=50;                        // The function is divided into "k" steps
+               double now=min;                  // The current position
+               double step=(max-min)/k;         // Calculate the step function
+               for(int i=1; i<k; i++)
+                 {
+                  double point_1 = mf.GetValue(now);
+                  double point_0 = mf.GetValue(now - step);
+                  double point_2 = mf.GetValue(now + step);
+                  //--- check the first element
+                  if(i==1)
+                    {
+                     if(mf.GetValue(min)>mf.GetValue(min+step))
+                       {
+                        local_max.Add(mf.GetValue(min));
+                       }
+                    }
+                  //--- check the second element
+                  if(i==k-1)
+                    {
+                     if(mf.GetValue(max)>mf.GetValue(max-step))
+                       {
+                        local_max.Add(mf.GetValue(max));
+                       }
+                    }
+                  //--- check all the other elements
+                  if((point_1>point_0) && (point_1>point_2))
+                    {
+                     local_max.Add(point_1);
+                    }
+                  now+=step;
+                 }
+               result=local_max.At(0);
+               for(int i=0; i<local_max.Total(); i++)
+                 {
+                  if(result<=local_max.At(i))
+                    {
+                     result=local_max.At(i);
+                    }
+                 }
+               now=min;
+               while(true)
+                 {
+                  if(mf.GetValue(now)==result)
+                    {
+                     break;
+                    }
+                  now+=step;
+                 }
+               delete local_max;
+               delete mf;
+               //--- return result
+               return (now);
               }
-           }
-         //--- check all the other elements   
-         if((point_1>point_0) && (point_1>point_2))
-           {
-            local_max.Add(point_1);
-           }
-         now+=step;
-        }
-      result=local_max.At(0);
-      for(int i=0; i<local_max.Total(); i++)
-        {
-         if(result<=local_max.At(i))
-           {
-            result=local_max.At(i);
-           }
-        }
-      now=min;
-      while(true)
-        {
-         if(mf.GetValue(now)==result)
-           {
-            break;
-           }
-         now+=step;
-        }
-      delete local_max;
-      delete mf;
-      //--- return result
-      return (now);
-     }
-   else if(m_defuzz_method==SmallestMaximumDef)
-     {
-      CArrayDouble *local_max=new CArrayDouble; // Array of all local maximum
-      double result;                   // Result of defuzzification method
-      int k=50;                        // The function is divided into "k" steps 
-      double now=min;                  // The current position
-      double step=(max-min)/k;         // Calculate the step function
-      for(int i=1; i<k; i++)
-        {
-         double point_1 = mf.GetValue(now);
-         double point_0 = mf.GetValue(now - step);
-         double point_2 = mf.GetValue(now + step);
-         //--- check the first element
-         if(i==1)
-           {
-            if(mf.GetValue(min)>mf.GetValue(min+step))
-              {
-               local_max.Add(mf.GetValue(min));
-              }
-           }
-         //--- check the second element  
-         if(i==k-1)
-           {
-            if(mf.GetValue(max)>mf.GetValue(max-step))
-              {
-               local_max.Add(mf.GetValue(max));
-              }
-           }
-         //--- check all the other elements   
-         if((point_1>point_0) && (point_1>point_2))
-           {
-            local_max.Add(point_1);
-           }
-         now+=step;
-        }
-      result=local_max.At(0);
-      for(int i=0; i<local_max.Total(); i++)
-        {
-         if(result>=local_max.At(i))
-           {
-            result=local_max.At(i);
-           }
-        }
-      now=min;
-      while(true)
-        {
-         if(mf.GetValue(now)==result)
-           {
-            break;
-           }
-         now+=step;
-        }
-      delete local_max;
-      delete mf;
-      //--- return result
-      return (now);
-     }
-   else
-     {
-      Print("Internal exception.");
-      delete mf;
-      //--- return 
-      return (0);
-     }
+            else
+               if(m_defuzz_method==SmallestMaximumDef)
+                 {
+                  CArrayDouble *local_max=new CArrayDouble; // Array of all local maximum
+                  double result;                   // Result of defuzzification method
+                  int k=50;                        // The function is divided into "k" steps
+                  double now=min;                  // The current position
+                  double step=(max-min)/k;         // Calculate the step function
+                  for(int i=1; i<k; i++)
+                    {
+                     double point_1 = mf.GetValue(now);
+                     double point_0 = mf.GetValue(now - step);
+                     double point_2 = mf.GetValue(now + step);
+                     //--- check the first element
+                     if(i==1)
+                       {
+                        if(mf.GetValue(min)>mf.GetValue(min+step))
+                          {
+                           local_max.Add(mf.GetValue(min));
+                          }
+                       }
+                     //--- check the second element
+                     if(i==k-1)
+                       {
+                        if(mf.GetValue(max)>mf.GetValue(max-step))
+                          {
+                           local_max.Add(mf.GetValue(max));
+                          }
+                       }
+                     //--- check all the other elements
+                     if((point_1>point_0) && (point_1>point_2))
+                       {
+                        local_max.Add(point_1);
+                       }
+                     now+=step;
+                    }
+                  result=local_max.At(0);
+                  for(int i=0; i<local_max.Total(); i++)
+                    {
+                     if(result>=local_max.At(i))
+                       {
+                        result=local_max.At(i);
+                       }
+                    }
+                  now=min;
+                  while(true)
+                    {
+                     if(mf.GetValue(now)==result)
+                       {
+                        break;
+                       }
+                     now+=step;
+                    }
+                  delete local_max;
+                  delete mf;
+                  //--- return result
+                  return (now);
+                 }
+               else
+                 {
+                  Print("Internal exception.");
+                  delete mf;
+                  //--- return
+                  return (0);
+                 }
   }
 //+------------------------------------------------------------------+

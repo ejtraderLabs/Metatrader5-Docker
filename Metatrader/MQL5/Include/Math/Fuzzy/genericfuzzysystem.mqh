@@ -1,6 +1,6 @@
 //+------------------------------------------------------------------+
 //|                                           genericfuzzysystem.mqh |
-//|                   Copyright 2015-2017, MetaQuotes Software Corp. |
+//|                             Copyright 2000-2025, MetaQuotes Ltd. |
 //|                                             https://www.mql5.com |
 //+------------------------------------------------------------------+
 //| Implementation of Fuzzy library in MetaQuotes Language 5         |
@@ -41,8 +41,8 @@ class CGenericFuzzySystem
   {
 private:
    CList            *m_input;          // List of input fuzzy variables
-   AndMethod         m_and_method;     // And method from InferenceMethod
-   OrMethod          m_or_method;      // Or method from InferenceMethod
+   EnAndMethod       m_and_method;     // And method from InferenceMethod
+   EnOrMethod        m_or_method;      // Or method from InferenceMethod
 
 protected:
                      CGenericFuzzySystem(void);
@@ -51,11 +51,11 @@ public:
    //--- method gets the input linguistic variables
    CList            *Input(void) { return(m_input); }
    //--- method gets or sets the type of "And method"
-   void              AndMethod(AndMethod value) { m_and_method=value;    }
-   AndMethod         AndMethod(void)            { return (m_and_method); }
+   void              AndMethod(EnAndMethod value) { m_and_method=value;    }
+   EnAndMethod       AndMethod(void) const        { return (m_and_method); }
    //--- method gets or sets the type of "Or method"
-   void              OrMethod(OrMethod value)   { m_or_method=value;     }
-   OrMethod          OrMethod(void)             { return (m_or_method);  }
+   void              OrMethod(EnOrMethod value)   { m_or_method=value;     }
+   EnOrMethod        OrMethod(void) const         { return (m_or_method);  }
    //--- method gets the varriable by name
    CFuzzyVariable *InputByName(const string name);
    //--- common steps of calculating

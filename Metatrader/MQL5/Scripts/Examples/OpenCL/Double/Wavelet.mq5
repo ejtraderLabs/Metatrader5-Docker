@@ -1,9 +1,9 @@
 //+------------------------------------------------------------------+
 //|                                                      Wavelet.mq5 |
-//|                   Copyright 2016-2017, MetaQuotes Software Corp. |
+//|                             Copyright 2000-2025, MetaQuotes Ltd. |
 //|                                             https://www.mql5.com |
 //+------------------------------------------------------------------+
-#property copyright "Copyright 2016-2017, MetaQuotes Software Corp."
+#property copyright "Copyright 2000-2025, MetaQuotes Ltd."
 #property link      "https://www.mql5.com"
 #property version   "1.00"
 
@@ -84,7 +84,7 @@ void CWavelet::Blend(const uint c1,const uint c2,const uint r1,const uint g1,con
    int n=int(c2-c1);
    for(int i=0; i<=n; i++)
      {
-      if((c1+i+2)<ArraySize(m_palette))
+      if((c1+i+2)<m_palette.Size())
         {
          m_palette[3*(c1+i)]=uchar(MathRound(1*(r1*(n-i)+r2*i)*1.0/n));
          m_palette[3*(c1+i)+1]=uchar(MathRound(1*(g1*(n-i)+g2*i)*1.0/n));

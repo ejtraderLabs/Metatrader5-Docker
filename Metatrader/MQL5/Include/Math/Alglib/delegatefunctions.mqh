@@ -1,7 +1,7 @@
 //+------------------------------------------------------------------+
 //|                                            delegatefunctions.mqh |
-//|            Copyright 2003-2012 Sergey Bochkanov (ALGLIB project) |
-//|                   Copyright 2012-2017, MetaQuotes Software Corp. |
+//|            Copyright 2003-2022 Sergey Bochkanov (ALGLIB project) |
+//|                             Copyright 2012-2023, MetaQuotes Ltd. |
 //|                                             https://www.mql5.com |
 //+------------------------------------------------------------------+
 //| Implementation of ALGLIB library in MetaQuotes Language 5        |
@@ -43,27 +43,31 @@ public:
                     ~CNDimensional_Func(void);
 
    virtual void      Func(double &x[],double &func,CObject &obj);
+   virtual void      Func(CRowDouble &x,double &func,CObject &obj);
   };
 //+------------------------------------------------------------------+
 //| Constructor without parameters                                   |
 //+------------------------------------------------------------------+
 CNDimensional_Func::CNDimensional_Func(void)
   {
-
   }
 //+------------------------------------------------------------------+
 //| Destructor                                                       |
 //+------------------------------------------------------------------+
 CNDimensional_Func::~CNDimensional_Func(void)
   {
-
   }
 //+------------------------------------------------------------------+
 //| Empty function body                                              |
 //+------------------------------------------------------------------+
 void CNDimensional_Func::Func(double &x[],double &func,CObject &obj)
   {
-
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void CNDimensional_Func::Func(CRowDouble &x,double &func,CObject &obj)
+  {
   }
 //+------------------------------------------------------------------+
 //| calculates func = f(arg), grad[i] = df(arg)/d(arg[i])            |
@@ -76,20 +80,19 @@ public:
                     ~CNDimensional_Grad(void);
    //--- virtual method
    virtual void      Grad(double &x[],double &func,double &grad[],CObject &obj);
+   virtual void      Grad(CRowDouble &x,double &func,CRowDouble &grad,CObject &obj);
   };
 //+------------------------------------------------------------------+
 //| Constructor without parameters                                   |
 //+------------------------------------------------------------------+
 CNDimensional_Grad::CNDimensional_Grad(void)
   {
-
   }
 //+------------------------------------------------------------------+
 //| Destructor                                                       |
 //+------------------------------------------------------------------+
 CNDimensional_Grad::~CNDimensional_Grad(void)
   {
-
   }
 //+------------------------------------------------------------------+
 //| Empty function body                                              |
@@ -97,7 +100,13 @@ CNDimensional_Grad::~CNDimensional_Grad(void)
 void CNDimensional_Grad::Grad(double &x[],double &func,double &grad[],
                               CObject &obj)
   {
-
+  }
+//+------------------------------------------------------------------+
+//| Empty function body                                              |
+//+------------------------------------------------------------------+
+void CNDimensional_Grad::Grad(CRowDouble &x,double &func,CRowDouble &grad,
+                              CObject &obj)
+  {
   }
 //+------------------------------------------------------------------+
 //| Calculates func = f(arg), grad[i] = df(arg)/d(arg[i]),           |
@@ -111,20 +120,19 @@ public:
                     ~CNDimensional_Hess(void);
    //--- virtual method
    virtual void      Hess(double &x[],double &func,double &grad[],CMatrixDouble &hess,CObject &obj);
+   virtual void      Hess(CRowDouble &x,double &func,CRowDouble &grad,CMatrixDouble &hess,CObject &obj);
   };
 //+------------------------------------------------------------------+
 //| Constructor without parameters                                   |
 //+------------------------------------------------------------------+
 CNDimensional_Hess::CNDimensional_Hess(void)
   {
-
   }
 //+------------------------------------------------------------------+
 //| Destructor                                                       |
 //+------------------------------------------------------------------+
 CNDimensional_Hess::~CNDimensional_Hess(void)
   {
-
   }
 //+------------------------------------------------------------------+
 //| Empty function body                                              |
@@ -132,7 +140,13 @@ CNDimensional_Hess::~CNDimensional_Hess(void)
 void CNDimensional_Hess::Hess(double &x[],double &func,double &grad[],
                               CMatrixDouble &hess,CObject &obj)
   {
-
+  }
+//+------------------------------------------------------------------+
+//| Empty function body                                              |
+//+------------------------------------------------------------------+
+void CNDimensional_Hess::Hess(CRowDouble &x,double &func,CRowDouble &grad,
+                              CMatrixDouble &hess,CObject &obj)
+  {
   }
 //+------------------------------------------------------------------+
 //| Calculates vector function f(arg), stores result to fi           |
@@ -145,27 +159,31 @@ public:
                     ~CNDimensional_FVec(void);
    //--- virtual method
    virtual void      FVec(double &x[],double &fi[],CObject &obj);
+   virtual void      FVec(CRowDouble &x,CRowDouble &fi,CObject &obj);
   };
 //+------------------------------------------------------------------+
 //| Constructor without parameters                                   |
 //+------------------------------------------------------------------+
 CNDimensional_FVec::CNDimensional_FVec(void)
   {
-
   }
 //+------------------------------------------------------------------+
 //| Destructor                                                       |
 //+------------------------------------------------------------------+
 CNDimensional_FVec::~CNDimensional_FVec(void)
   {
-
   }
 //+------------------------------------------------------------------+
 //| Empty function body                                              |
 //+------------------------------------------------------------------+
 void CNDimensional_FVec::FVec(double &x[],double &fi[],CObject &obj)
   {
-
+  }
+//+------------------------------------------------------------------+
+//| Empty function body                                              |
+//+------------------------------------------------------------------+
+void CNDimensional_FVec::FVec(CRowDouble &x,CRowDouble &fi,CObject &obj)
+  {
   }
 //+------------------------------------------------------------------+
 //| Calculates f[i] = fi(arg), jac[i,j] = df[i](arg)/d(arg[j])       |
@@ -177,30 +195,32 @@ public:
                      CNDimensional_Jac(void);
                     ~CNDimensional_Jac(void);
    //--- virtual method
-   virtual void      Jac(double &x[],double &fi[],CMatrixDouble &jac,
-                         CObject &obj);
+   virtual void      Jac(double &x[],double &fi[],CMatrixDouble &jac,CObject &obj);
+   virtual void      Jac(CRowDouble &x,CRowDouble &fi,CMatrixDouble &jac,CObject &obj);
   };
 //+------------------------------------------------------------------+
 //| Constructor without parameters                                   |
 //+------------------------------------------------------------------+
 CNDimensional_Jac::CNDimensional_Jac(void)
   {
-
   }
 //+------------------------------------------------------------------+
 //| Destructor                                                       |
 //+------------------------------------------------------------------+
 CNDimensional_Jac::~CNDimensional_Jac(void)
   {
-
   }
 //+------------------------------------------------------------------+
 //| Empty function body                                              |
 //+------------------------------------------------------------------+
-void CNDimensional_Jac::Jac(double &x[],double &fi[],CMatrixDouble &jac,
-                            CObject &obj)
+void CNDimensional_Jac::Jac(double &x[],double &fi[],CMatrixDouble &jac,CObject &obj)
   {
-
+  }
+//+------------------------------------------------------------------+
+//| Empty function body                                              |
+//+------------------------------------------------------------------+
+void CNDimensional_Jac::Jac(CRowDouble &x,CRowDouble &fi,CMatrixDouble &jac,CObject &obj)
+  {
   }
 //+------------------------------------------------------------------+
 //| Calculates f(p,q), stores result to func                         |
@@ -213,28 +233,31 @@ public:
                     ~CNDimensional_PFunc(void);
    //--- virtual method
    virtual void      PFunc(double &c[],double &x[],double &func,CObject &obj);
+   virtual void      PFunc(CRowDouble &c,CRowDouble &x,double &func,CObject &obj);
   };
 //+------------------------------------------------------------------+
 //| Constructor without parameters                                   |
 //+------------------------------------------------------------------+
 CNDimensional_PFunc::CNDimensional_PFunc(void)
   {
-
   }
 //+------------------------------------------------------------------+
 //| Destructor                                                       |
 //+------------------------------------------------------------------+
 CNDimensional_PFunc::~CNDimensional_PFunc(void)
   {
-
   }
 //+------------------------------------------------------------------+
 //| Empty function body                                              |
 //+------------------------------------------------------------------+
-void CNDimensional_PFunc::PFunc(double &c[],double &x[],double &func,
-                                CObject &obj)
+void CNDimensional_PFunc::PFunc(double &c[],double &x[],double &func,CObject &obj)
   {
-
+  }
+//+------------------------------------------------------------------+
+//| Empty function body                                              |
+//+------------------------------------------------------------------+
+void CNDimensional_PFunc::PFunc(CRowDouble &c,CRowDouble &x,double &func,CObject &obj)
+  {
   }
 //+------------------------------------------------------------------+
 //| Calculates func = f(p,q), grad[i] = df(p,q)/d(p[i])              |
@@ -247,20 +270,19 @@ public:
                     ~CNDimensional_PGrad(void);
    //--- virtual method
    virtual void      PGrad(double &c[],double &x[],double &func,double &grad[],CObject &obj);
+   virtual void      PGrad(CRowDouble &c,CRowDouble &x,double &func,CRowDouble &grad,CObject &obj);
   };
 //+------------------------------------------------------------------+
 //| Constructor without parameters                                   |
 //+------------------------------------------------------------------+
 CNDimensional_PGrad::CNDimensional_PGrad(void)
   {
-
   }
 //+------------------------------------------------------------------+
 //| Destructor                                                       |
 //+------------------------------------------------------------------+
 CNDimensional_PGrad::~CNDimensional_PGrad(void)
   {
-
   }
 //+------------------------------------------------------------------+
 //| Empty function body                                              |
@@ -268,7 +290,13 @@ CNDimensional_PGrad::~CNDimensional_PGrad(void)
 void CNDimensional_PGrad::PGrad(double &c[],double &x[],double &func,
                                 double &grad[],CObject &obj)
   {
-
+  }
+//+------------------------------------------------------------------+
+//| Empty function body                                              |
+//+------------------------------------------------------------------+
+void CNDimensional_PGrad::PGrad(CRowDouble &c,CRowDouble &x,double &func,
+                                CRowDouble &grad,CObject &obj)
+  {
   }
 //+------------------------------------------------------------------+
 //| Calculates func = f(p,q), grad[i] = df(p,q)/d(p[i]),             |
@@ -282,20 +310,19 @@ public:
                     ~CNDimensional_PHess(void);
    //--- virtual method
    virtual void      PHess(double &c[],double &x[],double &func,double &grad[],CMatrixDouble &hess,CObject &obj);
+   virtual void      PHess(CRowDouble &c,CRowDouble &x,double &func,CRowDouble &grad,CMatrixDouble &hess,CObject &obj);
   };
 //+------------------------------------------------------------------+
 //| Constructor without parameters                                   |
 //+------------------------------------------------------------------+
 CNDimensional_PHess::CNDimensional_PHess(void)
   {
-
   }
 //+------------------------------------------------------------------+
 //| Destructor                                                       |
 //+------------------------------------------------------------------+
 CNDimensional_PHess::~CNDimensional_PHess(void)
   {
-
   }
 //+------------------------------------------------------------------+
 //| Empty function body                                              |
@@ -304,7 +331,14 @@ void CNDimensional_PHess::PHess(double &c[],double &x[],double &func,
                                 double &grad[],CMatrixDouble &hess,
                                 CObject &obj)
   {
-
+  }
+//+------------------------------------------------------------------+
+//| Empty function body                                              |
+//+------------------------------------------------------------------+
+void CNDimensional_PHess::PHess(CRowDouble &c,CRowDouble &x,double &func,
+                                CRowDouble &grad,CMatrixDouble &hess,
+                                CObject &obj)
+  {
   }
 //+------------------------------------------------------------------+
 //| Callbacks for ODE solvers: calculates dy/dx for given y[] and x  |
@@ -323,14 +357,12 @@ public:
 //+------------------------------------------------------------------+
 CNDimensional_ODE_RP::CNDimensional_ODE_RP(void)
   {
-
   }
 //+------------------------------------------------------------------+
 //| Destructor                                                       |
 //+------------------------------------------------------------------+
 CNDimensional_ODE_RP::~CNDimensional_ODE_RP(void)
   {
-
   }
 //+------------------------------------------------------------------+
 //| Empty function body                                              |
@@ -338,7 +370,6 @@ CNDimensional_ODE_RP::~CNDimensional_ODE_RP(void)
 void CNDimensional_ODE_RP::ODE_RP(double &y[],double x,double &dy[],
                                   CObject &obj)
   {
-
   }
 //+------------------------------------------------------------------+
 //| Callbacks for integrators: calculates f(x) for given x           |
@@ -358,14 +389,12 @@ public:
 //+------------------------------------------------------------------+
 CIntegrator1_Func::CIntegrator1_Func(void)
   {
-
   }
 //+------------------------------------------------------------------+
 //| Destructor                                                       |
 //+------------------------------------------------------------------+
 CIntegrator1_Func::~CIntegrator1_Func(void)
   {
-
   }
 //+------------------------------------------------------------------+
 //| Empty function body                                              |
@@ -373,7 +402,6 @@ CIntegrator1_Func::~CIntegrator1_Func(void)
 void CIntegrator1_Func::Int_Func(double x,double xminusa,double bminusx,
                                  double &y,CObject &obj)
   {
-
   }
 //+------------------------------------------------------------------+
 //| Callbacks for progress reports: reports current position of      |
@@ -387,26 +415,30 @@ public:
                     ~CNDimensional_Rep(void);
    //--- virtual method
    virtual void      Rep(double &arg[],double func,CObject &obj);
+   virtual void      Rep(CRowDouble &arg,double func,CObject &obj);
   };
 //+------------------------------------------------------------------+
 //| Constructor without parameters                                   |
 //+------------------------------------------------------------------+
 CNDimensional_Rep::CNDimensional_Rep(void)
   {
-
   }
 //+------------------------------------------------------------------+
 //| Destructor                                                       |
 //+------------------------------------------------------------------+
 CNDimensional_Rep::~CNDimensional_Rep(void)
   {
-
   }
 //+------------------------------------------------------------------+
 //| Empty function body                                              |
 //+------------------------------------------------------------------+
 void CNDimensional_Rep::Rep(double &arg[],double func,CObject &obj)
   {
-
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void CNDimensional_Rep::Rep(CRowDouble &arg,double func,CObject &obj)
+  {
   }
 //+------------------------------------------------------------------+

@@ -1,6 +1,6 @@
 //+------------------------------------------------------------------+
 //|                                              inferencemethod.mqh |
-//|                   Copyright 2015-2017, MetaQuotes Software Corp. |
+//|                             Copyright 2000-2025, MetaQuotes Ltd. |
 //|                                             https://www.mql5.com |
 //+------------------------------------------------------------------+
 //| Implementation of Fuzzy library in MetaQuotes Language 5         |
@@ -34,7 +34,7 @@
 //+------------------------------------------------------------------+
 //| And evaluating method                                            |
 //+------------------------------------------------------------------+
-enum AndMethod
+enum EnAndMethod
   {
    MinAnd,                            // Minimum: min(a, b)
    ProductionAnd                      // Production: a * b
@@ -42,7 +42,7 @@ enum AndMethod
 //+------------------------------------------------------------------+
 //| Or evaluating method                                             |
 //+------------------------------------------------------------------+
-enum OrMethod
+enum EnOrMethod
   {
    MaxOr,                             // Maximum: max(a, b)
    ProbabilisticOr                    // Probabilistic OR: a + b - a * b

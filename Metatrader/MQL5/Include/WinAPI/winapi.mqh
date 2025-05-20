@@ -1,6 +1,6 @@
 //+------------------------------------------------------------------+
 //|                                                       winapi.mqh |
-//|                        Copyright 2018, MetaQuotes Software Corp. |
+//|                             Copyright 2000-2025, MetaQuotes Ltd. |
 //|                                             https://www.mql5.com |
 //+------------------------------------------------------------------+
 #include "windef.mqh"

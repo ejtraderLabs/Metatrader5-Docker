@@ -1,6 +1,6 @@
 //+------------------------------------------------------------------+
 //|                                                    TestFuzzy.mq5 |
-//|                   Copyright 2015-2017, MetaQuotes Software Corp. |
+//|                             Copyright 2000-2025, MetaQuotes Ltd. |
 //|                                             https://www.mql5.com |
 //+------------------------------------------------------------------+
 //| Implementation of Fuzzy library in MetaQuotes Language 5         |
@@ -278,7 +278,7 @@ bool Test_Bisector()
   {
    double delta=1e-10;
    CMamdaniFuzzySystem system();
-   system.DefuzzificationMethod(BisectorDef);
+   system.SetDefuzzificationMethod(BisectorDef);
    CTriangularMembershipFunction *function=new CTriangularMembershipFunction(0,5,5);
    double actual=system.Defuzzify(function,0,5);
    double expected=3.5;
@@ -297,7 +297,7 @@ bool Test_Centroid()
    bool result=true;
    double delta=1e-1;
    CMamdaniFuzzySystem system();
-   system.DefuzzificationMethod(CentroidDef);
+   system.SetDefuzzificationMethod(CentroidDef);
    double mean[]={-5,-3,-1,1,3,5};
    double sigma[]={1,2};
    for(int i=0; i<ArraySize(mean); i++)
@@ -327,7 +327,7 @@ bool Test_Defuzzification()
    double actual=0.0;
    double expected=0.0;
 //---  
-   system.DefuzzificationMethod(CentroidDef);
+   system.SetDefuzzificationMethod(CentroidDef);
    actual=system.Defuzzify(new CNormalMembershipFunction(0,2),-10,10);
    if(MathAbs(actual-expected)>=delta)
      {
@@ -335,7 +335,7 @@ bool Test_Defuzzification()
       result=false;
      }
 //---
-   system.DefuzzificationMethod(BisectorDef);
+   system.SetDefuzzificationMethod(BisectorDef);
    actual=system.Defuzzify(new CNormalMembershipFunction(0,2),-10,10);
    if(MathAbs(actual-expected)>=delta)
      {
@@ -343,7 +343,7 @@ bool Test_Defuzzification()
       result=false;
      }
 //---
-   system.DefuzzificationMethod(AverageMaximumDef);
+   system.SetDefuzzificationMethod(AverageMaximumDef);
    actual=system.Defuzzify(new CNormalMembershipFunction(0,2),-10,10);
    if(MathAbs(actual-expected)>=delta)
      {
@@ -351,7 +351,7 @@ bool Test_Defuzzification()
       result=false;
      }
 //---
-   system.DefuzzificationMethod(SmallestMaximumDef);
+   system.SetDefuzzificationMethod(SmallestMaximumDef);
    actual=system.Defuzzify(new CNormalMembershipFunction(0,2),-10,10);
    if(MathAbs(actual-expected)>=delta)
      {
@@ -359,7 +359,7 @@ bool Test_Defuzzification()
       result=false;
      }
 //---
-   system.DefuzzificationMethod(LargestMaximumDef);
+   system.SetDefuzzificationMethod(LargestMaximumDef);
    actual=system.Defuzzify(new CNormalMembershipFunction(0,2),-10,10);
    if(MathAbs(actual-expected)>=delta)
      {

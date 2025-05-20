@@ -1,6 +1,6 @@
 //+------------------------------------------------------------------+
 //|                                                    Introsort.mqh |
-//|                        Copyright 2016, MetaQuotes Software Corp. |
+//|                             Copyright 2000-2025, MetaQuotes Ltd. |
 //|                                             https://www.mql5.com |
 //+------------------------------------------------------------------+
 //+------------------------------------------------------------------+
@@ -11,7 +11,7 @@ template<typename TKey,typename TItem>
 struct Introsort
   {
 public:
-   IComparer<TKey>*comparer;
+   IComparer<TKey>*  comparer;
    TKey              keys[];
    TItem             items[];
 
@@ -24,7 +24,7 @@ private:
    void              IntroSort(const int lo,const int hi,int depthLimit);
    int               PickPivotAndPartition(const int lo,const int hi);
    void              InsertionSort(const int lo,const int hi);
-   //--- methods for heap sorting  
+   //--- methods for heap sorting
    void              Heapsort(const int lo,const int hi);
    void              DownHeap(const int i,const int n,const int lo);
    //--- swap methods
@@ -221,31 +221,24 @@ void Introsort::Heapsort(const int lo,const int hi)
 template<typename TKey,typename TItem>
 void Introsort::DownHeap(int i,const int n,const int lo)
   {
-   TKey d=keys[lo+i-1];
-   TItem dt=items[lo+i-1];
-   int child;
+   bool  f=ArraySize(items)!=0;
+   TKey  d=keys[lo+i-1];
+   TItem dt=f ? (TItem)items[lo+i-1] : (TItem)NULL;
+
    while(i<=n/2)
      {
-      child=2*i;
+      int child=2*i;
       if(child<n && comparer.Compare(keys[lo+child-1],keys[lo+child])<0)
-        {
          child++;
-        }
       if(!(comparer.Compare(d,keys[lo+child-1])<0))
-        {
          break;
-        }
       keys[lo+i-1]=keys[lo+child-1];
-      if(true)//(items!=NULL)
-        {
+      if(f)
          items[lo+i-1]=items[lo+child-1];
-        }
       i=child;
      }
    keys[lo+i-1]=d;
-   if(ArraySize(items)!=NULL)
-     {
+   if(f)
       items[lo+i-1]=dt;
-     }
   }
 //+------------------------------------------------------------------+

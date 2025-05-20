@@ -1,6 +1,6 @@
 //+------------------------------------------------------------------+
 //|                                            sugenofuzzysystem.mqh |
-//|                   Copyright 2015-2017, MetaQuotes Software Corp. |
+//|                             Copyright 2000-2025, MetaQuotes Ltd. |
 //|                                             https://www.mql5.com |
 //+------------------------------------------------------------------+
 //| Implementation of Fuzzy library in MetaQuotes Language 5         |
@@ -41,29 +41,29 @@
 class CSugenoFuzzySystem : public CGenericFuzzySystem
   {
 private:
-   CList            *m_output;              // List of Sugeno variable
-   CList            *m_rules;               // List of Sugeno fuzzy rule
+   CList             *m_output;              // List of Sugeno variable
+   CList             *m_rules;               // List of Sugeno fuzzy rule
 
 public:
                      CSugenoFuzzySystem(void);
                     ~CSugenoFuzzySystem(void);
    //--- method gets the output linguistic variables
-   CList            *Output() { return(m_output); }
+   CList*            Output(void) { return(m_output); }
    //--- method gets the fuzzy rule
-   CList            *Rules() { return(m_rules);  }
+   CList*            Rules(void)  { return(m_rules);  }
    //--- maethod gets the variable by name
-   CSugenoVariable *OutputByName(const string name);
+   CSugenoVariable*  OutputByName(const string name);
    //--- method create new linear function
-   CLinearSugenoFunction *CreateSugenoFunction(const string name,CList *coeffs,const double constValue);
-   CLinearSugenoFunction *CreateSugenoFunction(const string name,const double &coeffs[]);
+   CLinearSugenoFunction* CreateSugenoFunction(const string name,CList *coeffs,const double constValue);
+   CLinearSugenoFunction* CreateSugenoFunction(const string name,const double &coeffs[]);
    //--- method create a new rule
-   CSugenoFuzzyRule *EmptyRule();
+   CSugenoFuzzyRule* EmptyRule(void);
    //--- method for calculate result
-   CSugenoFuzzyRule *ParseRule(const string rule);
-   CList            *EvaluateConditions(CList *fuzzifiedInput);
-   CList            *EvaluateFunctions(CList *inputValues);
-   CList            *CombineResult(CList *ruleWeights,CList *functionResults);
-   CList            *Calculate(CList *inputValues);
+   CSugenoFuzzyRule* ParseRule(const string rule);
+   CList*            EvaluateConditions(CList *fuzzifiedInput);
+   CList*            EvaluateFunctions(CList *inputValues);
+   CList*            CombineResult(CList *ruleWeights,CList *functionResults);
+   CList*            Calculate(CList *inputValues);
   };
 //+------------------------------------------------------------------+
 //| Constructor without parameters                                   |
@@ -75,7 +75,7 @@ CSugenoFuzzySystem::CSugenoFuzzySystem(void)
   }
 //+------------------------------------------------------------------+
 //| Destructor                                                       |
-//+------------------------------------------------------------------+     
+//+------------------------------------------------------------------+
 CSugenoFuzzySystem::~CSugenoFuzzySystem(void)
   {
    delete m_output;
@@ -96,7 +96,7 @@ CSugenoVariable *CSugenoFuzzySystem::OutputByName(const string name)
         }
      }
    Print("Variable with that name is not found");
-//--- return  
+//--- return
    return (NULL);
   }
 //+------------------------------------------------------------------------+
@@ -104,7 +104,7 @@ CSugenoVariable *CSugenoFuzzySystem::OutputByName(const string name)
 //+------------------------------------------------------------------------+
 CLinearSugenoFunction *CSugenoFuzzySystem::CreateSugenoFunction(const string name,CList *coeffs,const double constValue)
   {
-//--- return linear Sugeno function  
+//--- return linear Sugeno function
    return new CLinearSugenoFunction(name, CGenericFuzzySystem::Input(), coeffs, constValue);
   }
 //+------------------------------------------------------------------------+
@@ -112,7 +112,7 @@ CLinearSugenoFunction *CSugenoFuzzySystem::CreateSugenoFunction(const string nam
 //+------------------------------------------------------------------------+
 CLinearSugenoFunction *CSugenoFuzzySystem::CreateSugenoFunction(const string name,const double &coeffs[])
   {
-//--- return linear Sugeno function 
+//--- return linear Sugeno function
    return new CLinearSugenoFunction(name, Input(), coeffs);
   }
 //+------------------------------------------------------------------+
@@ -216,7 +216,7 @@ CList *CSugenoFuzzySystem::CombineResult(CList *ruleWeights,CList *functionResul
             break;
            }
         }
-      for(int j=0; j<ruleWeights.Total();j++)
+      for(int j=0; j<ruleWeights.Total(); j++)
         {
          p_rd=ruleWeights.GetNodeAtIndex(j);
          if(p_rd.Key()==rule)
@@ -225,7 +225,7 @@ CList *CSugenoFuzzySystem::CombineResult(CList *ruleWeights,CList *functionResul
             break;
            }
         }
-      for(int j=0; j<numerators.Total();j++)
+      for(int j=0; j<numerators.Total(); j++)
         {
          p_vd1=numerators.GetNodeAtIndex(j);
          double num=p_vd1.Value();
@@ -236,7 +236,7 @@ CList *CSugenoFuzzySystem::CombineResult(CList *ruleWeights,CList *functionResul
             break;
            }
         }
-      for(int j=0; j<denominators.Total();j++)
+      for(int j=0; j<denominators.Total(); j++)
         {
          p_vd2=denominators.GetNodeAtIndex(j);
          double den=p_vd2.Value();
@@ -296,7 +296,7 @@ CList *CSugenoFuzzySystem::Calculate(CList *inputValues)
    if(m_rules.Total()==0)
      {
       Print("There should be one rule as minimum.");
-      //--- return 
+      //--- return
       return (NULL);
      }
 //--- Fuzzification step

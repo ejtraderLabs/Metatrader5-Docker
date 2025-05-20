@@ -1,6 +1,6 @@
 //+------------------------------------------------------------------+
 //|                                                      HashSet.mqh |
-//|                   Copyright 2016-2021, MetaQuotes Software Corp. |
+//|                             Copyright 2000-2025, MetaQuotes Ltd. |
 //|                                             https://www.mql5.com |
 //+------------------------------------------------------------------+
 #include<Generic\Interfaces\ISet.mqh>

@@ -1,6 +1,6 @@
 //+------------------------------------------------------------------+
 //|                                                TestArrayList.mq5 |
-//|                        Copyright 2017, MetaQuotes Software Corp. |
+//|                             Copyright 2000-2025, MetaQuotes Ltd. |
 //|                                             https://www.mql5.com |
 //+------------------------------------------------------------------+
 #include <Generic\ArrayList.mqh>
@@ -295,6 +295,42 @@ bool TestIndexOf_OrderIsCorrect(const int count)
    return(true);
   }
 //+------------------------------------------------------------------+
+//| TestIndexOf_Common.                                              |
+//+------------------------------------------------------------------+
+bool TestIndexOf_Common(const int count)
+  {
+//--- create source list
+   CArrayList<int>list_test(count);
+   for(int i=0; i<count; i++)
+      list_test.Add(i);
+//--- get item from middle of array
+   int item = count/2;
+//--- find value with method IndexOf
+   if(item != list_test.IndexOf(item))
+      return (false);
+   if(item != list_test.IndexOf(item, 0))
+      return (false);
+   if(item != list_test.IndexOf(item, 0, item+1))
+      return (false);
+   if(item != list_test.IndexOf(item, 0, count))
+      return (false);
+   if(item != list_test.IndexOf(item,  0, count+1))
+      return (false);
+//--- find value with method LastIndexOf
+   if(item != list_test.LastIndexOf(item))
+      return (false);
+   if(item != list_test.LastIndexOf(item, count-1))
+      return (false);
+   if(item != list_test.LastIndexOf(item, count-1, count-item))
+      return (false);
+   if(item != list_test.LastIndexOf(item, count-1, count))
+      return (false);
+   if(item != list_test.LastIndexOf(item, count-1, count+1))
+      return (false);
+//--- successful
+   return(true);
+  }
+//+------------------------------------------------------------------+
 //| TestIndexOf_OutOfRange.                                          |
 //+------------------------------------------------------------------+
 bool TestIndexOf_OutOfRange(const int count)
@@ -306,13 +342,13 @@ bool TestIndexOf_OutOfRange(const int count)
 //--- crete some element
    int element=MathRand();
 //--- try to find index of element
-   if(list_test.IndexOf(element,count+1)!=-1 || 
+   if(list_test.IndexOf(element,count+1)!=-1 ||
       list_test.IndexOf(element,count+10)!=-1 ||
       list_test.IndexOf(element, count-1)!=-1 ||
       list_test.IndexOf(element,INT_MIN)!=-1 ||
       list_test.IndexOf(element,count,1)!=-1 ||
-      list_test.IndexOf(element,count+1,1)!=-1 || 
-      list_test.IndexOf(element,count/2,count/2+2)!=-1 || 
+      list_test.IndexOf(element,count+1,1)!=-1 ||
+      list_test.IndexOf(element,count/2,count/2+2)!=-1 ||
       list_test.IndexOf(element, 0, -1)!=-1 ||
       list_test.IndexOf(element, -1, 1)!=-1)
       return(false);
@@ -337,6 +373,10 @@ bool TestIndexOf(const string test_name)
    PrintFormat("%s: Test 3: Validation of IndexOf method on the list with duplicate values and incorrect input parameters.",test_name);
    if(!TestIndexOf_OutOfRange(10))
       return(false);
+//--- test 4
+   PrintFormat("%s: Test 3: Validation of IndexOf method on the list with duplicate values and differents input parameters.",test_name);
+   if(!TestIndexOf_Common(10))
+      return(false);
 //--- successful
    PrintFormat("%s passed",test_name);
    return(true);
@@ -354,7 +394,7 @@ bool TestMisc_BasicInsert(const int count)
    CArrayList<int>list_clone(GetPointer(list_test));
 //--- create random array
    int element=MathRand();
-//--- insert 
+//--- insert
    int index=count/2;
    for(int i=0; i<count; i++)
       list_test.Insert(index,element);
@@ -621,7 +661,7 @@ bool TestRemove_Range(const int count)
          if(value_actual!=value_clone)
             return(false);
         }
-      for(int i=rindex; i<count-rcount;i++)
+      for(int i=rindex; i<count-rcount; i++)
         {
          int value_actual;
          int value_clone;
@@ -645,27 +685,48 @@ bool TestRemove_Invalid(const int count)
       list_test.Add(MathRand());
 //--- create invalid paremeters
    int values[21][2];
-   values[0][0]=count;      values[0][1]=1;
-   values[1][0]=count+1;    values[1][1]=0;
-   values[2][0]=count+1;    values[2][1]=1;
-   values[3][0]=count;      values[3][1]=2;
-   values[4][0]=count/2;    values[4][1]=count/2+1;
-   values[5][0]=count-1;    values[5][1]=2;
-   values[6][0]=count-2;    values[6][1]=3;
-   values[7][0]=1;          values[7][1]=count;
-   values[8][0]=0;          values[8][1]=count+1;
-   values[9][0]=1;          values[9][1]=count+1;
-   values[10][0]=2;         values[10][1]=count;
-   values[11][0]=count/2+1; values[11][1]=count/2;
-   values[12][0]=2;         values[12][1]=count-1;
-   values[13][0]=3;         values[13][1]=count-2;
-   values[14][0]=-1;        values[14][1]=-1;
-   values[15][0]=-1;        values[15][1]=0;
-   values[16][0]=-1;        values[16][1]=1;
-   values[17][0]=-1;        values[17][1]=2;
-   values[18][0]=0;         values[18][1]=-1;
-   values[19][0]=1;         values[19][1]=-1;
-   values[20][0]=2;         values[20][1]=-1;
+   values[0][0]=count;
+   values[0][1]=1;
+   values[1][0]=count+1;
+   values[1][1]=0;
+   values[2][0]=count+1;
+   values[2][1]=1;
+   values[3][0]=count;
+   values[3][1]=2;
+   values[4][0]=count/2;
+   values[4][1]=count/2+1;
+   values[5][0]=count-1;
+   values[5][1]=2;
+   values[6][0]=count-2;
+   values[6][1]=3;
+   values[7][0]=1;
+   values[7][1]=count;
+   values[8][0]=0;
+   values[8][1]=count+1;
+   values[9][0]=1;
+   values[9][1]=count+1;
+   values[10][0]=2;
+   values[10][1]=count;
+   values[11][0]=count/2+1;
+   values[11][1]=count/2;
+   values[12][0]=2;
+   values[12][1]=count-1;
+   values[13][0]=3;
+   values[13][1]=count-2;
+   values[14][0]=-1;
+   values[14][1]=-1;
+   values[15][0]=-1;
+   values[15][1]=0;
+   values[16][0]=-1;
+   values[16][1]=1;
+   values[17][0]=-1;
+   values[17][1]=2;
+   values[18][0]=0;
+   values[18][1]=-1;
+   values[19][0]=1;
+   values[19][1]=-1;
+   values[20][0]=2;
+   values[20][1]=-1;
 //--- remove range
    for(int j=0; j<21; j++)
      {
@@ -773,27 +834,48 @@ bool TestReverse_Invalid(const int count)
       list_test.Add(MathRand());
 //--- create invalid paremeters
    int values[21][2];
-   values[0][0]=count;      values[0][1]=1;
-   values[1][0]=count+1;    values[1][1]=0;
-   values[2][0]=count+1;    values[2][1]=1;
-   values[3][0]=count;      values[3][1]=2;
-   values[4][0]=count/2;    values[4][1]=count/2+1;
-   values[5][0]=count-1;    values[5][1]=2;
-   values[6][0]=count-2;    values[6][1]=3;
-   values[7][0]=1;          values[7][1]=count;
-   values[8][0]=0;          values[8][1]=count+1;
-   values[9][0]=1;          values[9][1]=count+1;
-   values[10][0]=2;         values[10][1]=count;
-   values[11][0]=count/2+1; values[11][1]=count/2;
-   values[12][0]=2;         values[12][1]=count-1;
-   values[13][0]=3;         values[13][1]=count-2;
-   values[14][0]=-1;        values[14][1]=-1;
-   values[15][0]=-1;        values[15][1]=0;
-   values[16][0]=-1;        values[16][1]=1;
-   values[17][0]=-1;        values[17][1]=2;
-   values[18][0]=0;         values[18][1]=-1;
-   values[19][0]=1;         values[19][1]=-1;
-   values[20][0]=2;         values[20][1]=-1;
+   values[0][0]=count;
+   values[0][1]=1;
+   values[1][0]=count+1;
+   values[1][1]=0;
+   values[2][0]=count+1;
+   values[2][1]=1;
+   values[3][0]=count;
+   values[3][1]=2;
+   values[4][0]=count/2;
+   values[4][1]=count/2+1;
+   values[5][0]=count-1;
+   values[5][1]=2;
+   values[6][0]=count-2;
+   values[6][1]=3;
+   values[7][0]=1;
+   values[7][1]=count;
+   values[8][0]=0;
+   values[8][1]=count+1;
+   values[9][0]=1;
+   values[9][1]=count+1;
+   values[10][0]=2;
+   values[10][1]=count;
+   values[11][0]=count/2+1;
+   values[11][1]=count/2;
+   values[12][0]=2;
+   values[12][1]=count-1;
+   values[13][0]=3;
+   values[13][1]=count-2;
+   values[14][0]=-1;
+   values[14][1]=-1;
+   values[15][0]=-1;
+   values[15][1]=0;
+   values[16][0]=-1;
+   values[16][1]=1;
+   values[17][0]=-1;
+   values[17][1]=2;
+   values[18][0]=0;
+   values[18][1]=-1;
+   values[19][0]=1;
+   values[19][1]=-1;
+   values[20][0]=2;
+   values[20][1]=-1;
 //--- remove range
    for(int j=0; j<21; j++)
      {

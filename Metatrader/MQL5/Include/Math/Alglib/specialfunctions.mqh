@@ -1,7 +1,7 @@
 //+------------------------------------------------------------------+
 //|                                             specialfunctions.mqh |
-//|            Copyright 2003-2012 Sergey Bochkanov (ALGLIB project) |
-//|                   Copyright 2012-2017, MetaQuotes Software Corp. |
+//|            Copyright 2003-2022 Sergey Bochkanov (ALGLIB project) |
+//|                             Copyright 2012-2023, MetaQuotes Ltd. |
 //|                                             https://www.mql5.com |
 //+------------------------------------------------------------------+
 //| Implementation of ALGLIB library in MetaQuotes Language 5        |
@@ -38,59 +38,13 @@
 //+------------------------------------------------------------------+
 class CGammaFunc
   {
-private:
-   static double     GammaStirlFunc(double x);
-
 public:
-                     CGammaFunc(void);
-                    ~CGammaFunc(void);
    static double     GammaFunc(double x);
    static double     LnGamma(double x,double &sgngam);
+
+private:
+   static double     GammaStirlFunc(double x);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CGammaFunc::CGammaFunc(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CGammaFunc::~CGammaFunc(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Stirling function                                                |
-//+------------------------------------------------------------------+
-static double CGammaFunc::GammaStirlFunc(double x)
-  {
-//--- create variables
-   double y;
-   double w;
-   double v;
-   double stir;
-//--- initialization
-   w=1/x;
-   stir=7.87311395793093628397E-4;
-   stir=-2.29549961613378126380E-4+w*stir;
-   stir=-2.68132617805781232825E-3+w*stir;
-   stir=3.47222221605458667310E-3+w*stir;
-   stir=8.33333333333482257126E-2+w*stir;
-   w=1+w*stir;
-   y=MathExp(x);
-//--- check
-   if(x>143.01608)
-     {
-      v=MathPow(x,0.5*x-0.25);
-      y=v*(v/y);
-     }
-   else
-      y=MathPow(x,x-0.5)/y;
-//--- return result
-   return(2.50662827463100050242*y*w);
-  }
 //+------------------------------------------------------------------+
 //| Gamma function                                                   |
 //| Input parameters:                                                |
@@ -104,7 +58,7 @@ static double CGammaFunc::GammaStirlFunc(double x)
 //|     IEEE     -33,  33     20000       9.4e-16     2.2e-16        |
 //|     IEEE      33, 171.6   20000       2.3e-15     3.2e-16        |
 //+------------------------------------------------------------------+
-static double CGammaFunc::GammaFunc(double x)
+double CGammaFunc::GammaFunc(double x)
   {
 //--- create variables
    double p;
@@ -212,7 +166,7 @@ static double CGammaFunc::GammaFunc(double x)
 //| indicated.                                                       |
 //|    IEEE    -200, -4             10000     4.8e-16     1.3e-16    |
 //+------------------------------------------------------------------+
-static double CGammaFunc::LnGamma(double x,double &sgngam)
+double CGammaFunc::LnGamma(double x,double &sgngam)
   {
 //--- create variables
    double a;
@@ -328,35 +282,57 @@ static double CGammaFunc::LnGamma(double x,double &sgngam)
    return(q);
   }
 //+------------------------------------------------------------------+
+//| Stirling function                                                |
+//+------------------------------------------------------------------+
+double CGammaFunc::GammaStirlFunc(double x)
+  {
+//--- create variables
+   double y;
+   double w;
+   double v;
+   double stir;
+//--- initialization
+   w=1/x;
+   stir=7.87311395793093628397E-4;
+   stir=-2.29549961613378126380E-4+w*stir;
+   stir=-2.68132617805781232825E-3+w*stir;
+   stir=3.47222221605458667310E-3+w*stir;
+   stir=8.33333333333482257126E-2+w*stir;
+   w=1+w*stir;
+   y=MathExp(x);
+//--- check
+   if(x>143.01608)
+     {
+      v=MathPow(x,0.5*x-0.25);
+      y=v*(v/y);
+     }
+   else
+      y=MathPow(x,x-0.5)/y;
+//--- return result
+   return(2.50662827463100050242*y*w);
+  }
+//+------------------------------------------------------------------+
 //| Normal distribution                                              |
 //+------------------------------------------------------------------+
 class CNormalDistr
   {
 public:
-   //--- constructor, destructor
-                     CNormalDistr(void);
-                    ~CNormalDistr(void);
    //--- methods
    static double     ErrorFunction(double x);
    static double     ErrorFunctionC(double x);
    static double     NormalDistribution(const double x);
+   static double     NormalPDF(const double x);
+   static double     NormalCDF(const double x);
    static double     InvErF(const double e);
    static double     InvNormalDistribution(double y0);
+   static double     InvNormalCDF(const double y0);
+   static double     BivariateNormalPDF(const double x,const double y,const double rho);
+   static double     BivariateNormalCDF(double x,double y,const double rho);
+
+private:
+   static double     BVNIntegrate3(double rangea,double rangeb,double x,double y,double gw,double gx);
+   static double     BVNIntegrate6(double rangea,double rangeb,double x,double y,double s,double gw,double gx);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CNormalDistr::CNormalDistr(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CNormalDistr::~CNormalDistr(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| Error function                                                   |
 //| The integral is                                                  |
@@ -374,7 +350,7 @@ CNormalDistr::~CNormalDistr(void)
 //| arithmetic   domain     # trials      peak         rms           |
 //|    IEEE      0,1         30000       3.7e-16     1.0e-16         |
 //+------------------------------------------------------------------+
-static double CNormalDistr::ErrorFunction(double x)
+double CNormalDistr::ErrorFunction(double x)
   {
 //--- create variables
    double xsq=0;
@@ -391,15 +367,14 @@ static double CNormalDistr::ErrorFunction(double x)
       //--- calculation
       xsq=x*x;
       p=0.007547728033418631287834;
-      p=0.288805137207594084924010+xsq*p;
+      p=-0.288805137207594084924010+xsq*p;
       p=14.3383842191748205576712+xsq*p;
       p=38.0140318123903008244444+xsq*p;
       p=3017.82788536507577809226+xsq*p;
       p=7404.07142710151470082064+xsq*p;
       p=80437.3630960840172832162+xsq*p;
-      q=0.0;
-      q=1.00000000000000000000000+xsq*q;
-      q=38.0190713951939403753468+xsq*q;
+      //---
+      q=38.0190713951939403753468+xsq;
       q=658.070155459240506326937+xsq*q;
       q=6379.60017324428279487120+xsq*q;
       q=34216.5257924628539769006+xsq*q;
@@ -430,7 +405,7 @@ static double CNormalDistr::ErrorFunction(double x)
 //| arithmetic   domain     # trials      peak         rms           |
 //|    IEEE      0,26.6417   30000       5.7e-14     1.5e-14         |
 //+------------------------------------------------------------------+
-static double CNormalDistr::ErrorFunctionC(double x)
+double CNormalDistr::ErrorFunctionC(double x)
   {
 //--- create variables
    double p=0;
@@ -445,8 +420,7 @@ static double CNormalDistr::ErrorFunctionC(double x)
    if(x>=10)
       return(0);
 //--- calculation
-   p=0.0;
-   p=0.5641877825507397413087057563+x*p;
+   p=0.5641877825507397413087057563;
    p=9.675807882987265400604202961+x*p;
    p=77.08161730368428609781633646+x*p;
    p=368.5196154710010637133875746+x*p;
@@ -454,8 +428,8 @@ static double CNormalDistr::ErrorFunctionC(double x)
    p=2320.439590251635247384768711+x*p;
    p=2898.0293292167655611275846+x*p;
    p=1826.3348842295112592168999+x*p;
-   q=1.0;
-   q=17.14980943627607849376131193+x*q;
+
+   q=17.14980943627607849376131193+x;
    q=137.1255960500622202878443578+x*q;
    q=661.7361207107653469211984771+x*q;
    q=2094.384367789539593790281779+x*q;
@@ -486,17 +460,63 @@ static double CNormalDistr::ErrorFunctionC(double x)
 //| arithmetic   domain     # trials      peak         rms           |
 //|    IEEE     -13,0        30000       3.4e-14     6.7e-15         |
 //+------------------------------------------------------------------+
-static double CNormalDistr::NormalDistribution(const double x)
+double CNormalDistr::NormalDistribution(const double x)
   {
-//--- return result
    return(0.5*(ErrorFunction(x/1.41421356237309504880)+1));
+  }
+//+------------------------------------------------------------------+
+//| Normal distribution PDF                                          |
+//| Returns Gaussian probability density function:                   |
+//|                        1                                         |
+//|            f(x)  = --------- * exp(-x^2/2)                       |
+//|                    sqrt(2pi)                                     |
+//| Cephes Math Library Release 2.8:  June, 2000                     |
+//| Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier     |
+//+------------------------------------------------------------------+
+double CNormalDistr::NormalPDF(const double x)
+  {
+//--- check
+   if(!CAp::Assert(MathIsValidNumber(x),"NormalPDF: X is infinite"))
+      return(0);
+
+  double result=MathExp(-(x*x/2))/MathSqrt(2*M_PI);
+//--- return result
+   return(result);
+  }
+//+------------------------------------------------------------------+
+//| Normal distribution CDF                                          |
+//| Returns the area under the Gaussian probability density          |
+//| function, integrated from minus infinity to x:                   |
+//|                                    x                             |
+//|                                     -                            |
+//|                           1        | |          2                |
+//|            ndtr(x)  = ---------    |    exp( - t /2 ) dt         |
+//|                       sqrt(2pi)  | |                             |
+//|                                   -                              |
+//|                                  -inf.                           |
+//|                                                                  |
+//|                     =  ( 1 + erf(z) ) / 2                        |
+//|                     =  erfc(z) / 2                               |
+//| where z = x/sqrt(2). Computation is via the functions erf and    |
+//|                      erfc.                                       |
+//| ACCURACY:                                                        |
+//|                              Relative error:                     |
+//|      arithmetic   domain     # trials      peak         rms      |
+//|         IEEE     -13,0        30000       3.4e-14     6.7e-15    |
+//| Cephes Math Library Release 2.8:  June, 2000                     |
+//| Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier     |
+//+------------------------------------------------------------------+
+double CNormalDistr::NormalCDF(const double x)
+  {
+   double result=0.5*(ErrorFunction(x/1.41421356237309504880)+1);
+//--- return result
+   return(result);
   }
 //+------------------------------------------------------------------+
 //| Inverse of the error function                                    |
 //+------------------------------------------------------------------+
-static double CNormalDistr::InvErF(const double e)
+double CNormalDistr::InvErF(const double e)
   {
-//--- return result
    return(InvNormalDistribution(0.5*(e+1))/MathSqrt(2));
   }
 //+------------------------------------------------------------------+
@@ -516,7 +536,7 @@ static double CNormalDistr::InvErF(const double e)
 //|    IEEE     0.125, 1        20000       7.2e-16     1.3e-16      |
 //|    IEEE     3e-308, 0.135   50000       4.6e-16     9.8e-17      |
 //+------------------------------------------------------------------+
-static double CNormalDistr::InvNormalDistribution(double y0)
+double CNormalDistr::InvNormalDistribution(double y0)
   {
 //--- check
    if(y0<=0)
@@ -627,33 +647,357 @@ static double CNormalDistr::InvNormalDistribution(double y0)
    return(x);
   }
 //+------------------------------------------------------------------+
+//| Inverse of Normal CDF                                            |
+//| Returns the argument, x, for which the area under the Gaussian   |
+//| probability density function (integrated from minus infinity to  |
+//| x) is equal to y.                                                |
+//| For small arguments 0 < y < exp(-2), the program computes        |
+//|   z = sqrt( -2.0 * log(y) );  then the approximation is          |
+//|   x = z - log(z)/z  - (1/z) P(1/z) / Q(1/z).                     |
+//| There are two rational functions P/Q, one for 0 < y < exp(-32)   |
+//| and the other for y up to exp(-2).  For larger arguments,        |
+//|   w = y - 0.5, and  x/sqrt(2pi) = w + w**3 R(w**2)/S(w**2)).     |
+//| ACCURACY:                                                        |
+//|                           Relative error:                        |
+//|      arithmetic   domain        # trials      peak        rms    |
+//|        IEEE     0.125, 1        20000       7.2e-16     1.3e-16  |
+//|        IEEE     3e-308, 0.135   50000       4.6e-16     9.8e-17  |
+//| Cephes Math Library Release 2.8:  June, 2000                     |
+//| Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier     |
+//+------------------------------------------------------------------+
+double CNormalDistr::InvNormalCDF(const double y0)
+  {
+//--- create variables
+   double result=0;
+   double expm2=0;
+   double s2pi=0;
+   double x=0;
+   double y=0;
+   double z=0;
+   double y2=0;
+   double x0=0;
+   double x1=0;
+   int    code=0;
+   double p0=0;
+   double q0=0;
+   double p1=0;
+   double q1=0;
+   double p2=0;
+   double q2=0;
+
+   expm2=0.13533528323661269189;
+   s2pi=2.50662827463100050242;
+
+   if(y0<=0.0)
+     {
+      result=-CMath::m_maxrealnumber;
+      return(result);
+     }
+
+   if(y0>=1.0)
+     {
+      result=CMath::m_maxrealnumber;
+      return(result);
+     }
+   code=1;
+   y=y0;
+   if(y>(1.0-expm2))
+     {
+      y=1.0-y;
+      code=0;
+     }
+   if(y>expm2)
+     {
+      y=y-0.5;
+      y2=y*y;
+      p0=-59.9633501014107895267;
+      p0=98.0010754185999661536+y2*p0;
+      p0=-56.6762857469070293439+y2*p0;
+      p0=13.9312609387279679503+y2*p0;
+      p0=-1.23916583867381258016+y2*p0;
+      q0=1;
+      q0=1.95448858338141759834+y2*q0;
+      q0=4.67627912898881538453+y2*q0;
+      q0=86.3602421390890590575+y2*q0;
+      q0=-225.462687854119370527+y2*q0;
+      q0=200.260212380060660359+y2*q0;
+      q0=-82.0372256168333339912+y2*q0;
+      q0=15.9056225126211695515+y2*q0;
+      q0=-1.18331621121330003142+y2*q0;
+      x=y+y*y2*p0/q0;
+      x=x*s2pi;
+      result=x;
+      return(result);
+     }
+   x=MathSqrt(-(2.0*MathLog(y)));
+   x0=x-MathLog(x)/x;
+   z=1.0/x;
+   if(x<8.0)
+     {
+      p1=4.05544892305962419923;
+      p1=31.5251094599893866154+z*p1;
+      p1=57.1628192246421288162+z*p1;
+      p1=44.0805073893200834700+z*p1;
+      p1=14.6849561928858024014+z*p1;
+      p1=2.18663306850790267539+z*p1;
+      p1=-(1.40256079171354495875*0.1)+z*p1;
+      p1=-(3.50424626827848203418*0.01)+z*p1;
+      p1=-(8.57456785154685413611*0.0001)+z*p1;
+      q1=1;
+      q1=15.7799883256466749731+z*q1;
+      q1=45.3907635128879210584+z*q1;
+      q1=41.3172038254672030440+z*q1;
+      q1=15.0425385692907503408+z*q1;
+      q1=2.50464946208309415979+z*q1;
+      q1=-(1.42182922854787788574*0.1)+z*q1;
+      q1=-(3.80806407691578277194*0.01)+z*q1;
+      q1=-(9.33259480895457427372*0.0001)+z*q1;
+      x1=z*p1/q1;
+     }
+   else
+     {
+      p2=3.23774891776946035970;
+      p2=6.91522889068984211695+z*p2;
+      p2=3.93881025292474443415+z*p2;
+      p2=1.33303460815807542389+z*p2;
+      p2=2.01485389549179081538*0.1+z*p2;
+      p2=1.23716634817820021358*0.01+z*p2;
+      p2=3.01581553508235416007*0.0001+z*p2;
+      p2=2.65806974686737550832*0.000001+z*p2;
+      p2=6.23974539184983293730*0.000000001+z*p2;
+      q2=1;
+      q2=6.02427039364742014255+z*q2;
+      q2=3.67983563856160859403+z*q2;
+      q2=1.37702099489081330271+z*q2;
+      q2=2.16236993594496635890*0.1+z*q2;
+      q2=1.34204006088543189037*0.01+z*q2;
+      q2=3.28014464682127739104*0.0001+z*q2;
+      q2=2.89247864745380683936*0.000001+z*q2;
+      q2=6.79019408009981274425*0.000000001+z*q2;
+      x1=z*p2/q2;
+     }
+   x=x0-x1;
+   if(code!=0)
+      x=-x;
+//--- return result
+   result=x;
+   return(result);
+  }
+//+------------------------------------------------------------------+
+//| Bivariate normal PDF                                             |
+//| Returns probability density function of the bivariate  Gaussian  |
+//| with correlation parameter equal to Rho:                         |
+//|                      1              (    x^2 - 2*rho*x*y + y^2  )|
+//| f(x,y,rho) = ----------------- * exp( - ----------------------- )|
+//|              2pi*sqrt(1-rho^2)      (        2*(1-rho^2)        )|
+//| with -1<rho<+1 and arbitrary x, y.                               |
+//| This function won't fail as long as Rho is in (-1,+1) range.     |
+//+------------------------------------------------------------------+
+double CNormalDistr::BivariateNormalPDF(const double x,const double y,
+                                        const double rho)
+  {
+//--- create variables
+   double result=0;
+   double onerho2=0;
+//--- check
+   if(!CAp::Assert(MathIsValidNumber(x),"BivariateNormalCDF: X is infinite"))
+      return(result);
+   if(!CAp::Assert(MathIsValidNumber(y),"BivariateNormalCDF: Y is infinite"))
+      return(result);
+   if(!CAp::Assert(MathIsValidNumber(rho),"BivariateNormalCDF: Rho is infinite"))
+      return(result);
+   if(!CAp::Assert(-1<rho && rho<1.0,"BivariateNormalCDF: Rho is not in (-1,+1) range"))
+      return(result);
+
+   onerho2=(1-rho)*(1+rho);
+   result=MathExp(-((x*x+y*y-2*rho*x*y)/(2*onerho2)))/(2*M_PI*MathSqrt(onerho2));
+//--- return result
+   return(result);
+  }
+//+------------------------------------------------------------------+
+//| Bivariate normal CDF                                             |
+//| Returns the area under the bivariate Gaussian  PDF  with         |
+//| correlation parameter equal to Rho, integrated from minus        |
+//| infinity to (x,y):                                               |
+//|                                       x      y                   |
+//|                                       -      -                   |
+//|                         1            | |    | |                  |
+//| bvn(x,y,rho) = -------------------   |      |   f(u,v,rho)*du*dv |
+//|                 2pi*sqrt(1-rho^2)  | |    | |                    |
+//|                                     -      -                     |
+//|                                   -INF   -INF                    |
+//| where                                                            |
+//|                            (    u^2 - 2*rho*u*v + v^2  )         |
+//|          f(u,v,rho)   = exp( - ----------------------- )         |
+//|                            (        2*(1-rho^2)        )         |
+//| with -1<rho<+1 and arbitrary x, y.                               |
+//| This subroutine uses high-precision approximation scheme proposed|
+//| by Alan Genz in "Numerical Computation of Rectangular Bivariate  |
+//| and Trivariate Normal and t probabilities", which computes CDF   |
+//| with absolute error roughly equal to 1e-14.                      |
+//| This function won't fail as long as Rho is in (-1,+1) range.     |
+//+------------------------------------------------------------------+
+double CNormalDistr::BivariateNormalCDF(double x,double y,
+                                        const double rho)
+  {
+//--- create variables
+   double result=0;
+   double rangea=0;
+   double rangeb=0;
+   double s=0;
+   double v=0;
+   double v0=0;
+   double v1=0;
+   double fxys=0;
+   double ta=0;
+   double tb=0;
+   double tc=0;
+//--- check
+   if(!CAp::Assert(MathIsValidNumber(x),"BivariateNormalCDF: X is infinite"))
+      return(result);
+   if(!CAp::Assert(MathIsValidNumber(y),"BivariateNormalCDF: Y is infinite"))
+      return(result);
+   if(!CAp::Assert(MathIsValidNumber(rho),"BivariateNormalCDF: Rho is infinite"))
+      return(result);
+   if(!CAp::Assert(-1<rho && rho<1.0,"BivariateNormalCDF: Rho is not in (-1,+1) range"))
+      return(result);
+
+   if(rho==0.0)
+     {
+      result=NormalCDF(x)*NormalCDF(y);
+      return(result);
+     }
+
+   if(MathAbs(rho)<=0.8)
+     {
+      // Rho is small, compute integral using using formula (3) by Alan Genz, integrated
+      // by means of 10-point Gauss-Legendre quadrature
+      rangea=0;
+      rangeb=MathArcsin(rho);
+      v=BVNIntegrate3(rangea,rangeb,x,y,0.2491470458134028,-0.1252334085114689);
+      v+=BVNIntegrate3(rangea,rangeb,x,y,0.2491470458134028,0.1252334085114689);
+      v+=BVNIntegrate3(rangea,rangeb,x,y,0.2334925365383548,-0.3678314989981802);
+      v+=BVNIntegrate3(rangea,rangeb,x,y,0.2334925365383548,0.3678314989981802);
+      v+=BVNIntegrate3(rangea,rangeb,x,y,0.2031674267230659,-0.5873179542866175);
+      v+=BVNIntegrate3(rangea,rangeb,x,y,0.2031674267230659,0.5873179542866175);
+      v+=BVNIntegrate3(rangea,rangeb,x,y,0.1600783285433462,-0.7699026741943047);
+      v+=BVNIntegrate3(rangea,rangeb,x,y,0.1600783285433462,0.7699026741943047);
+      v+=BVNIntegrate3(rangea,rangeb,x,y,0.1069393259953184,-0.9041172563704749);
+      v+=BVNIntegrate3(rangea,rangeb,x,y,0.1069393259953184,0.9041172563704749);
+      v+=BVNIntegrate3(rangea,rangeb,x,y,0.0471753363865118,-0.9815606342467192);
+      v+=BVNIntegrate3(rangea,rangeb,x,y,0.0471753363865118,0.9815606342467192);
+      v=v*0.5*(rangeb-rangea)/(2*M_PI);
+      result=NormalCDF(x)*NormalCDF(y)+v;
+     }
+   else
+     {
+      // Rho is large, compute integral using using formula (6) by Alan Genz, integrated
+      // by means of 20-point Gauss-Legendre quadrature.
+      x=-x;
+      y=-y;
+      s=MathSign(rho);
+      if(s>0.0)
+         fxys=NormalCDF(-MathMax(x,y));
+      else
+         fxys=MathMax(0.0,NormalCDF(-x)-NormalCDF(y));
+      rangea=0;
+      rangeb=MathSqrt(1-rho*rho);
+      // Compute first term (analytic integral) from formula (6)
+      ta=rangeb;
+      tb=MathAbs(x-s*y);
+      tc=(4-s*x*y)/8;
+      v0=ta*(1-tc*(tb*tb-ta*ta)/3)*MathExp(-(tb*tb/(2*ta*ta)))-tb*(1-tc*tb*tb/3)*MathSqrt(2*M_PI)*NormalCDF(-(tb/ta));
+      v0*=MathExp(-(s*x*y/2))/(2*M_PI);
+      // Compute second term (numerical integral, 20-point Gauss-Legendre rule) from formula (6)
+      v1=BVNIntegrate6(rangea,rangeb,x,y,s,0.1527533871307258,-0.0765265211334973);
+      v1+=BVNIntegrate6(rangea,rangeb,x,y,s,0.1527533871307258,0.0765265211334973);
+      v1+=BVNIntegrate6(rangea,rangeb,x,y,s,0.1491729864726037,-0.2277858511416451);
+      v1+=BVNIntegrate6(rangea,rangeb,x,y,s,0.1491729864726037,0.2277858511416451);
+      v1+=BVNIntegrate6(rangea,rangeb,x,y,s,0.1420961093183820,-0.3737060887154195);
+      v1+=BVNIntegrate6(rangea,rangeb,x,y,s,0.1420961093183820,0.3737060887154195);
+      v1+=BVNIntegrate6(rangea,rangeb,x,y,s,0.1316886384491766,-0.5108670019508271);
+      v1+=BVNIntegrate6(rangea,rangeb,x,y,s,0.1316886384491766,0.5108670019508271);
+      v1+=BVNIntegrate6(rangea,rangeb,x,y,s,0.1181945319615184,-0.6360536807265150);
+      v1+=BVNIntegrate6(rangea,rangeb,x,y,s,0.1181945319615184,0.6360536807265150);
+      v1+=BVNIntegrate6(rangea,rangeb,x,y,s,0.1019301198172404,-0.7463319064601508);
+      v1+=BVNIntegrate6(rangea,rangeb,x,y,s,0.1019301198172404,0.7463319064601508);
+      v1+=BVNIntegrate6(rangea,rangeb,x,y,s,0.0832767415767048,-0.8391169718222188);
+      v1+=BVNIntegrate6(rangea,rangeb,x,y,s,0.0832767415767048,0.8391169718222188);
+      v1+=BVNIntegrate6(rangea,rangeb,x,y,s,0.0626720483341091,-0.9122344282513259);
+      v1+=BVNIntegrate6(rangea,rangeb,x,y,s,0.0626720483341091,0.9122344282513259);
+      v1+=BVNIntegrate6(rangea,rangeb,x,y,s,0.0406014298003869,-0.9639719272779138);
+      v1+=BVNIntegrate6(rangea,rangeb,x,y,s,0.0406014298003869,0.9639719272779138);
+      v1+=BVNIntegrate6(rangea,rangeb,x,y,s,0.0176140071391521,-0.9931285991850949);
+      v1+=BVNIntegrate6(rangea,rangeb,x,y,s,0.0176140071391521,0.9931285991850949);
+      v1=v1*0.5*(rangeb-rangea)/(2*M_PI);
+      result=fxys-s*(v0+v1);
+     }
+
+   result=MathMax(result,0);
+   result=MathMin(result,1);
+//--- return result
+   return(result);
+  }
+//+------------------------------------------------------------------+
+//| Internal function which computes integrand of  formula  (3)  by  |
+//| Alan Genz times Gaussian weights (passed by user).               |
+//+------------------------------------------------------------------+
+double CNormalDistr::BVNIntegrate3(double rangea,double rangeb,
+                                   double x,double y,double gw,
+                                   double gx)
+  {
+//--- create variables
+   double result=0;
+   double r=0;
+   double t2=0;
+   double dd=0;
+   double sinr=0;
+   double cosr=0;
+
+   r=(rangeb-rangea)*0.5*gx+(rangeb+rangea)*0.5;
+   t2=MathTan(0.5*r);
+   dd=1/(1+t2*t2);
+   sinr=2*t2*dd;
+   cosr=(1-t2*t2)*dd;
+   result=gw*MathExp(-((x*x+y*y-2*x*y*sinr)/(2*cosr*cosr)));
+//--- return result
+   return(result);
+  }
+//+------------------------------------------------------------------+
+//| Internal function which computes integrand of  formula  (6)  by  |
+//| Alan Genz times Gaussian weights (passed by user).               |
+//+------------------------------------------------------------------+
+double CNormalDistr::BVNIntegrate6(double rangea,double rangeb,
+                                   double x,double y,double s,
+                                   double gw,double gx)
+  {
+//--- create variables
+   double result=0;
+   double r=0;
+   double exphsk22x2=0;
+   double exphsk2=0;
+   double sqrt1x2=0;
+   double exphsk1sqrt1x2=0;
+
+   r=(rangeb-rangea)*0.5*gx+(rangeb+rangea)*0.5;
+   exphsk22x2=MathExp(-((x-s*y)*(x-s*y)/(2*r*r)));
+   exphsk2=MathExp(-(x*s*y/2));
+   sqrt1x2=MathSqrt((1-r)*(1+r));
+   exphsk1sqrt1x2=MathExp(-(x*s*y/(1+sqrt1x2)));
+   result=gw*exphsk22x2*(exphsk1sqrt1x2/sqrt1x2-exphsk2*(1+(4-x*y*s)*r*r/8));
+//--- create variables
+   return(result);
+  }
+//+------------------------------------------------------------------+
 //| Incomplete gamma function                                        |
 //+------------------------------------------------------------------+
 class CIncGammaF
   {
 public:
-   //--- constructor, destructor
-                     CIncGammaF(void);
-                    ~CIncGammaF(void);
-   //--- methods
    static double     IncompleteGamma(const double a,const double x);
    static double     IncompleteGammaC(const double a,const double x);
    static double     InvIncompleteGammaC(const double a,const double y0);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CIncGammaF::CIncGammaF(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CIncGammaF::~CIncGammaF(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| Incomplete gamma integral                                        |
 //| The function is defined by                                       |
@@ -674,7 +1018,7 @@ CIncGammaF::~CIncGammaF(void)
 //|    IEEE      0,30       200000       3.6e-14     2.9e-15         |
 //|    IEEE      0,100      300000       9.9e-14     1.5e-14         |
 //+------------------------------------------------------------------+
-static double CIncGammaF::IncompleteGamma(const double a,const double x)
+double CIncGammaF::IncompleteGamma(const double a,const double x)
   {
 //--- check
    if(x<=0 || a<=0)
@@ -732,7 +1076,7 @@ static double CIncGammaF::IncompleteGamma(const double a,const double x)
 //|    IEEE     0.5,100   0,100      200000       1.9e-14     1.7e-15|
 //|    IEEE     0.01,0.5  0,100      200000       1.4e-13     1.6e-15|
 //+------------------------------------------------------------------+
-static double CIncGammaF::IncompleteGammaC(const double a,const double x)
+double CIncGammaF::IncompleteGammaC(const double a,const double x)
   {
 //--- check
    if(x<=0 || a<=0)
@@ -831,7 +1175,7 @@ static double CIncGammaF::IncompleteGammaC(const double a,const double x)
 //|    IEEE     0.01,0.5  0,0.5       100000       9.0e-14    3.4e-15|
 //|    IEEE    0.5,10000  0,0.5        20000       2.3e-13    3.8e-14|
 //+------------------------------------------------------------------+
-static double CIncGammaF::InvIncompleteGammaC(const double a,const double y0)
+double CIncGammaF::InvIncompleteGammaC(const double a,const double y0)
   {
 //--- create variables
    double igammaepsilon=0;
@@ -1001,26 +1345,8 @@ static double CIncGammaF::InvIncompleteGammaC(const double a,const double y0)
 class CAiryF
   {
 public:
-   //--- constructor, destructor
-                     CAiryF(void);
-                    ~CAiryF(void);
-   //--- method
    static void       Airy(const double x,double &ai,double &aip,double &bi,double &bip);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CAiryF::CAiryF(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CAiryF::~CAiryF(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| Airy function                                                    |
 //| Solution of the differential equation                            |
@@ -1042,8 +1368,8 @@ CAiryF::~CAiryF(void)
 //| IEEE        -10, 10    Bi        30000       4.2e-15     5.3e-16 |
 //| IEEE        -10, 10    Bi'       30000       4.9e-15     7.3e-16 |
 //+------------------------------------------------------------------+
-static void CAiryF::Airy(const double x,double &ai,double &aip,double &bi,
-                         double &bip)
+void CAiryF::Airy(const double x,double &ai,double &aip,double &bi,
+                  double &bip)
   {
 //--- create variables
    double z=0;
@@ -1373,19 +1699,7 @@ static void CAiryF::Airy(const double x,double &ai,double &aip,double &bi,
 //+------------------------------------------------------------------+
 class CBessel
   {
-private:
-   //--- private methods
-   static void       BesselMFirstCheb(const double c,double &b0,double &b1,double &b2);
-   static void       BesselMNextCheb(const double x,const double c,double &b0,double &b1,double &b2);
-   static void       BesselM1FirstCheb(const double c,double &b0,double &b1,double &b2);
-   static void       BesselM1NextCheb(const double x,const double c,double &b0,double &b1,double &b2);
-   static void       BesselAsympt0(const double x,double &pzero,double &qzero);
-   static void       BesselAsympt1(const double x,double &pzero,double &qzero);
 public:
-   //--- constructor, destructor
-                     CBessel(void);
-                    ~CBessel(void);
-   //--- public methods
    static double     BesselJ0(double x);
    static double     BesselJ1(double x);
    static double     BesselJN(int n,double x);
@@ -1397,21 +1711,15 @@ public:
    static double     BesselK0(double x);
    static double     BesselK1(double x);
    static double     BesselKN(int nn,double x);
+
+private:
+   static void       BesselMFirstCheb(const double c,double &b0,double &b1,double &b2);
+   static void       BesselMNextCheb(const double x,const double c,double &b0,double &b1,double &b2);
+   static void       BesselM1FirstCheb(const double c,double &b0,double &b1,double &b2);
+   static void       BesselM1NextCheb(const double x,const double c,double &b0,double &b1,double &b2);
+   static void       BesselAsympt0(const double x,double &pzero,double &qzero);
+   static void       BesselAsympt1(const double x,double &pzero,double &qzero);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CBessel::CBessel(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CBessel::~CBessel(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| Bessel function of order zero                                    |
 //| Returns Bessel function of order zero of the argument.           |
@@ -1431,7 +1739,7 @@ CBessel::~CBessel(void)
 //| arithmetic   domain     # trials      peak         rms           |
 //|    IEEE      0, 30       60000       4.2e-16     1.1e-16         |
 //+------------------------------------------------------------------+
-static double CBessel::BesselJ0(double x)
+double CBessel::BesselJ0(double x)
   {
 //--- create variables
    double xsq=0;
@@ -1488,7 +1796,7 @@ static double CBessel::BesselJ0(double x)
 //| arithmetic   domain      # trials      peak         rms          |
 //|    IEEE      0, 30       30000       2.6e-16     1.1e-16         |
 //+------------------------------------------------------------------+
-static double CBessel::BesselJ1(double x)
+double CBessel::BesselJ1(double x)
   {
 //--- create variables
    double result=0;
@@ -1558,7 +1866,7 @@ static double CBessel::BesselJ1(double x)
 //| Not suitable for large n or x. Use jv() (fractional order)       |
 //| instead.                                                         |
 //+------------------------------------------------------------------+
-static double CBessel::BesselJN(int n,double x)
+double CBessel::BesselJN(int n,double x)
   {
 //--- create variables
    double result=0;
@@ -1662,7 +1970,7 @@ static double CBessel::BesselJN(int n,double x)
 //| arithmetic   domain     # trials      peak         rms           |
 //|    IEEE      0, 30       30000       1.3e-15     1.6e-16         |
 //+------------------------------------------------------------------+
-static double CBessel::BesselY0(double x)
+double CBessel::BesselY0(double x)
   {
 //--- create variables
    double nn=0;
@@ -1717,7 +2025,7 @@ static double CBessel::BesselY0(double x)
 //| arithmetic   domain      # trials      peak         rms          |
 //|    IEEE      0, 30       30000       1.0e-15     1.3e-16         |
 //+------------------------------------------------------------------+
-static double CBessel::BesselY1(double x)
+double CBessel::BesselY1(double x)
   {
 //--- create variables
    double nn=0;
@@ -1774,10 +2082,9 @@ static double CBessel::BesselY1(double x)
 //| arithmetic   domain     # trials      peak         rms           |
 //|    IEEE      0, 30       30000       3.4e-15     4.3e-16         |
 //+------------------------------------------------------------------+
-static double CBessel::BesselYN(int n,double x)
+double CBessel::BesselYN(int n,double x)
   {
 //--- create variables
-   int    i=0;
    double a=0;
    double b=0;
    double tmp=0;
@@ -1801,7 +2108,7 @@ static double CBessel::BesselYN(int n,double x)
 //--- calculation
    a=BesselY0(x);
    b=BesselY1(x);
-   for(i=1;i<=n-1;i++)
+   for(int i=1; i<=n-1; i++)
      {
       tmp=b;
       b=2*i/x*b-a;
@@ -1823,7 +2130,7 @@ static double CBessel::BesselYN(int n,double x)
 //| arithmetic   domain     # trials      peak         rms           |
 //|    IEEE      0,30        30000       5.8e-16     1.4e-16         |
 //+------------------------------------------------------------------+
-static double CBessel::BesselI0(double x)
+double CBessel::BesselI0(double x)
   {
 //--- create variables
    double y=0;
@@ -1921,7 +2228,7 @@ static double CBessel::BesselI0(double x)
 //| arithmetic   domain     # trials      peak         rms           |
 //|    IEEE      0, 30       30000       1.9e-15     2.1e-16         |
 //+------------------------------------------------------------------+
-static double CBessel::BesselI1(double x)
+double CBessel::BesselI1(double x)
   {
 //--- create variables
    double y=0;
@@ -2025,7 +2332,7 @@ static double CBessel::BesselI1(double x)
 //| arithmetic   domain     # trials      peak         rms           |
 //|    IEEE      0, 30       30000       1.2e-15     1.6e-16         |
 //+------------------------------------------------------------------+
-static double CBessel::BesselK0(double x)
+double CBessel::BesselK0(double x)
   {
 //--- create variables
    double result=0;
@@ -2106,7 +2413,7 @@ static double CBessel::BesselK0(double x)
 //| arithmetic   domain     # trials      peak         rms           |
 //|    IEEE      0, 30       30000       1.2e-15     1.6e-16         |
 //+------------------------------------------------------------------+
-static double CBessel::BesselK1(double x)
+double CBessel::BesselK1(double x)
   {
 //--- create variables
    double result=0;
@@ -2193,7 +2500,7 @@ static double CBessel::BesselK1(double x)
 //| Error is high only near the crossover point x = 9.55             |
 //| between the two expansions used.                                 |
 //+------------------------------------------------------------------+
-static double CBessel::BesselKN(int nn,double x)
+double CBessel::BesselKN(int nn,double x)
   {
 //--- create variables
    double k=0;
@@ -2244,7 +2551,7 @@ static double CBessel::BesselKN(int nn,double x)
          //--- calculation
          pn=-eul;
          k=1.0;
-         for(i=1;i<=n-1;i++)
+         for(i=1; i<=n-1; i++)
            {
             pn=pn+1.0/k;
             k=k+1.0;
@@ -2263,7 +2570,7 @@ static double CBessel::BesselKN(int nn,double x)
             z=-z0;
             zn=1.0;
             //--- calculation
-            for(i=1;i<=n-1;i++)
+            for(i=1; i<=n-1; i++)
               {
                nk1f=nk1f/(n-i);
                kf=kf*i;
@@ -2362,8 +2669,8 @@ static double CBessel::BesselKN(int nn,double x)
 //+------------------------------------------------------------------+
 //| Internal subroutine                                              |
 //+------------------------------------------------------------------+
-static void CBessel::BesselMFirstCheb(const double c,double &b0,double &b1,
-                                      double &b2)
+void CBessel::BesselMFirstCheb(const double c,double &b0,double &b1,
+                               double &b2)
   {
 //--- change values
    b0=c;
@@ -2373,8 +2680,8 @@ static void CBessel::BesselMFirstCheb(const double c,double &b0,double &b1,
 //+------------------------------------------------------------------+
 //| Internal subroutine                                              |
 //+------------------------------------------------------------------+
-static void CBessel::BesselMNextCheb(const double x,const double c,double &b0,
-                                     double &b1,double &b2)
+void CBessel::BesselMNextCheb(const double x,const double c,double &b0,
+                              double &b1,double &b2)
   {
 //--- change values
    b2=b1;
@@ -2384,8 +2691,8 @@ static void CBessel::BesselMNextCheb(const double x,const double c,double &b0,
 //+------------------------------------------------------------------+
 //| Internal subroutine                                              |
 //+------------------------------------------------------------------+
-static void CBessel::BesselM1FirstCheb(const double c,double &b0,double &b1,
-                                       double &b2)
+void CBessel::BesselM1FirstCheb(const double c,double &b0,double &b1,
+                                double &b2)
   {
 //--- change values
    b0=c;
@@ -2395,8 +2702,8 @@ static void CBessel::BesselM1FirstCheb(const double c,double &b0,double &b1,
 //+------------------------------------------------------------------+
 //| Internal subroutine                                              |
 //+------------------------------------------------------------------+
-static void CBessel::BesselM1NextCheb(const double x,const double c,double &b0,
-                                      double &b1,double &b2)
+void CBessel::BesselM1NextCheb(const double x,const double c,double &b0,
+                               double &b1,double &b2)
   {
 //--- change values
    b2=b1;
@@ -2406,7 +2713,7 @@ static void CBessel::BesselM1NextCheb(const double x,const double c,double &b0,
 //+------------------------------------------------------------------+
 //| Internal subroutine                                              |
 //+------------------------------------------------------------------+
-static void CBessel::BesselAsympt0(const double x,double &pzero,double &qzero)
+void CBessel::BesselAsympt0(const double x,double &pzero,double &qzero)
   {
 //--- create variables
    double xsq=0;
@@ -2454,7 +2761,7 @@ static void CBessel::BesselAsympt0(const double x,double &pzero,double &qzero)
 //+------------------------------------------------------------------+
 //| Internal subroutine                                              |
 //+------------------------------------------------------------------+
-static void CBessel::BesselAsympt1(const double x,double &pzero,double &qzero)
+void CBessel::BesselAsympt1(const double x,double &pzero,double &qzero)
   {
 //--- create variables
    double xsq=0;
@@ -2503,26 +2810,8 @@ static void CBessel::BesselAsympt1(const double x,double &pzero,double &qzero)
 class CBetaF
   {
 public:
-   //--- constructor, destructor
-                     CBetaF(void);
-                    ~CBetaF(void);
-   //--- method
    static double     Beta(const double a,const double b);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CBetaF::CBetaF(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CBetaF::~CBetaF(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| Beta function                                                    |
 //|                   -     -                                        |
@@ -2537,7 +2826,7 @@ CBetaF::~CBetaF(void)
 //| arithmetic   domain     # trials      peak         rms           |
 //|    IEEE       0,30       30000       8.1e-14     1.1e-14         |
 //+------------------------------------------------------------------+
-static double CBetaF::Beta(const double a,const double b)
+double CBetaF::Beta(const double a,const double b)
   {
 //--- create variables
    double y=0;
@@ -2551,6 +2840,7 @@ static double CBetaF::Beta(const double a,const double b)
 //--- check
    if(!CAp::Assert(b>0.0 || b!=(double)((int)MathFloor(b)),__FUNCTION__+": overflow"))
       return(EMPTY_VALUE);
+
    y=a+b;
 //--- check
    if(MathAbs(y)>171.624376956302725)
@@ -2594,33 +2884,15 @@ static double CBetaF::Beta(const double a,const double b)
 //+------------------------------------------------------------------+
 class CIncBetaF
   {
+public:
+   static double     IncompleteBeta(double a,double b,double x);
+   static double     InvIncompleteBeta(const double a,double b,double y);
+
 private:
-   //--- private methods
    static double     IncompleteBetaFracExpans(const double a,const double b,const double x,const double big,const double biginv);
    static double     IncompleteBetaFracExpans2(const double a,const double b,const double x,const double big,const double biginv);
    static double     IncompleteBetaPowSeries(const double a,const double b,const double x,const double maxgam);
-public:
-   //--- constructor, destructor
-                     CIncBetaF(void);
-                    ~CIncBetaF(void);
-   //--- public methods
-   static double     IncompleteBeta(double a,double b,double x);
-   static double     InvIncompleteBeta(const double a,double b,double y);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CIncBetaF::CIncBetaF(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CIncBetaF::~CIncBetaF(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| Incomplete beta integral                                         |
 //| Returns incomplete beta integral of the arguments, evaluated     |
@@ -2652,7 +2924,7 @@ CIncBetaF::~CIncBetaF(void)
 //| Outputs smaller than the IEEE gradual underflow threshold        |
 //| were excluded from these statistics.                             |
 //+------------------------------------------------------------------+
-static double CIncBetaF::IncompleteBeta(double a,double b,double x)
+double CIncBetaF::IncompleteBeta(double a,double b,double x)
   {
 //--- check
    if(!CAp::Assert(a>0 && b>0,__FUNCTION__+": the error variable"))
@@ -2678,7 +2950,6 @@ static double CIncBetaF::IncompleteBeta(double a,double b,double x)
    double maxgam=171.624376956302725;
    double minlog=MathLog(CMath::m_minrealnumber);
    double maxlog=MathLog(CMath::m_maxrealnumber);
-
 //--- check
    if(b*x<=1.0 && x<=0.95)
       return(IncompleteBetaPowSeries(a,b,x,maxgam));
@@ -2774,7 +3045,7 @@ static double CIncBetaF::IncompleteBeta(double a,double b,double x)
 //| With a = .5, b constrained to half-integer or integer values:    |
 //|    IEEE      0,1    .5,10000   10000    8.3e-11   1.0e-11        |
 //+------------------------------------------------------------------+
-static double CIncBetaF::InvIncompleteBeta(const double a,double b,double y)
+double CIncBetaF::InvIncompleteBeta(const double a,double b,double y)
   {
 //--- check
    if(!CAp::Assert(y>=0 && y<=1,__FUNCTION__+": the error variable"))
@@ -3170,9 +3441,9 @@ static double CIncBetaF::InvIncompleteBeta(const double a,double b,double y)
 //+------------------------------------------------------------------+
 //| Continued fraction expansion #1 for incomplete beta integral     |
 //+------------------------------------------------------------------+
-static double CIncBetaF::IncompleteBetaFracExpans(const double a,const double b,
-                                                  const double x,const double big,
-                                                  const double biginv)
+double CIncBetaF::IncompleteBetaFracExpans(const double a,const double b,
+                                           const double x,const double big,
+                                           const double biginv)
   {
 //--- create variables
    double xk=0;
@@ -3261,9 +3532,9 @@ static double CIncBetaF::IncompleteBetaFracExpans(const double a,const double b,
 //| Continued fraction expansion #2                                  |
 //| for incomplete beta integral                                     |
 //+------------------------------------------------------------------+
-static double CIncBetaF::IncompleteBetaFracExpans2(const double a,const double b,
-                                                   const double x,const double big,
-                                                   const double biginv)
+double CIncBetaF::IncompleteBetaFracExpans2(const double a,const double b,
+                                            const double x,const double big,
+                                            const double biginv)
   {
 //--- create variables
    double xk=0;
@@ -3353,8 +3624,8 @@ static double CIncBetaF::IncompleteBetaFracExpans2(const double a,const double b
 //| Power series for incomplete beta integral.                       |
 //| Use when b*x is small and x not too close to 1.                  |
 //+------------------------------------------------------------------+
-static double CIncBetaF::IncompleteBetaPowSeries(const double a,const double b,
-                                                 const double x,const double maxgam)
+double CIncBetaF::IncompleteBetaPowSeries(const double a,const double b,
+                                          const double x,const double maxgam)
   {
 //--- create variables
    double s=0.0;
@@ -3403,28 +3674,10 @@ static double CIncBetaF::IncompleteBetaPowSeries(const double a,const double b,
 class CBinomialDistr
   {
 public:
-   //--- constructor, destructor
-                     CBinomialDistr(void);
-                    ~CBinomialDistr(void);
-   //--- methods
    static double     BinomialDistribution(const int k,const int n,const double p);
    static double     BinomialComplDistribution(const int k,const int n,const double p);
    static double     InvBinomialDistribution(const int k,const int n,const double y);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CBinomialDistr::CBinomialDistr(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CBinomialDistr::~CBinomialDistr(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| Binomial distribution                                            |
 //| Returns the sum of the terms 0 through k of the Binomial         |
@@ -3445,8 +3698,8 @@ CBinomialDistr::~CBinomialDistr(void)
 //|  For p between 0.001 and 1:                                      |
 //|    IEEE     0,100       100000      4.3e-15     2.6e-16          |
 //+------------------------------------------------------------------+
-static double CBinomialDistr::BinomialDistribution(const int k,const int n,
-                                                   const double p)
+double CBinomialDistr::BinomialDistribution(const int k,const int n,
+                                            const double p)
   {
 //--- check
    if(!CAp::Assert(p>=0 && p<=1,__FUNCTION__+": the eroor variable"))
@@ -3496,9 +3749,9 @@ static double CBinomialDistr::BinomialDistribution(const int k,const int n,
 //|  For p between 0 and .001:                                       |
 //|    IEEE     0,100       100000      1.5e-13     2.7e-15          |
 //+------------------------------------------------------------------+
-static double CBinomialDistr::BinomialComplDistribution(const int k,
-                                                        const int n,
-                                                        const double p)
+double CBinomialDistr::BinomialComplDistribution(const int k,
+                                                 const int n,
+                                                 const double p)
   {
 //--- check
    if(!CAp::Assert(p>=0 && p<=1,__FUNCTION__+": the eroor variable"))
@@ -3508,20 +3761,25 @@ static double CBinomialDistr::BinomialComplDistribution(const int k,
       return(EMPTY_VALUE);
 //--- check
    if(k==-1)
-      return(0);
+      return(1.0);
 //--- check
    if(k==n)
-      return(1);
+      return(0);
 //--- create variables
    double dk;
    double dn=n-k;
 //--- check
    if(k==0)
-      dk=MathPow(1.0-p,dn);
+     {
+      if(p<0.01)
+         dk=-CNearUnitYUnit::NUExp1m(dn*CNearUnitYUnit::NULog1p(-p));
+      else
+         dk=1.0-MathPow(1.0-p,dn);
+     }
    else
      {
       dk=k+1;
-      dk=CIncBetaF::IncompleteBeta(dn,dk,1.0-p);
+      dk=CIncBetaF::IncompleteBeta(dk,dn,p);
      }
 //--- return result
    return(dk);
@@ -3545,8 +3803,8 @@ static double CBinomialDistr::BinomialComplDistribution(const int k,
 //|    IEEE     0,100       100000      2.0e-12     1.3e-14          |
 //|    IEEE     0,10000     100000      1.5e-12     3.2e-14          |
 //+------------------------------------------------------------------+
-static double CBinomialDistr::InvBinomialDistribution(const int k,const int n,
-                                                      const double y)
+double CBinomialDistr::InvBinomialDistribution(const int k,const int n,
+                                               const double y)
   {
 //--- create variables
    double dk=0;
@@ -3586,29 +3844,11 @@ static double CBinomialDistr::InvBinomialDistribution(const int k,const int n,
 class CChebyshev
   {
 public:
-   //--- constructor, destructor
-                     CChebyshev(void);
-                    ~CChebyshev(void);
-   //--- methods
    static double     ChebyshevCalculate(const int r,const int n,const double x);
    static double     ChebyshevSum(double &c[],const int r,const int n,const double x);
    static void       ChebyshevCoefficients(const int n,double &c[]);
    static void       FromChebyshev(double &a[],const int n,double &b[]);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CChebyshev::CChebyshev(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CChebyshev::~CChebyshev(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| Calculation of the value of the Chebyshev polynomials of the     |
 //| first and second kinds.                                          |
@@ -3619,8 +3859,8 @@ CChebyshev::~CChebyshev(void)
 //| Result:                                                          |
 //|     the value of the Chebyshev polynomial at x                   |
 //+------------------------------------------------------------------+
-static double CChebyshev::ChebyshevCalculate(const int r,const int n,
-                                             const double x)
+double CChebyshev::ChebyshevCalculate(const int r,const int n,
+                                      const double x)
   {
 //--- create variables
    double result=0;
@@ -3645,7 +3885,7 @@ static double CChebyshev::ChebyshevCalculate(const int r,const int n,
    if(n==1)
       return(b);
 //--- General case: N>=2
-   for(i=2;i<=n;i++)
+   for(i=2; i<=n; i++)
      {
       result=2*x*b-a;
       a=b;
@@ -3669,8 +3909,8 @@ static double CChebyshev::ChebyshevCalculate(const int r,const int n,
 //| Result:                                                          |
 //|     the value of the Chebyshev polynomial at x                   |
 //+------------------------------------------------------------------+
-static double CChebyshev::ChebyshevSum(double &c[],const int r,const int n,
-                                       const double x)
+double CChebyshev::ChebyshevSum(double &c[],const int r,const int n,
+                                const double x)
   {
 //--- create variables
    double result=0;
@@ -3681,7 +3921,7 @@ static double CChebyshev::ChebyshevSum(double &c[],const int r,const int n,
    b1=0;
    b2=0;
 //--- calculation
-   for(i=n;i>=1;i--)
+   for(i=n; i>=1; i--)
      {
       result=2*x*b1-b2+c[i];
       b2=b1;
@@ -3702,14 +3942,12 @@ static double CChebyshev::ChebyshevSum(double &c[],const int r,const int n,
 //| Output parameters:                                               |
 //|     C   -   coefficients                                         |
 //+------------------------------------------------------------------+
-static void CChebyshev::ChebyshevCoefficients(const int n,double &c[])
+void CChebyshev::ChebyshevCoefficients(const int n,double &c[])
   {
-//--- create a variable
-   int i=0;
 //--- allocation
-   ArrayResizeAL(c,n+1);
-   for(i=0;i<=n;i++)
-      c[i]=0;
+   ArrayResize(c,n+1);
+//--- initialization
+   ArrayInitialize(c,0.0);
 //--- check
    if(n==0 || n==1)
       c[n]=1;
@@ -3717,7 +3955,7 @@ static void CChebyshev::ChebyshevCoefficients(const int n,double &c[])
      {
       c[n]=MathExp((n-1)*MathLog(2));
       //--- calculation
-      for(i=0;i<=n/2-1;i++)
+      for(int i=0; i<=n/2-1; i++)
          c[n-2*(i+1)]=-(c[n-2*i]*(n-2*i)*(n-2*i-1)/4/(i+1)/(n-i-1));
      }
   }
@@ -3732,7 +3970,7 @@ static void CChebyshev::ChebyshevCoefficients(const int n,double &c[])
 //| Output parameters                                                |
 //|     B   -   power series coefficients                            |
 //+------------------------------------------------------------------+
-static void CChebyshev::FromChebyshev(double &a[],const int n,double &b[])
+void CChebyshev::FromChebyshev(double &a[],const int n,double &b[])
   {
 //--- create variables
    int    i=0;
@@ -3740,10 +3978,9 @@ static void CChebyshev::FromChebyshev(double &a[],const int n,double &b[])
    double e=0;
    double d=0;
 //--- allocation
-   ArrayResizeAL(b,n+1);
+   ArrayResize(b,n+1);
 //--- initialization
-   for(i=0;i<=n;i++)
-      b[i]=0;
+   ArrayInitialize(b,0.0);
 //--- calculation
    d=0;
    i=0;
@@ -3794,28 +4031,10 @@ static void CChebyshev::FromChebyshev(double &a[],const int n,double &b[])
 class CChiSquareDistr
   {
 public:
-   //--- constructor, destructor
-                     CChiSquareDistr(void);
-                    ~CChiSquareDistr(void);
-   //--- methods
    static double     ChiSquareDistribution(const double v,const double x);
    static double     ChiSquareComplDistribution(const double v,const double x);
    static double     InvChiSquareDistribution(const double v,const double y);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CChiSquareDistr::CChiSquareDistr(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CChiSquareDistr::~CChiSquareDistr(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| Chi-square distribution                                          |
 //| Returns the area under the left hand tail (from 0 to x)          |
@@ -3836,8 +4055,8 @@ CChiSquareDistr::~CChiSquareDistr(void)
 //| ACCURACY:                                                        |
 //| See incomplete gamma function                                    |
 //+------------------------------------------------------------------+
-static double CChiSquareDistr::ChiSquareDistribution(const double v,
-                                                     const double x)
+double CChiSquareDistr::ChiSquareDistribution(const double v,
+                                              const double x)
   {
 //--- check
    if(!CAp::Assert(x>=0 && v>=1,__FUNCTION__+": the error variable"))
@@ -3865,8 +4084,8 @@ static double CChiSquareDistr::ChiSquareDistribution(const double v,
 //| ACCURACY:                                                        |
 //| See incomplete gamma function                                    |
 //+------------------------------------------------------------------+
-static double CChiSquareDistr::ChiSquareComplDistribution(const double v,
-                                                          const double x)
+double CChiSquareDistr::ChiSquareComplDistribution(const double v,
+                                                   const double x)
   {
 //--- check
    if(!CAp::Assert(x>=0.0 && v>=1.0,__FUNCTION__+": domain error"))
@@ -3885,8 +4104,8 @@ static double CChiSquareDistr::ChiSquareComplDistribution(const double v,
 //| ACCURACY:                                                        |
 //| See inverse incomplete gamma function                            |
 //+------------------------------------------------------------------+
-static double CChiSquareDistr::InvChiSquareDistribution(const double v,
-                                                        const double y)
+double CChiSquareDistr::InvChiSquareDistribution(const double v,
+                                                 const double y)
   {
 //--- check
    if(!CAp::Assert((y>=0.0 && y<=1.0) && v>=1.0,__FUNCTION__+": domain error"))
@@ -3900,26 +4119,8 @@ static double CChiSquareDistr::InvChiSquareDistribution(const double v,
 class CDawson
   {
 public:
-   //--- constructor, destructor
-                     CDawson(void);
-                    ~CDawson(void);
-   //--- method
    static double     DawsonIntegral(double x);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CDawson::CDawson(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CDawson::~CDawson(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| Dawson's Integral                                                |
 //| Approximates the integral                                        |
@@ -3937,21 +4138,18 @@ CDawson::~CDawson(void)
 //| arithmetic   domain     # trials      peak         rms           |
 //|    IEEE      0,10        10000       6.9e-16     1.0e-16         |
 //+------------------------------------------------------------------+
-static double CDawson::DawsonIntegral(double x)
+double CDawson::DawsonIntegral(double x)
   {
 //--- create variables
-   double result=0;
+   int    sg=1;
    double x2=0;
    double y=0;
-   int    sg=0;
    double an=0;
    double ad=0;
    double bn=0;
    double bd=0;
    double cn=0;
    double cd=0;
-//--- initialization
-   sg=1;
 //--- check
    if(x<0.0)
      {
@@ -4044,30 +4242,12 @@ static double CDawson::DawsonIntegral(double x)
 class CElliptic
   {
 public:
-   //--- constructor, destructor
-                     CElliptic(void);
-                    ~CElliptic(void);
-   //--- methods
    static double     EllipticIntegralK(const double m);
    static double     EllipticIntegralKhighPrecision(const double m1);
    static double     IncompleteEllipticIntegralK(double phi,const double m);
    static double     EllipticIntegralE(double m);
    static double     IncompleteEllipticIntegralE(const double phi,const double m);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CElliptic::CElliptic(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CElliptic::~CElliptic(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| Complete elliptic integral of the first kind                     |
 //| Approximates the integral                                        |
@@ -4087,7 +4267,7 @@ CElliptic::~CElliptic(void)
 //| arithmetic   domain     # trials      peak         rms           |
 //|    IEEE       0,1        30000       2.5e-16     6.8e-17         |
 //+------------------------------------------------------------------+
-static double CElliptic::EllipticIntegralK(const double m)
+double CElliptic::EllipticIntegralK(const double m)
   {
 //--- return result
    return(EllipticIntegralKhighPrecision(1.0-m));
@@ -4115,7 +4295,7 @@ static double CElliptic::EllipticIntegralK(const double m)
 //| arithmetic   domain     # trials      peak         rms           |
 //|    IEEE       0,1        30000       2.5e-16     6.8e-17         |
 //+------------------------------------------------------------------+
-static double CElliptic::EllipticIntegralKhighPrecision(const double m1)
+double CElliptic::EllipticIntegralKhighPrecision(const double m1)
   {
 //--- create variables
    double result=0;
@@ -4175,28 +4355,26 @@ static double CElliptic::EllipticIntegralKhighPrecision(const double m1)
 //| arithmetic   domain     # trials      peak         rms           |
 //|    IEEE     -10,10       200000      7.4e-16     1.0e-16         |
 //+------------------------------------------------------------------+
-static double CElliptic::IncompleteEllipticIntegralK(double phi,const double m)
+double CElliptic::IncompleteEllipticIntegralK(double phi,const double m)
   {
 //--- create variables
+   double pio2=1.57079632679489661923;
    double a=0;
    double b=0;
    double c=0;
    double e=0;
    double temp=0;
-   double pio2=0;
    double t=0;
    double k=0;
    int    d=0;
    int    md=0;
    int    s=0;
    int    npio2=0;
-//--- initialization
-   pio2=1.57079632679489661923;
 //--- check
    if(m==0.0)
       return(phi);
 //--- initialization
-   a=1-m;
+   a=1.0-m;
 //--- check
    if(a==0.0)
       return(MathLog(MathTan(0.5*(pio2+phi))));
@@ -4288,7 +4466,7 @@ static double CElliptic::IncompleteEllipticIntegralK(double phi,const double m)
 //| arithmetic   domain     # trials      peak         rms           |
 //|    IEEE       0, 1       10000       2.1e-16     7.3e-17         |
 //+------------------------------------------------------------------+
-static double CElliptic::EllipticIntegralE(double m)
+double CElliptic::EllipticIntegralE(double m)
   {
 //--- create variables
    double p=0;
@@ -4297,10 +4475,10 @@ static double CElliptic::EllipticIntegralE(double m)
    if(!CAp::Assert(m>=0.0 && m<=1.0,__FUNCTION__+": m<0 or m>1"))
       return(EMPTY_VALUE);
 //--- change value
-   m=1-m;
+   m=1.0-m;
 //--- check
    if(m==0.0)
-      return(1);
+      return(1.0);
 //--- calculation
    p=1.53552577301013293365E-4;
    p=p*m+2.50888492163602060990E-3;
@@ -4347,11 +4525,11 @@ static double CElliptic::EllipticIntegralE(double m)
 //| arithmetic   domain     # trials      peak         rms           |
 //|    IEEE     -10,10      150000       3.3e-15     1.4e-16         |
 //+------------------------------------------------------------------+
-static double CElliptic::IncompleteEllipticIntegralE(const double phi,
-                                                     const double m)
+double CElliptic::IncompleteEllipticIntegralE(const double phi,
+                                              const double m)
   {
 //--- create variables
-   double pio2=0;
+   double pio2=1.57079632679489661923;
    double a=0;
    double b=0;
    double c=0;
@@ -4360,12 +4538,10 @@ static double CElliptic::IncompleteEllipticIntegralE(const double phi,
    double lphi=0;
    double t=0;
    double ebig=0;
-   int d=0;
-   int md=0;
-   int npio2=0;
-   int s=0;
-//--- initialization
-   pio2=1.57079632679489661923;
+   int    d=0;
+   int    md=0;
+   int    npio2=0;
+   int    s=0;
 //--- check
    if(m==0.0)
       return(phi);
@@ -4455,27 +4631,9 @@ static double CElliptic::IncompleteEllipticIntegralE(const double phi,
 class CExpIntegrals
   {
 public:
-   //--- constructor, destructor
-                     CExpIntegrals(void);
-                    ~CExpIntegrals(void);
-   //--- methods
    static double     ExponentialIntegralEi(const double x);
    static double     ExponentialIntegralEn(const double x,const int n);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CExpIntegrals::CExpIntegrals(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CExpIntegrals::~CExpIntegrals(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| Exponential integral Ei(x)                                       |
 //|               x                                                  |
@@ -4492,16 +4650,14 @@ CExpIntegrals::~CExpIntegrals(void)
 //| arithmetic   domain     # trials      peak         rms           |
 //|    IEEE       0,100       50000      8.6e-16     1.3e-16         |
 //+------------------------------------------------------------------+
-static double CExpIntegrals::ExponentialIntegralEi(const double x)
+double CExpIntegrals::ExponentialIntegralEi(const double x)
   {
 //--- create variables
-   double eul=0;
+   double eul=0.5772156649015328606065;
    double f=0;
    double f1=0;
    double f2=0;
    double w=0;
-//--- initialization
-   eul=0.5772156649015328606065;
 //--- check
    if(x<=0.0)
       return(0);
@@ -4699,9 +4855,11 @@ static double CExpIntegrals::ExponentialIntegralEi(const double x)
 //| arithmetic   domain     # trials      peak         rms           |
 //|    IEEE      0, 30       10000       1.7e-15     3.6e-16         |
 //+------------------------------------------------------------------+
-static double CExpIntegrals::ExponentialIntegralEn(const double x,const int n)
+double CExpIntegrals::ExponentialIntegralEn(const double x,const int n)
   {
 //--- create variables
+   double eul=0.57721566490153286060;
+   double big=1.44115188075855872*MathPow(10,17);
    double result=0;
    double r=0;
    double t=0;
@@ -4717,11 +4875,6 @@ static double CExpIntegrals::ExponentialIntegralEn(const double x,const int n)
    double z=0;
    int    i=0;
    int    k=0;
-   double big=0;
-   double eul=0;
-//--- initialization
-   eul=0.57721566490153286060;
-   big=1.44115188075855872*MathPow(10,17);
 //--- check
    if(((n<0 || x<0.0) || x>170) || (x==0.0 && n<2))
       return(-1);
@@ -4750,7 +4903,7 @@ static double CExpIntegrals::ExponentialIntegralEn(const double x,const int n)
      {
       //--- calculation
       psi=-eul-MathLog(x);
-      for(i=1;i<=n-1;i++)
+      for(i=1; i<=n-1; i++)
          psi=psi+1.0/(double)i;
       z=-x;
       xk=0;
@@ -4778,7 +4931,7 @@ static double CExpIntegrals::ExponentialIntegralEn(const double x,const int n)
         }
       while(t>=CMath::m_machineepsilon);
       t=1;
-      for(i=1;i<=n-1;i++)
+      for(i=1; i<=n-1; i++)
          t=t*z/i;
       //--- return result
       return(psi*t-result);
@@ -4845,28 +4998,10 @@ static double CExpIntegrals::ExponentialIntegralEn(const double x,const int n)
 class CFDistr
   {
 public:
-   //--- constructor, destructor
-                     CFDistr(void);
-                    ~CFDistr(void);
-   //--- methods
    static double     FDistribution(const int a,const int b,const double x);
    static double     FComplDistribution(const int a,const int b,const double x);
    static double     InvFDistribution(const int a,const int b,const double y);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CFDistr::CFDistr(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CFDistr::~CFDistr(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| F distribution                                                   |
 //| Returns the area from zero to x under the F density              |
@@ -4889,15 +5024,13 @@ CFDistr::~CFDistr(void)
 //|    IEEE      0,1    1,10000     100000      2.2e-11     3.3e-12  |
 //|    IEEE      1,5    1,10000     100000      1.1e-11     1.7e-13  |
 //+------------------------------------------------------------------+
-static double CFDistr::FDistribution(const int a,const int b,const double x)
+double CFDistr::FDistribution(const int a,const int b,const double x)
   {
 //--- check
    if(!CAp::Assert(a>=1 && b>=1 && x>=0,__FUNCTION__+": the error variable"))
       return(EMPTY_VALUE);
-//--- create a variable
-   double w=0;
 //--- calculation
-   w=a*x;
+   double w=a*x;
    w/=b+w;
 //--- return result
    return(CIncBetaF::IncompleteBeta(0.5*a,0.5*b,w));
@@ -4926,15 +5059,13 @@ static double CFDistr::FDistribution(const int a,const int b,const double x)
 //|    IEEE      0,1    1,10000     100000      1.8e-11     3.5e-13  |
 //|    IEEE      1,5    1,10000     100000      2.0e-11     3.0e-12  |
 //+------------------------------------------------------------------+
-static double CFDistr::FComplDistribution(const int a,const int b,const double x)
+double CFDistr::FComplDistribution(const int a,const int b,const double x)
   {
-//--- create a variable
-   double w=0;
 //--- check
    if(!CAp::Assert((a>=1 && b>=1) && x>=0.0,__FUNCTION__+": domain error"))
       return(EMPTY_VALUE);
 //--- calculation
-   w=b/(b+a*x);
+   double w=b/(b+a*x);
 //--- return result
    return(CIncBetaF::IncompleteBeta(0.5*b,0.5*a,w));
   }
@@ -4962,7 +5093,7 @@ static double CFDistr::FComplDistribution(const int a,const int b,const double x
 //|    IEEE     1,100        50000      1.3e-12     8.4e-15          |
 //|    IEEE     1,10000      50000      3.0e-12     4.8e-14          |
 //+------------------------------------------------------------------+
-static double CFDistr::InvFDistribution(const int a,const int b,const double y)
+double CFDistr::InvFDistribution(const int a,const int b,const double y)
   {
 //--- create variables
    double result=0;
@@ -4995,26 +5126,8 @@ static double CFDistr::InvFDistribution(const int a,const int b,const double y)
 class CFresnel
   {
 public:
-   //--- constructor, destructor
-                     CFresnel(void);
-                    ~CFresnel(void);
-   //--- method
    static void       FresnelIntegral(double x,double &c,double &s);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CFresnel::CFresnel(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CFresnel::~CFresnel(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| Fresnel integral                                                 |
 //| Evaluates the Fresnel integrals                                  |
@@ -5043,7 +5156,7 @@ CFresnel::~CFresnel(void)
 //|   IEEE       S(x)      0, 10       10000       2.0e-15    3.2e-16|
 //|   IEEE       C(x)      0, 10       10000       1.8e-15    3.3e-16|
 //+------------------------------------------------------------------+
-static void CFresnel::FresnelIntegral(double x,double &c,double &s)
+void CFresnel::FresnelIntegral(double x,double &c,double &s)
   {
 //--- create variables
    double xxa=0;
@@ -5182,28 +5295,10 @@ static void CFresnel::FresnelIntegral(double x,double &c,double &s)
 class CHermite
   {
 public:
-   //--- constructor, destructor
-                     CHermite(void);
-                    ~CHermite(void);
-   //--- methods
    static double     HermiteCalculate(const int n,const double x);
    static double     HermiteSum(double &c[],const int n,const double x);
    static void       HermiteCoefficients(const int n,double &c[]);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CHermite::CHermite(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CHermite::~CHermite(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| Calculation of the value of the Hermite polynomial.              |
 //| Parameters:                                                      |
@@ -5212,16 +5307,12 @@ CHermite::~CHermite(void)
 //| Result:                                                          |
 //|     the value of the Hermite polynomial Hn at x                  |
 //+------------------------------------------------------------------+
-static double CHermite::HermiteCalculate(const int n,const double x)
+double CHermite::HermiteCalculate(const int n,const double x)
   {
 //--- create variables
    double result=0;
-   int    i=0;
-   double a=0;
-   double b=0;
-//--- Prepare A and B
-   a=1;
-   b=2*x;
+   double a=1.0;
+   double b=2.0*x;
 //--- Special cases: N=0 or N=1
    if(n==0)
       return(a);
@@ -5229,7 +5320,7 @@ static double CHermite::HermiteCalculate(const int n,const double x)
    if(n==1)
       return(b);
 //--- General case: N>=2
-   for(i=2;i<=n;i++)
+   for(int i=2; i<=n; i++)
      {
       result=2*x*b-2*(i-1)*a;
       a=b;
@@ -5249,18 +5340,14 @@ static double CHermite::HermiteCalculate(const int n,const double x)
 //| Result:                                                          |
 //|     the value of the Hermite polynomial at x                     |
 //+------------------------------------------------------------------+
-static double CHermite::HermiteSum(double &c[],const int n,const double x)
+double CHermite::HermiteSum(double &c[],const int n,const double x)
   {
 //--- create variables
    double result=0;
    double b1=0;
    double b2=0;
-   int    i=0;
-//--- initialization
-   b1=0;
-   b2=0;
 //--- calculation
-   for(i=n;i>=0;i--)
+   for(int i=n; i>=0; i--)
      {
       result=2*(x*b1-(i+1)*b2)+c[i];
       b2=b1;
@@ -5276,18 +5363,15 @@ static double CHermite::HermiteSum(double &c[],const int n,const double x)
 //| Output parameters:                                               |
 //|     C   -   coefficients                                         |
 //+------------------------------------------------------------------+
-static void CHermite::HermiteCoefficients(const int n,double &c[])
+void CHermite::HermiteCoefficients(const int n,double &c[])
   {
-//--- create a variable
-   int i=0;
 //--- allocation
-   ArrayResizeAL(c,n+1);
+   ArrayResize(c,n+1);
 //--- initialization
-   for(i=0;i<=n;i++)
-      c[i]=0;
+   ArrayInitialize(c,0.0);
 //--- calculation
    c[n]=MathExp(n*MathLog(2));
-   for(i=0;i<=n/2-1;i++)
+   for(int i=0; i<=n/2-1; i++)
       c[n-2*(i+1)]=-(c[n-2*i]*(n-2*i)*(n-2*i-1)/4/(i+1));
   }
 //+------------------------------------------------------------------+
@@ -5296,26 +5380,8 @@ static void CHermite::HermiteCoefficients(const int n,double &c[])
 class CJacobianElliptic
   {
 public:
-   //--- constructor, destructor
-                     CJacobianElliptic(void);
-                    ~CJacobianElliptic(void);
-   //--- method
    static void       JacobianEllipticFunctions(const double u,const double m,double &sn,double &cn,double &dn,double &ph);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CJacobianElliptic::CJacobianElliptic(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CJacobianElliptic::~CJacobianElliptic(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| Jacobian Elliptic Functions                                      |
 //| Evaluates the Jacobian elliptic functions sn(u|m), cn(u|m),      |
@@ -5345,10 +5411,10 @@ CJacobianElliptic::~CJacobianElliptic(void)
 //| the above relation to the incomplete elliptic integral.          |
 //| Accuracy deteriorates when u is large.                           |
 //+------------------------------------------------------------------+
-static void CJacobianElliptic::JacobianEllipticFunctions(const double u,
-                                                         const double m,
-                                                         double &sn,double &cn,
-                                                         double &dn,double &ph)
+void CJacobianElliptic::JacobianEllipticFunctions(const double u,
+                                                  const double m,
+                                                  double &sn,double &cn,
+                                                  double &dn,double &ph)
   {
 //--- create variables
    double ai=0;
@@ -5369,8 +5435,8 @@ static void CJacobianElliptic::JacobianEllipticFunctions(const double u,
    if(!CAp::Assert(m>=0.0 && m<=1.0,__FUNCTION__+": m<0 or m>1"))
       return;
 //--- allocation
-   ArrayResizeAL(a,9);
-   ArrayResizeAL(c,9);
+   ArrayResize(a,9);
+   ArrayResize(c,9);
 //--- check
    if(m<1.0e-9)
      {
@@ -5453,28 +5519,10 @@ static void CJacobianElliptic::JacobianEllipticFunctions(const double u,
 class CLaguerre
   {
 public:
-   //--- constructor, destructor
-                     CLaguerre(void);
-                    ~CLaguerre(void);
-   //--- methods
    static double     LaguerreCalculate(const int n,const double x);
    static double     LaguerreSum(double &c[],const int n,const double x);
    static void       LaguerreCoefficients(const int n,double &c[]);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CLaguerre::CLaguerre(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CLaguerre::~CLaguerre(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| Calculation of the value of the Laguerre polynomial.             |
 //| Parameters:                                                      |
@@ -5483,7 +5531,7 @@ CLaguerre::~CLaguerre(void)
 //| Result:                                                          |
 //|     the value of the Laguerre polynomial Ln at x                 |
 //+------------------------------------------------------------------+
-static double CLaguerre::LaguerreCalculate(const int n,const double x)
+double CLaguerre::LaguerreCalculate(const int n,const double x)
   {
 //--- create variables
    double result=0;
@@ -5522,19 +5570,14 @@ static double CLaguerre::LaguerreCalculate(const int n,const double x)
 //| Result:                                                          |
 //|     the value of the Laguerre polynomial at x                    |
 //+------------------------------------------------------------------+
-static double CLaguerre::LaguerreSum(double &c[],const int n,const double x)
+double CLaguerre::LaguerreSum(double &c[],const int n,const double x)
   {
 //--- create variables
    double result=0;
    double b1=0;
    double b2=0;
-   int    i=0;
-//--- initialization
-   b1=0;
-   b2=0;
-   result=0;
 //--- calculation
-   for(i=n;i>=0;i--)
+   for(int i=n; i>=0; i--)
      {
       result=(2*i+1-x)*b1/(i+1)-(i+1)*b2/(i+2)+c[i];
       b2=b1;
@@ -5550,16 +5593,14 @@ static double CLaguerre::LaguerreSum(double &c[],const int n,const double x)
 //| Output parameters:                                               |
 //|     C   -   coefficients                                         |
 //+------------------------------------------------------------------+
-static void CLaguerre::LaguerreCoefficients(const int n,double &c[])
+void CLaguerre::LaguerreCoefficients(const int n,double &c[])
   {
-//--- create a variable
-   int i=0;
 //--- allocation
-   ArrayResizeAL(c,n+1);
+   ArrayResize(c,n+1);
 //--- initialization
    c[0]=1;
 //--- calculation
-   for(i=0;i<=n-1;i++)
+   for(int i=0; i<n; i++)
       c[i+1]=-(c[i]*(n-i)/(i+1)/(i+1));
   }
 //+------------------------------------------------------------------+
@@ -5568,28 +5609,10 @@ static void CLaguerre::LaguerreCoefficients(const int n,double &c[])
 class CLegendre
   {
 public:
-   //--- constructor, destructor
-                     CLegendre(void);
-                    ~CLegendre(void);
-   //--- methods
    static double     LegendreCalculate(const int n,const double x);
    static double     LegendreSum(double &c[],const int n,const double x);
    static void       LegendreCoefficients(const int n,double &c[]);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CLegendre::CLegendre(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CLegendre::~CLegendre(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| Calculation of the value of the Legendre polynomial Pn.          |
 //| Parameters:                                                      |
@@ -5598,17 +5621,12 @@ CLegendre::~CLegendre(void)
 //| Result:                                                          |
 //|     the value of the Legendre polynomial Pn at x                 |
 //+------------------------------------------------------------------+
-static double CLegendre::LegendreCalculate(const int n,const double x)
+double CLegendre::LegendreCalculate(const int n,const double x)
   {
 //--- create variables
-   double result=0;
-   double a=0;
-   double b=0;
-   int    i=0;
-//--- initialization
-   result=1;
-   a=1;
-   b=x;
+   double result=1.0;
+   double a=1.0;
+   double b=x;
 //--- check
    if(n==0)
       return(a);
@@ -5616,7 +5634,7 @@ static double CLegendre::LegendreCalculate(const int n,const double x)
    if(n==1)
       return(b);
 //--- calculation
-   for(i=2;i<=n;i++)
+   for(int i=2; i<=n; i++)
      {
       result=((2*i-1)*x*b-(i-1)*a)/i;
       a=b;
@@ -5636,19 +5654,14 @@ static double CLegendre::LegendreCalculate(const int n,const double x)
 //| Result:                                                          |
 //|     the value of the Legendre polynomial at x                    |
 //+------------------------------------------------------------------+
-static double CLegendre::LegendreSum(double &c[],const int n,const double x)
+double CLegendre::LegendreSum(double &c[],const int n,const double x)
   {
 //--- create variables
    double result=0;
    double b1=0;
    double b2=0;
-   int    i=0;
-//--- initialization
-   b1=0;
-   b2=0;
-   result=0;
 //--- calculation
-   for(i=n;i>=0;i--)
+   for(int i=n; i>=0; i--)
      {
       result=(2*i+1)*x*b1/(i+1)-(i+1)*b2/(i+2)+c[i];
       b2=b1;
@@ -5664,20 +5677,17 @@ static double CLegendre::LegendreSum(double &c[],const int n,const double x)
 //| Output parameters:                                               |
 //|     C   -   coefficients                                         |
 //+------------------------------------------------------------------+
-static void CLegendre::LegendreCoefficients(const int n,double &c[])
+void CLegendre::LegendreCoefficients(const int n,double &c[])
   {
-//--- create a variable
-   int i=0;
 //--- allocation
-   ArrayResizeAL(c,n+1);
+   ArrayResize(c,n+1);
 //--- initialization
-   for(i=0;i<=n;i++)
-      c[i]=0;
+   ArrayInitialize(c,0.0);
    c[n]=1;
 //--- calculation
-   for(i=1;i<=n;i++)
+   for(int i=1; i<=n; i++)
       c[n]=c[n]*(n+i)/2/i;
-   for(i=0;i<=n/2-1;i++)
+   for(int i=0; i<=n/2-1; i++)
       c[n-2*(i+1)]=-(c[n-2*i]*(n-2*i)*(n-2*i-1)/2/(i+1)/(2*(n-i)-1));
   }
 //+------------------------------------------------------------------+
@@ -5686,28 +5696,10 @@ static void CLegendre::LegendreCoefficients(const int n,double &c[])
 class CPoissonDistr
   {
 public:
-   //--- constructor, destructor
-                     CPoissonDistr(void);
-                    ~CPoissonDistr(void);
-   //--- methods
    static double     PoissonDistribution(const int k,const double m);
    static double     PoissonComplDistribution(const int k,const double m);
    static double     InvPoissonDistribution(const int k,const double y);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CPoissonDistr::CPoissonDistr(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CPoissonDistr::~CPoissonDistr(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| Poisson distribution                                             |
 //| Returns the sum of the first k+1 terms of the Poisson            |
@@ -5724,7 +5716,7 @@ CPoissonDistr::~CPoissonDistr(void)
 //| ACCURACY:                                                        |
 //| See incomplete gamma function                                    |
 //+------------------------------------------------------------------+
-static double CPoissonDistr::PoissonDistribution(const int k,const double m)
+double CPoissonDistr::PoissonDistribution(const int k,const double m)
   {
 //--- check
    if(!CAp::Assert(k>=0 && m>0.0,__FUNCTION__+": domain error"))
@@ -5748,7 +5740,7 @@ static double CPoissonDistr::PoissonDistribution(const int k,const double m)
 //| ACCURACY:                                                        |
 //| See incomplete gamma function                                    |
 //+------------------------------------------------------------------+
-static double CPoissonDistr::PoissonComplDistribution(const int k,const double m)
+double CPoissonDistr::PoissonComplDistribution(const int k,const double m)
   {
 //--- check
    if(!CAp::Assert(k>=0 && m>0.0,__FUNCTION__+": domain error"))
@@ -5767,7 +5759,7 @@ static double CPoissonDistr::PoissonComplDistribution(const int k,const double m
 //| ACCURACY:                                                        |
 //| See inverse incomplete gamma function                            |
 //+------------------------------------------------------------------+
-static double CPoissonDistr::InvPoissonDistribution(const int k,const double y)
+double CPoissonDistr::InvPoissonDistribution(const int k,const double y)
   {
 //--- check
    if(!CAp::Assert((k>=0 && y>=0.0) && y<1.0,__FUNCTION__+": domain error"))
@@ -5781,26 +5773,8 @@ static double CPoissonDistr::InvPoissonDistribution(const int k,const double y)
 class CPsiF
   {
 public:
-   //--- constructor, destructor
-                     CPsiF(void);
-                    ~CPsiF(void);
-   //--- method
    static double     Psi(double x);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CPsiF::CPsiF(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CPsiF::~CPsiF(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| Psi (digamma) function                                           |
 //|              d      -                                            |
@@ -5831,10 +5805,9 @@ CPsiF::~CPsiF(void)
 //|    IEEE      0,30        30000       1.3e-15     1.4e-16         |
 //|    IEEE      -30,0       40000       1.5e-15     2.2e-16         |
 //+------------------------------------------------------------------+
-static double CPsiF::Psi(double x)
+double CPsiF::Psi(double x)
   {
 //--- create variables
-   double result=0;
    double p=0;
    double q=0;
    double nz=0;
@@ -5846,9 +5819,6 @@ static double CPsiF::Psi(double x)
    int    i=0;
    int    n=0;
    int    negative=0;
-//--- initialization
-   negative=0;
-   nz=0.0;
 //--- check
    if(x<=0.0)
      {
@@ -5887,7 +5857,7 @@ static double CPsiF::Psi(double x)
       y=0.0;
       n=(int)MathFloor(x);
       //--- calculation
-      for(i=1;i<=n-1;i++)
+      for(i=1; i<=n-1; i++)
         {
          w=i;
          y=y+1.0/w;
@@ -5936,27 +5906,9 @@ static double CPsiF::Psi(double x)
 class CStudenttDistr
   {
 public:
-   //--- constructor, destructor
-                     CStudenttDistr(void);
-                    ~CStudenttDistr(void);
-   //--- methods
    static double     StudenttDistribution(const int k,const double t);
    static double     InvStudenttDistribution(const int k,double p);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CStudenttDistr::CStudenttDistr(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CStudenttDistr::~CStudenttDistr(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| Student's t distribution                                         |
 //| Computes the integral from minus infinity to t of the Student    |
@@ -5982,13 +5934,13 @@ CStudenttDistr::~CStudenttDistr(void)
 //| right tail of the density is found by calling the function       |
 //| with -t instead of t.                                            |
 //| ACCURACY:                                                        |
-//| Tested at random 1 <= k <= 25.  The "domain" refers to t.        |
+//| Tested at random 1<=k<=25.  The "domain" refers to t.        |
 //|                      Relative error:                             |
 //| arithmetic   domain     # trials      peak         rms           |
 //|    IEEE     -100,-2      50000       5.9e-15     1.4e-15         |
 //|    IEEE     -2,100      500000       2.7e-15     4.9e-17         |
 //+------------------------------------------------------------------+
-static double CStudenttDistr::StudenttDistribution(const int k,const double t)
+double CStudenttDistr::StudenttDistribution(const int k,const double t)
   {
 //--- check
    if(!CAp::Assert(k>0,__FUNCTION__+": the error variable"))
@@ -6070,13 +6022,13 @@ static double CStudenttDistr::StudenttDistribution(const int k,const double t)
 //| Given probability p, finds the argument t such that stdtr(k,t)   |
 //| is equal to p.                                                   |
 //| ACCURACY:                                                        |
-//| Tested at random 1 <= k <= 100.  The "domain" refers to p:       |
+//| Tested at random 1<=k<=100.  The "domain" refers to p:       |
 //|                      Relative error:                             |
 //| arithmetic   domain     # trials      peak         rms           |
 //|    IEEE    .001,.999     25000       5.7e-15     8.0e-16         |
 //|    IEEE    10^-6,.001    25000       2.0e-12     2.9e-14         |
 //+------------------------------------------------------------------+
-static double CStudenttDistr::InvStudenttDistribution(const int k,double p)
+double CStudenttDistr::InvStudenttDistribution(const int k,double p)
   {
 //--- create variables
    double    t=0;
@@ -6116,6 +6068,7 @@ static double CStudenttDistr::InvStudenttDistribution(const int k,double p)
 //--- check
    if(CMath::m_maxrealnumber*z<rk)
       return(rflg*CMath::m_maxrealnumber);
+
    t=MathSqrt(rk/z-rk);
 //--- return result
    return(rflg*t);
@@ -6125,31 +6078,13 @@ static double CStudenttDistr::InvStudenttDistribution(const int k,double p)
 //+------------------------------------------------------------------+
 class CTrigIntegrals
   {
-private:
-   //--- private method
-   static void       ChebIterationShiChi(const double x,const double c,double &b0,double &b1,double &b2);
 public:
-   //--- constructor, destructor
-                     CTrigIntegrals(void);
-                    ~CTrigIntegrals(void);
-   //--- public methods
    static void       SineCosineIntegrals(double x,double &si,double &ci);
    static void       HyperbolicSineCosineIntegrals(double x,double &shi,double &chi);
+
+private:
+   static void       ChebIterationShiChi(const double x,const double c,double &b0,double &b1,double &b2);
   };
-//+------------------------------------------------------------------+
-//| Constructor without parameters                                   |
-//+------------------------------------------------------------------+
-CTrigIntegrals::CTrigIntegrals(void)
-  {
-
-  }
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-CTrigIntegrals::~CTrigIntegrals(void)
-  {
-
-  }
 //+------------------------------------------------------------------+
 //| Sine and cosine integrals                                        |
 //| Evaluates the integrals                                          |
@@ -6180,7 +6115,7 @@ CTrigIntegrals::~CTrigIntegrals(void)
 //|    IEEE        Si        30000       4.4e-16     7.3e-17         |
 //|    IEEE        Ci        30000       6.9e-16     5.1e-17         |
 //+------------------------------------------------------------------+
-static void CTrigIntegrals::SineCosineIntegrals(double x,double &si,double &ci)
+void CTrigIntegrals::SineCosineIntegrals(double x,double &si,double &ci)
   {
 //--- create variables
    double z=0;
@@ -6386,9 +6321,9 @@ static void CTrigIntegrals::SineCosineIntegrals(double x,double &si,double &ci)
 //|        Absolute error, except relative when |Chi| > 1:           |
 //|    IEEE         Chi      30000       8.4e-16     1.4e-16         |
 //+------------------------------------------------------------------+
-static void CTrigIntegrals::HyperbolicSineCosineIntegrals(double x,
-                                                          double &shi,
-                                                          double &chi)
+void CTrigIntegrals::HyperbolicSineCosineIntegrals(double x,
+                                                   double &shi,
+                                                   double &chi)
   {
 //--- create variables
    double k=0;
@@ -6588,8 +6523,8 @@ static void CTrigIntegrals::HyperbolicSineCosineIntegrals(double x,
 //+------------------------------------------------------------------+
 //| Internal subroutine                                              |
 //+------------------------------------------------------------------+
-static void CTrigIntegrals::ChebIterationShiChi(const double x,const double c,
-                                                double &b0,double &b1,double &b2)
+void CTrigIntegrals::ChebIterationShiChi(const double x,const double c,
+                                         double &b0,double &b1,double &b2)
   {
 //--- change values
    b2=b1;

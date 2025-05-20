@@ -1,6 +1,6 @@
 //+------------------------------------------------------------------+
 //|                                               NoncentralBeta.mqh |
-//|                   Copyright 2016-2017, MetaQuotes Software Corp. |
+//|                             Copyright 2000-2025, MetaQuotes Ltd. |
 //|                                             https://www.mql5.com |
 //+------------------------------------------------------------------+
 #include "Math.mqh"
@@ -834,8 +834,8 @@ double MathRandomNoncentralBeta(const double a,const double b,const double lambd
 
    error_code=ERR_OK;
 //--- generate random number using Noncentral ChiSquare
-   double chi1=MathRandomNoncentralChiSquare(2*a,2*lambda,error_code);
-   double chi2=MathRandomNoncentralChiSquare(2*b,2*lambda,error_code);
+   double chi1=MathRandomNoncentralChiSquare(2*a,lambda,error_code);
+   double chi2=MathRandomChiSquare(2*b,error_code);
    return chi1/(chi1+chi2);
   }
 //+------------------------------------------------------------------+
@@ -869,14 +869,13 @@ bool MathRandomNoncentralBeta(const double a,const double b,const double lambda,
    int error_code=0;
 //--- prepare output array and calculate random values
    ArrayResize(result,data_count);
-   double lambda2=lambda*2;
    double a2=a*2;
    double b2=b*2;
    for(int i=0; i<data_count; i++)
      {
       //--- generate random number using Noncentral ChiSquare
-      double chi1=MathRandomNoncentralChiSquare(a2,lambda2,error_code);
-      double chi2=MathRandomNoncentralChiSquare(b2,lambda2,error_code);
+      double chi1=MathRandomNoncentralChiSquare(a2,lambda,error_code);
+      double chi2=MathRandomChiSquare(b2,error_code);
       result[i]=chi1/(chi1+chi2);
      }
    return true;
